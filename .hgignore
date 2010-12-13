@@ -3,3 +3,6 @@ syntax: glob
 
 # ignore compiled python files
 *.pyc
+
+# ignore sphinx build dir
+doc/_build
