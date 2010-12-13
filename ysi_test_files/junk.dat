@@ -1,0 +1,1050 @@
+Record Type = A
+File Location = 0
+A	1
+600	2
+870489733	4
+304	2
+NotSet	16
+trin 6J1735AC 26jan07	32
+*[	6
+3600	4
+722858400	4
+722858408	4
+ ñ+	36
+Starttime = 7 1 26 10 0 8 
+Record Type = B
+File Location = 111
+Channel *****************
+B
+2
+1
+0
+0
+0
+Record Type = B
+File Location = 126
+Channel *****************
+B
+7
+4
+0
+0
+0
+Record Type = B
+File Location = 141
+Channel *****************
+B
+25
+22
+0
+0
+0
+Record Type = B
+File Location = 156
+Channel *****************
+B
+75
+28
+0
+0
+0
+Record Type = D
+File Location = 171
+Reading D : 0
+D
+722858408
+15.9946
+Record Type = D
+File Location = 318
+Reading D : 1
+D
+722883608
+10.1178
+Record Type = D
+File Location = 465
+Reading D : 2
+D
+722908808
+10.5179
+Record Type = D
+File Location = 612
+Reading D : 3
+D
+722934008
+10.4565
+Record Type = D
+File Location = 759
+Reading D : 4
+D
+722959208
+10.1865
+Record Type = D
+File Location = 906
+Reading D : 5
+D
+722984408
+10.7422
+Record Type = D
+File Location = 1053
+Reading D : 6
+D
+723009608
+11.0938
+Record Type = D
+File Location = 1200
+Reading D : 7
+D
+723034808
+11.0004
+Record Type = D
+File Location = 1347
+Reading D : 8
+D
+723060008
+11.2851
+Record Type = D
+File Location = 1494
+Reading D : 9
+D
+723085208
+10.744
+Record Type = D
+File Location = 1641
+Reading D : 10
+D
+723110408
+10.1114
+Record Type = D
+File Location = 1788
+Reading D : 11
+D
+723135608
+10.6012
+Record Type = D
+File Location = 1935
+Reading D : 12
+D
+723160808
+10.5289
+Record Type = D
+File Location = 2082
+Reading D : 13
+D
+723186008
+10.4391
+Record Type = D
+File Location = 2229
+Reading D : 14
+D
+723211208
+10.3906
+Record Type = D
+File Location = 2376
+Reading D : 15
+D
+723236408
+10.3247
+Record Type = D
+File Location = 2523
+Reading D : 16
+D
+723261608
+10.1315
+Record Type = D
+File Location = 2670
+Reading D : 17
+D
+723286808
+9.85413
+Record Type = D
+File Location = 2817
+Reading D : 18
+D
+723312008
+9.99329
+Record Type = D
+File Location = 2964
+Reading D : 19
+D
+723337208
+9.66187
+Record Type = D
+File Location = 3111
+Reading D : 20
+D
+723362408
+9.4696
+Record Type = D
+File Location = 3258
+Reading D : 21
+D
+723387608
+9.65729
+Record Type = D
+File Location = 3405
+Reading D : 22
+D
+723412808
+9.63531
+Record Type = D
+File Location = 3552
+Reading D : 23
+D
+723438008
+9.73145
+Record Type = D
+File Location = 3699
+Reading D : 24
+D
+723463208
+9.48517
+Record Type = D
+File Location = 3846
+Reading D : 25
+D
+723488408
+9.76166
+Record Type = D
+File Location = 3993
+Reading D : 26
+D
+723513608
+9.32861
+Record Type = D
+File Location = 4140
+Reading D : 27
+D
+723538808
+8.85803
+Record Type = D
+File Location = 4287
+Reading D : 28
+D
+723564008
+9.33411
+Record Type = D
+File Location = 4434
+Reading D : 29
+D
+723589208
+9.38538
+Record Type = D
+File Location = 4581
+Reading D : 30
+D
+723614408
+9.56665
+Record Type = D
+File Location = 4728
+Reading D : 31
+D
+723639608
+9.01642
+Record Type = D
+File Location = 4875
+Reading D : 32
+D
+723664808
+9.18579
+Record Type = D
+File Location = 5022
+Reading D : 33
+D
+723690008
+9.47693
+Record Type = D
+File Location = 5169
+Reading D : 34
+D
+723715208
+10.213
+Record Type = D
+File Location = 5316
+Reading D : 35
+D
+723740408
+9.53278
+Record Type = D
+File Location = 5463
+Reading D : 36
+D
+723765608
+9.99603
+Record Type = D
+File Location = 5610
+Reading D : 37
+D
+723790808
+9.99695
+Record Type = D
+File Location = 5757
+Reading D : 38
+D
+723816008
+10.8237
+Record Type = D
+File Location = 5904
+Reading D : 39
+D
+723841208
+11.5973
+Record Type = D
+File Location = 6051
+Reading D : 40
+D
+723866408
+11.5021
+Record Type = D
+File Location = 6198
+Reading D : 41
+D
+723891608
+11.5524
+Record Type = D
+File Location = 6345
+Reading D : 42
+D
+723916808
+11.9846
+Record Type = D
+File Location = 6492
+Reading D : 43
+D
+723942008
+12.2272
+Record Type = D
+File Location = 6639
+Reading D : 44
+D
+723967208
+12.2629
+Record Type = D
+File Location = 6786
+Reading D : 45
+D
+723992408
+12.7115
+Record Type = D
+File Location = 6933
+Reading D : 46
+D
+724017608
+12.814
+Record Type = D
+File Location = 7080
+Reading D : 47
+D
+724042808
+13.8074
+Record Type = D
+File Location = 7227
+Reading D : 48
+D
+724068008
+13.6829
+Record Type = D
+File Location = 7374
+Reading D : 49
+D
+724093208
+13.6005
+Record Type = D
+File Location = 7521
+Reading D : 50
+D
+724118408
+12.9376
+Record Type = D
+File Location = 7668
+Reading D : 51
+D
+724143608
+12.4588
+Record Type = D
+File Location = 7815
+Reading D : 52
+D
+724168808
+12.2894
+Record Type = D
+File Location = 7962
+Reading D : 53
+D
+724194008
+12.229
+Record Type = D
+File Location = 8109
+Reading D : 54
+D
+724219208
+11.8784
+Record Type = D
+File Location = 8256
+Reading D : 55
+D
+724244408
+11.7053
+Record Type = D
+File Location = 8403
+Reading D : 56
+D
+724269608
+11.9214
+Record Type = D
+File Location = 8550
+Reading D : 57
+D
+724294808
+11.8243
+Record Type = D
+File Location = 8697
+Reading D : 58
+D
+724320008
+11.8948
+Record Type = D
+File Location = 8844
+Reading D : 59
+D
+724345208
+12.4057
+Record Type = D
+File Location = 8991
+Reading D : 60
+D
+724370408
+12.7902
+Record Type = D
+File Location = 9138
+Reading D : 61
+D
+724395608
+12.8809
+Record Type = D
+File Location = 9285
+Reading D : 62
+D
+724420808
+13.2123
+Record Type = D
+File Location = 9432
+Reading D : 63
+D
+724446008
+13.3881
+Record Type = D
+File Location = 9579
+Reading D : 64
+D
+724471208
+12.2482
+Record Type = D
+File Location = 9726
+Reading D : 65
+D
+724496408
+11.2173
+Record Type = D
+File Location = 9873
+Reading D : 66
+D
+724521608
+11.2878
+Record Type = D
+File Location = 10020
+Reading D : 67
+D
+724546808
+10.7532
+Record Type = D
+File Location = 10167
+Reading D : 68
+D
+724572008
+9.81293
+Record Type = D
+File Location = 10314
+Reading D : 69
+D
+724597208
+10.0253
+Record Type = D
+File Location = 10461
+Reading D : 70
+D
+724622408
+10.0922
+Record Type = D
+File Location = 10608
+Reading D : 71
+D
+724647608
+9.00085
+Record Type = D
+File Location = 10755
+Reading D : 72
+D
+724672808
+8.41675
+Record Type = D
+File Location = 10902
+Reading D : 73
+D
+724698008
+9.38263
+Record Type = D
+File Location = 11049
+Reading D : 74
+D
+724723208
+8.93127
+Record Type = D
+File Location = 11196
+Reading D : 75
+D
+724748408
+8.85712
+Record Type = D
+File Location = 11343
+Reading D : 76
+D
+724773608
+9.83856
+Record Type = D
+File Location = 11490
+Reading D : 77
+D
+724798808
+10.0848
+Record Type = D
+File Location = 11637
+Reading D : 78
+D
+724824008
+9.80927
+Record Type = D
+File Location = 11784
+Reading D : 79
+D
+724849208
+9.29932
+Record Type = D
+File Location = 11931
+Reading D : 80
+D
+724874408
+10.6827
+Record Type = D
+File Location = 12078
+Reading D : 81
+D
+724899608
+10.2359
+Record Type = D
+File Location = 12225
+Reading D : 82
+D
+724924808
+10.4117
+Record Type = D
+File Location = 12372
+Reading D : 83
+D
+724950008
+11.4545
+Record Type = D
+File Location = 12519
+Reading D : 84
+D
+724975208
+11.0416
+Record Type = D
+File Location = 12666
+Reading D : 85
+D
+725000408
+11.2
+Record Type = D
+File Location = 12813
+Reading D : 86
+D
+725025608
+11.741
+Record Type = D
+File Location = 12960
+Reading D : 87
+D
+725050808
+12.0331
+Record Type = D
+File Location = 13107
+Reading D : 88
+D
+725076008
+11.9424
+Record Type = D
+File Location = 13254
+Reading D : 89
+D
+725101208
+11.9534
+Record Type = D
+File Location = 13401
+Reading D : 90
+D
+725126408
+13.4641
+Record Type = D
+File Location = 13548
+Reading D : 91
+D
+725151608
+14.5682
+Record Type = D
+File Location = 13695
+Reading D : 92
+D
+725176808
+13.6087
+Record Type = D
+File Location = 13842
+Reading D : 93
+D
+725202008
+13.811
+Record Type = D
+File Location = 13989
+Reading D : 94
+D
+725227208
+14.8859
+Record Type = D
+File Location = 14136
+Reading D : 95
+D
+725252408
+14.7018
+Record Type = D
+File Location = 14283
+Reading D : 96
+D
+725277608
+14.711
+Record Type = D
+File Location = 14430
+Reading D : 97
+D
+725302808
+15.0735
+Record Type = D
+File Location = 14577
+Reading D : 98
+D
+725328008
+14.9371
+Record Type = D
+File Location = 14724
+Reading D : 99
+D
+725353208
+15.1019
+Record Type = D
+File Location = 14871
+Reading D : 100
+D
+725378408
+15.578
+Record Type = D
+File Location = 15018
+Reading D : 101
+D
+725403608
+15.6815
+Record Type = D
+File Location = 15165
+Reading D : 102
+D
+725428808
+15.3784
+Record Type = D
+File Location = 15312
+Reading D : 103
+D
+725454008
+15.2896
+Record Type = D
+File Location = 15459
+Reading D : 104
+D
+725479208
+15.578
+Record Type = D
+File Location = 15606
+Reading D : 105
+D
+725504408
+15.5533
+Record Type = D
+File Location = 15753
+Reading D : 106
+D
+725529608
+15.4572
+Record Type = D
+File Location = 15900
+Reading D : 107
+D
+725554808
+16.488
+Record Type = D
+File Location = 16047
+Reading D : 108
+D
+725580008
+16.4542
+Record Type = D
+File Location = 16194
+Reading D : 109
+D
+725605208
+16.5842
+Record Type = D
+File Location = 16341
+Reading D : 110
+D
+725630408
+16.51
+Record Type = D
+File Location = 16488
+Reading D : 111
+D
+725655608
+17.16
+Record Type = D
+File Location = 16635
+Reading D : 112
+D
+725680808
+17.2873
+Record Type = D
+File Location = 16782
+Reading D : 113
+D
+725706008
+17.3303
+Record Type = D
+File Location = 16929
+Reading D : 114
+D
+725731208
+18.0719
+Record Type = D
+File Location = 17076
+Reading D : 115
+D
+725756408
+18.0856
+Record Type = D
+File Location = 17223
+Reading D : 116
+D
+725781608
+18.1552
+Record Type = D
+File Location = 17370
+Reading D : 117
+D
+725806808
+18.3694
+Record Type = D
+File Location = 17517
+Reading D : 118
+D
+725832008
+18.3438
+Record Type = D
+File Location = 17664
+Reading D : 119
+D
+725857208
+17.6233
+Record Type = D
+File Location = 17811
+Reading D : 120
+D
+725882408
+17.2543
+Record Type = D
+File Location = 17958
+Reading D : 121
+D
+725907608
+18.1506
+Record Type = D
+File Location = 18105
+Reading D : 122
+D
+725932808
+17.6718
+Record Type = D
+File Location = 18252
+Reading D : 123
+D
+725958008
+16.976
+Record Type = D
+File Location = 18399
+Reading D : 124
+D
+725983208
+17.4713
+Record Type = D
+File Location = 18546
+Reading D : 125
+D
+726008408
+17.0987
+Record Type = D
+File Location = 18693
+Reading D : 126
+D
+726033608
+15.8353
+Record Type = D
+File Location = 18840
+Reading D : 127
+D
+726058808
+15.1038
+Record Type = D
+File Location = 18987
+Reading D : 128
+D
+726084008
+15.6192
+Record Type = D
+File Location = 19134
+Reading D : 129
+D
+726109208
+14.8209
+Record Type = D
+File Location = 19281
+Reading D : 130
+D
+726134408
+14.2825
+Record Type = D
+File Location = 19428
+Reading D : 131
+D
+726159608
+14.4592
+Record Type = D
+File Location = 19575
+Reading D : 132
+D
+726184808
+14.9069
+Record Type = D
+File Location = 19722
+Reading D : 133
+D
+726210008
+14.2926
+Record Type = D
+File Location = 19869
+Reading D : 134
+D
+726235208
+14.8465
+Record Type = D
+File Location = 20016
+Reading D : 135
+D
+726260408
+15.4626
+Record Type = D
+File Location = 20163
+Reading D : 136
+D
+726285608
+15.1678
+Record Type = D
+File Location = 20310
+Reading D : 137
+D
+726310808
+15.2512
+Record Type = D
+File Location = 20457
+Reading D : 138
+D
+726336008
+15.8774
+Record Type = D
+File Location = 20604
+Reading D : 139
+D
+726361208
+16.7004
+Record Type = D
+File Location = 20751
+Reading D : 140
+D
+726386408
+16.4349
+Record Type = D
+File Location = 20898
+Reading D : 141
+D
+726411608
+21.3
+Record Type = D
+File Location = 21045
+Reading D : 142
+D
+726436808
+19.2639
+Record Type = D
+File Location = 21192
+Reading D : 143
+D
+726462008
+18.9554
+Record Type = D
+File Location = 21339
+Reading D : 144
+D
+726487208
+19.4086
+Record Type = D
+File Location = 21486
+Reading D : 145
+D
+726512408
+20.033
+Record Type = D
+File Location = 21633
+Reading D : 146
+D
+726537608
+20.3754
+Record Type = D
+File Location = 21780
+Reading D : 147
+D
+726562808
+20.3616
+Record Type = D
+File Location = 21927
+Reading D : 148
+D
+726588008
+19.9542
+Record Type = D
+File Location = 22074
+Reading D : 149
+D
+726613208
+20.3708
+Record Type = D
+File Location = 22221
+Reading D : 150
+D
+726638408
+21.3422
+Record Type = D
+File Location = 22368
+Reading D : 151
+D
+726663608
+21.3733
+Record Type = D
+File Location = 22515
+Reading D : 152
+D
+726688808
+20.6921
+Record Type = D
+File Location = 22662
+Reading D : 153
+D
+726714008
+20.8597
+Record Type = D
+File Location = 22809
+Reading D : 154
+D
+726739208
+20.7022
+Record Type = D
+File Location = 22956
+Reading D : 155
+D
+726764408
+20.0833
+Record Type = D
+File Location = 23103
+Reading D : 156
+D
+726789608
+21.8704
+Record Type = D
+File Location = 23250
+Reading D : 157
+D
+726814808
+21.8054
+Record Type = D
+File Location = 23397
+Reading D : 158
+D
+726840008
+21.6635
+Record Type = D
+File Location = 23544
+Reading D : 159
+D
+726865208
+21.5665
+Record Type = D
+File Location = 23691
+Reading D : 160
+D
+726890408
+21.9318
+ DATA at 50 ************************************
+0 : 12.9376
+1 : 4.30603
+2 : 1.74384
+3 : 5.85938
+4 : 4.12103e-14
+5 : 9.83567e+08
+6 : -5.20652e-29
+7 : -2.60366e+15
+8 : -0.00390628
+9 : 86152.5
+10 : -7.22858e-35
+11 : 1.44402e+17
+12 : -2.31551e-41
+13 : -2.29028e-41
+14 : -4.67903e-05
+15 : 3.96375e-39
+16 : 5.9964e-39
+17 : 5.93051e-39
+18 : 5.85745e-39
+19 : 770.93
+20 : 6.01793e-13
+21 : 12.6932
+22 : 4.69128
+23 : 1.52063
+24 : 5.85938
+25 : 5.37003e-14
+26 : 2.98599e+06
+27 : -1.16323e-25
+28 : -745476
+29 : -0.00390628
+30 : nan
+31 : 1.6963e-21
+
