@@ -1,27 +1,9 @@
-import re
 import numpy as np
 import quantities as pq
+import re
 import seawater
 #import logging
 from collections import defaultdict
-
-class PyedsConfig:
-    def __init__(self):
-        self.config={}
-    #    self.config['plugins']=[]
-        self.config['drivers']=[]
-    #    self.config['plotmanips']=[]
-
-    def load_config(self, filename):
-        myconfig=file(filename)
-        file_string = myconfig.read()
-        processed_string = re.sub("\n\s*\n*", "\n", file_string)
-        processed_string = re.sub("#.*?\n", "", processed_string).splitlines()
-        config = defaultdict(dict)
-        for line in processed_string:
-            config_type, driver_name, driver_code = re.split('[\s,:]',line.strip().lower())
-            config[config_type][driver_code] = driver_name
-        return config
 
 
 class Sonde:
