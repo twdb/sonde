@@ -55,7 +55,7 @@ class Sonde:
                                   'TUR01' : ('Turbidity', self.ntu),
                                   }
         
-        self.available_params = []
+        self.available_params = {}
         self.read_data()
         self.convert_to_stdunits()
         self.convert_to_CST()
@@ -82,7 +82,7 @@ class Sonde:
 
     def convert_to_stdunits(self):
         """ Cycle through paramlist and convert units for each. """
-        self.available_params_orig =  self.available_params.copy()
+        self.available_params_orig = self.available_params.copy()
 
         new_params = dict()
         for param, unit in self.available_params.iteritems():
@@ -144,7 +144,7 @@ class Sonde:
             self.tz = 'CST'
             self.utc_offset = -6
             print 'Time converted from CDT/UTC-5 to CST/UTC-6'
-        elif self.tz == 'CST' or self.tz == 'UTC-6'::
+        elif self.tz == 'CST' or self.tz == 'UTC-6':
             print 'Time already in CST no conversion needed'
         else:
             print 'Unknown Timezone'
@@ -163,7 +163,7 @@ class Sonde:
         prefix = self.filename.split('.')[0]
         if split:
             for key in np.sort(self.data.keys()):
-                fid = open(prefix + '_Param-'
+                fid = open(prefix + '_Param-')
 
 
     def write_data(self,filename):
