@@ -2,6 +2,7 @@ import numpy as np
 import quantities as pq
 import re
 import seawater
+import sonde.quantities as sq
 #import logging
 from collections import defaultdict
 
@@ -13,28 +14,22 @@ class Sonde:
         #self.inboxdir = inboxdir
         #print '~~~~~~~~~~ reading : ' + self.filename
         #self.outdir = outdir
-        #define custom units
-        self.psu = pq.UnitQuantity('Salinity',pq.dimensionless,symbol='PSU')
-        self.uScm = pq.UnitQuantity('Specific Conductivity',pq.CompoundUnit("1e-6*S/cm"),symbol='uS/cm')
-        self.mScm = pq.UnitQuantity('Specific Conductivity in MilliSiemens per Centimeter',pq.CompoundUnit("1e-3*S/cm"),symbol='mS/cm')
-        self.mgl = pq.UnitQuantity('Concentration', pq.CompoundUnit("mg/L"), symbol='mg/L')
-        self.ntu = pq.UnitQuantity('Turbidity',pq.dimensionless,symbol='NTU')
         
         #self.site = site
         self.tz = []
         self.master_param_list = {'TEM01' : ('Water Temperature', pq.degC),
-                                  'CON01' : ('Specific Conductance(Normalized @25degC)', self.mScm),
-                                  'CON02' : ('Conductivity(Not Normalized)', self.mScm),
-                                  'SAL01' : ('Salinity', self.psu),
+                                  'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
+                                  'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
+                                  'SAL01' : ('Salinity', sq.psu),
                                   'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', pq.m),
                                   'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', pq.m),
                                   'BAT01' : ('Battery Voltage', pq.volt),
                                   'PHL01' : ('pH Level', pq.dimensionless),
-                                  'DOX01' : ('Dissolved Oxygen Concentration', self.mgl),
+                                  'DOX01' : ('Dissolved Oxygen Concentration', sq.mgl),
                                   'DOX02' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
                                   'ATM01' : ('Atmospheric Pressure', pq.pascal),
                                   'TEM02' : ('Air Temperature', pq.degC),
-                                  'TUR01' : ('Turbidity', self.ntu),
+                                  'TUR01' : ('Turbidity', sq.ntu),
                                   }
         
         self.available_params = {}
@@ -109,8 +104,8 @@ class Sonde:
             sal = seawater.salt(R,T,P)
 
             #add salinity to list of available params
-            self.available_params['SAL01'] = self.psu
-            self.data['SAL01'] = sal * self.psu
+            self.available_params['SAL01'] = sq.psu
+            self.data['SAL01'] = sal * sq.psu
 
     def set_tz(self, tz, offset):
         """ Set TIMEZONE """
