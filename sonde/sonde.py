@@ -2,9 +2,9 @@ import numpy as np
 import quantities as pq
 import re
 import seawater
-import sonde.quantities as sq
+
+from ..sonde import quantities as sq
 #import logging
-from collections import defaultdict
 
 
 class Sonde:

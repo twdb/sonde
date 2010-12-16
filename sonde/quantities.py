@@ -1,6 +1,9 @@
 """
 quantities specific to sonde
 """
+# absolute_import will make sure the sys.path quanties is grabbed, not
+# this file
+from __future__ import absolute_import
 
 import quantities as pq
 

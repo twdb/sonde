@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 import quantities as pq
 import re
-import sonde
+from .. import sonde
 from StringIO import StringIO
 import struct
 import time
