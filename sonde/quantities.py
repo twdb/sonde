@@ -1,8 +1,9 @@
 """
 quantities specific to sonde
 """
-# absolute_import will make sure the sys.path quanties is grabbed, not
-# this file
+# absolute_import will make sure that when "import quantities as pq"
+# is run, quantities refers to the package on sys.path and it is not a
+# reference to this file itself
 from __future__ import absolute_import
 
 import quantities as pq
