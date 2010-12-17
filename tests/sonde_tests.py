@@ -115,6 +115,7 @@ class YSIDatasetTestCase(unittest.TestCase):
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(YSIReaderTestCase))
+    suite.addTest(unittest.makeSuite(YSIDatasetTestCase))
     return suite
 
 
