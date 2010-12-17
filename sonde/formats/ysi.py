@@ -131,40 +131,39 @@ class YSIReader:
         self.ysi_param_def = np.genfromtxt(StringIO(file_string), delimiter=',', usecols=(0,1,3,5,7) , skiprows=3, dtype=dtype)
         
     def read_ysi(self):
-        fid = open(self.filename)
-        type = []
-        self.num_params=0
-        while 1:
-            type = fid.read(1)
-            #fid.seek(-1,1)
-        
-            if not type:
-                break
+        with open(self.filename) as fid:
+            type = []
+            self.num_params=0
+            while 1:
+                type = fid.read(1)
+                #fid.seek(-1,1)
 
-            if type=='A':
-                fmt = '<HLH16s32s6sLll36s'
-                fmt_size = struct.calcsize(fmt)
-                self.instr_type, self.system_sig, self.prog_ver, \
-                                 self.serial_num, site_name, self.pad1,\
-                                 self.logging_interval, self.begin_log_time, \
-                                 self.first_sample_time, self.pad2 \
-                                 = struct.unpack(fmt,fid.read(fmt_size))
-                
-            elif type=='B':
-                self.num_params = self.num_params + 1
-                fmt = '<hhHff'
-                fmt_size = struct.calcsize(fmt)
-                self.parameters.append(ChannelRec(struct.unpack(fmt,fid.read(fmt_size)),self.ysi_param_def))
-                
-            elif type=='D':
-                fmt = '<l' + str(self.num_params) + 'f'
-                fmt_size = struct.calcsize(fmt)
-                recs = struct.unpack(fmt,fid.read(fmt_size))
-                self.julian_time.append(recs[0])
-                for ii in range(self.num_params):
-                    self.parameters[ii].data.append(recs[ii+1])
-                
-            else:
-                print 'Type not implemented yet:',type
-                break
-        fid.close()
+                if not type:
+                    break
+
+                if type=='A':
+                    fmt = '<HLH16s32s6sLll36s'
+                    fmt_size = struct.calcsize(fmt)
+                    self.instr_type, self.system_sig, self.prog_ver, \
+                                     self.serial_num, site_name, self.pad1,\
+                                     self.logging_interval, self.begin_log_time, \
+                                     self.first_sample_time, self.pad2 \
+                                     = struct.unpack(fmt,fid.read(fmt_size))
+
+                elif type=='B':
+                    self.num_params = self.num_params + 1
+                    fmt = '<hhHff'
+                    fmt_size = struct.calcsize(fmt)
+                    self.parameters.append(ChannelRec(struct.unpack(fmt,fid.read(fmt_size)),self.ysi_param_def))
+
+                elif type=='D':
+                    fmt = '<l' + str(self.num_params) + 'f'
+                    fmt_size = struct.calcsize(fmt)
+                    recs = struct.unpack(fmt,fid.read(fmt_size))
+                    self.julian_time.append(recs[0])
+                    for ii in range(self.num_params):
+                        self.parameters[ii].data.append(recs[ii+1])
+
+                else:
+                    print 'Type not implemented yet:',type
+                    break
