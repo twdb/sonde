@@ -8,7 +8,7 @@ from . import quantities as sq
 #import logging
 
 
-class Sonde:
+class Sonde(object):
     def __init__(self):
         """ Plugin is used to open a file """
         self.tz = []

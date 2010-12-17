@@ -36,10 +36,10 @@ class Dataset(sonde.Sonde):
     def __init__(self, filename, param_file='ysi_param.def'):
         self.filename = filename
         self.param_file = param_file
-        super(Dataset, self).__init__(filename)
+        super(Dataset, self).__init__()
 
     
-    def read_data(self, filename, param_file='ysi_param.def'):
+    def read_data(self):
         """ read YSI binary data files """
         param_map = {'Temperature' : 'TEM01',
                      'Conductivity' : 'CON02',
