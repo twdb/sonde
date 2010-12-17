@@ -33,10 +33,14 @@ class ChannelRec:
 
 
 class Dataset(sonde.Sonde):
+    def __init__(self, filename, param_file='ysi_param.def'):
+        self.filename = filename
+        self.param_file = param_file
+        super(Dataset, self).__init__(filename)
+
     
-    def read_data(self):
+    def read_data(self, filename, param_file='ysi_param.def'):
         """ read YSI binary data files """
-        
         param_map = {'Temperature' : 'TEM01',
                      'Conductivity' : 'CON02',
                      'Specific Cond' : 'CON01',
@@ -58,8 +62,8 @@ class Dataset(sonde.Sonde):
                     'feet' : pq.ft,
                     'volts' : pq.volt,
                     }
-
-        ysi_data = YSIReader(self.filename)
+        
+        ysi_data = YSIReader(self.filename, self.param_file)
 
         #determine parameters provided and in what units
         params = dict()

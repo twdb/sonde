@@ -9,14 +9,8 @@ from . import quantities as sq
 
 
 class Sonde:
-    def __init__(self,filename):
+    def __init__(self):
         """ Plugin is used to open a file """
-        self.filename = filename
-        #self.inboxdir = inboxdir
-        #print '~~~~~~~~~~ reading : ' + self.filename
-        #self.outdir = outdir
-        
-        #self.site = site
         self.tz = []
         self.master_param_list = {'TEM01' : ('Water Temperature', pq.degC),
                                   'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
