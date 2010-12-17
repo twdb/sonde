@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-# Main Plugin Super Class
+
 import datetime
 import numpy as np
 import quantities as pq
@@ -10,9 +10,6 @@ from StringIO import StringIO
 import struct
 import time
 import traceback
-
-#from collections import defaultdict
-
 
 class ChannelRec:
     """
