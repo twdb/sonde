@@ -128,7 +128,7 @@ class YSIReader:
                           ('unit', '|S11'),
                           ('shortname', '|S9'),
                           ('num_dec_places', '<i8')])
-        self.ysi_param_def = np.genfromtxt(StringIO(file_string), delimiter=',', usecols=(0,1,3,5,7) , skiprows=3, dtype=dtype)
+        self.ysi_param_def = np.genfromtxt(StringIO(file_string), delimiter=',', usecols=(0,1,3,5,7) , skip_header=3, dtype=dtype)
         
     def read_ysi(self):
         with open(self.filename) as fid:
