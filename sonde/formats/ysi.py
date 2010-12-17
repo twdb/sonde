@@ -90,18 +90,24 @@ class YSIReader:
         self.julian_time = []
         self.read_param_def(param_file)
         self.read_ysi()
-        self.ysi_epoch = time.mktime((1984,03,01,0,0,0,0,0,-1))
+
+        ysi_epoch = datetime.datetime(year=1984,
+                                      month=3,
+                                      day=1)
+
+        ysi_epoch_in_seconds = time.mktime(ysi_epoch.timetuple())
+                                                    
         for param in self.parameters:
             param.data = (np.array(param.data)).round(decimals=param.ndecimals)
             
         self.dates = []
         for t in self.julian_time:
-            self.dates.append(datetime.datetime.fromtimestamp(t + self.ysi_epoch))
+            self.dates.append(datetime.datetime.fromtimestamp(t + ysi_epoch_in_seconds))
 
         self.dates = np.array(self.dates)
         self.julian_time = np.array(self.julian_time)
-        self.begin_log_time =  datetime.datetime.fromtimestamp(self.begin_log_time + self.ysi_epoch)
-        self.first_sample_time =  datetime.datetime.fromtimestamp(self.first_sample_time + self.ysi_epoch)
+        self.begin_log_time = datetime.datetime.fromtimestamp(self.begin_log_time + ysi_epoch_in_seconds)
+        self.first_sample_time = datetime.datetime.fromtimestamp(self.first_sample_time + ysi_epoch_in_seconds)
 
     def read_param_def(self, filename):
         fid = open(filename)
