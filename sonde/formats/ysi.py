@@ -117,9 +117,9 @@ class YSIReader:
         fid = open(filename)
         file_string = fid.read()
         file_string = re.sub("\n\s*\n*", "\n", file_string) #remove blank lines
-        file_string = re.sub(";.*\n*", "", file_string) #remove comment lines
-        file_string = re.sub("\t", "", file_string) #remove tabs
-        file_string = re.sub("\"", "", file_string) #remove quotes
+        file_string = re.sub(";.*\n*", "", file_string)     #remove comment lines
+        file_string = re.sub("\t", "", file_string)         #remove tabs
+        file_string = re.sub("\"", "", file_string)         #remove quotes
         self.ysi_file_version = int(file_string.splitlines()[0].split('=')[-1])
         self.ysi_num_param_in_def = int(file_string.splitlines()[1].split('=')[-1])
         self.ysi_ecowatch_version = int(file_string.splitlines()[2].split('=')[-1])
@@ -136,7 +136,6 @@ class YSIReader:
             self.num_params=0
             while 1:
                 type = fid.read(1)
-                #fid.seek(-1,1)
 
                 if not type:
                     break
