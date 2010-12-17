@@ -1,9 +1,10 @@
+from __future__ import absolute_import
+
 import numpy as np
 import quantities as pq
 import re
 import seawater
-
-from ..sonde import quantities as sq
+from . import quantities as sq
 #import logging
 
 

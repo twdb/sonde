@@ -1,14 +1,15 @@
+from __future__ import absolute_import
 # Main Plugin Super Class
 import datetime
 import numpy as np
 import quantities as pq
 import re
 from .. import sonde
+from .. import quantities as sq
 from StringIO import StringIO
 import struct
 import time
 import traceback
-import ysi
 
 #from collections import defaultdict
 
@@ -49,8 +50,8 @@ class Dataset(sonde.Sonde):
         unit_map = {'C' : pq.degC,
                     'F' : pq.degF,
                     'K' : pq.degK,
-                    'mS/cm' : self.mScm,
-                    'uS/cm' : self.uScm,
+                    'mS/cm' : sq.mScm,
+                    'uS/cm' : sq.uScm,
                     '%' : pq.percent,
                     'pH' : pq.dimensionless,
                     'meters' : pq.m,
