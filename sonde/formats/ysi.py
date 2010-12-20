@@ -11,6 +11,8 @@ import struct
 import time
 import traceback
 
+from ..timezones import cdt, cst
+
 class ChannelRec:
     """
     A class that holds YSI Channel Record data
@@ -30,9 +32,10 @@ class ChannelRec:
 
 
 class Dataset(sonde.Sonde):
-    def __init__(self, filename, param_file='ysi_param.def'):
+    def __init__(self, filename, param_file='ysi_param.def', tzinfo=None):
         self.filename = filename
         self.param_file = param_file
+        self.default_tzinfo = tzinfo
         super(Dataset, self).__init__()
 
     
@@ -59,8 +62,9 @@ class Dataset(sonde.Sonde):
                     'feet' : pq.ft,
                     'volts' : pq.volt,
                     }
-        
-        ysi_data = YSIReader(self.filename, self.param_file)
+
+
+        ysi_data = YSIReader(self.filename, self.param_file, self.default_tzinfo)
 
         #determine parameters provided and in what units
         params = dict()
@@ -83,9 +87,10 @@ class Dataset(sonde.Sonde):
 
 
 class YSIReader:
-    def __init__(self, filename, param_file='ysi_param.def'):
+    def __init__(self, filename, param_file='ysi_param.def', tzinfo=None):
         """ opens filename and reads in ysi data """
         self.filename = filename
+        self.default_tzinfo = tzinfo
         self.num_params = 0
         self.parameters = []
         self.julian_time = []
@@ -94,18 +99,17 @@ class YSIReader:
 
         ysi_epoch = datetime.datetime(year=1984,
                                       month=3,
-                                      day=1)
+                                      day=1,
+                                      tzinfo=tzinfo)
 
         ysi_epoch_in_seconds = time.mktime(ysi_epoch.timetuple())
                                                     
         for param in self.parameters:
             param.data = (np.array(param.data)).round(decimals=param.ndecimals)
             
-        self.dates = []
-        for t in self.julian_time:
-            self.dates.append(datetime.datetime.fromtimestamp(t + ysi_epoch_in_seconds))
+        self.dates = np.array([datetime.datetime.fromtimestamp(t + ysi_epoch_in_seconds, tzinfo)
+                               for t in self.julian_time])
 
-        self.dates = np.array(self.dates)
         self.julian_time = np.array(self.julian_time)
         self.begin_log_time = datetime.datetime.fromtimestamp(self.begin_log_time + ysi_epoch_in_seconds)
         self.first_sample_time = datetime.datetime.fromtimestamp(self.first_sample_time + ysi_epoch_in_seconds)

@@ -1,17 +1,23 @@
 from __future__ import absolute_import
 
+import datetime
 import numpy as np
 import quantities as pq
+import pytz
 import re
 import seawater
+
 from . import quantities as sq
 #import logging
+from .timezones import cst
+
+# XXX: put this into a proper config file
+default_timezone = cst
 
 
 class Sonde(object):
     def __init__(self):
         """ Plugin is used to open a file """
-        self.tz = []
         self.master_param_list = {'TEM01' : ('Water Temperature', pq.degC),
                                   'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
                                   'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
@@ -30,7 +36,10 @@ class Sonde(object):
         self.available_params = {}
         self.read_data()
         self.convert_to_stdunits()
-        self.convert_to_CST()
+
+        if default_timezone:
+            self.convert_timezones(default_timezone)
+
         #self.remove_abnormal_ECNorm()
         #self.convert_data_to_common_fmt()
         #TODO ADD COMMENTS FIELD
@@ -102,30 +111,29 @@ class Sonde(object):
             self.available_params['SAL01'] = sq.psu
             self.data['SAL01'] = sal * sq.psu
 
-    def set_tz(self, tz, offset):
-        """ Set TIMEZONE """
-        self.tz = tz
-        self.utc_offset = offset
-
-    def convert_to_CST(self):
-        """ convert all dates to CST
-        this assumes a fixed time shift between timezones and is not date dependent. ie instrument was set up eithr as UTC-5 or UTC-6
+    def convert_timezones(self, to_tzinfo):
         """
-        if self.tz == 'CDT' or self.tz == 'UTC-5':
-            self.dates = self.dates - datetime.timedelta(seconds=3600)
-            self.tz = 'CST'
-            self.utc_offset = -6
-            print 'Time converted from CDT/UTC-5 to CST/UTC-6'
-        elif self.tz == 'CST' or self.tz == 'UTC-6':
-            print 'Time already in CST no conversion needed'
+        convert all dates to some timezone
+
+        to_tzinfo must be an instance of tzinfo, either from the
+        datetime library or pytz
+        """
+
+        # If to_tzinfo is a pytz timezone, then use the normalize
+        # method so pytz can do normalize DST transition data
+        if isinstance(to_tzinfo, pytz.tzinfo.BaseTzInfo):
+            self.dates = np.array([to_tzinfo.normalize(date.astimezone(to_tzinfo))
+                                   for date in self.dates])
+
         else:
-            print 'Unknown Timezone'
+            self.dates = np.array([date.astimezone(to_tzinfo)
+                                   for date in self.dates])
 
     def read_data(self):
         """ use numpy genfromtxt to read in data from filename """
-        dates = []
-        data = []
-        self.set_tz('CST',-6)
+        dates = np.array([])
+        data = np.array([])
+
         return [dates,data]
 
     def write_data_to_file(self, split=True):
