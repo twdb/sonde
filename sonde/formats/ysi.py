@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from ..timezones import cdt, cst
 import datetime
 import numpy as np
 import quantities as pq
@@ -11,24 +12,6 @@ import struct
 import time
 import traceback
 
-from ..timezones import cdt, cst
-
-class ChannelRec:
-    """
-    A class that holds YSI Channel Record data
-    """
-    
-    def __init__(self, rec, param_def):
-        self.sonde_channel_num = rec[0]
-        self.sensor_type = rec[1]
-        self.probe_type = rec[2]
-        self.zero_scale = rec[3]
-        self.full_scale = rec[4]
-        self.name = param_def[rec[1]][1]
-        self.unit = param_def[rec[1]][2]
-        self.unitcode = param_def[rec[1]][3]
-        self.ndecimals = param_def[rec[1]][4]
-        self.data = []
 
 
 class Dataset(sonde.Sonde):
@@ -86,6 +69,25 @@ class Dataset(sonde.Sonde):
 
 
 
+class ChannelRec:
+    """
+    A class that holds YSI Channel Record data
+    """
+    
+    def __init__(self, rec, param_def):
+        self.sonde_channel_num = rec[0]
+        self.sensor_type = rec[1]
+        self.probe_type = rec[2]
+        self.zero_scale = rec[3]
+        self.full_scale = rec[4]
+        self.name = param_def[rec[1]][1]
+        self.unit = param_def[rec[1]][2]
+        self.unitcode = param_def[rec[1]][3]
+        self.ndecimals = param_def[rec[1]][4]
+        self.data = []
+
+
+
 class YSIReader:
     def __init__(self, filename, param_file='ysi_param.def', tzinfo=None):
         """ opens filename and reads in ysi data """
@@ -115,8 +117,9 @@ class YSIReader:
         self.first_sample_time = datetime.datetime.fromtimestamp(self.first_sample_time + ysi_epoch_in_seconds)
 
     def read_param_def(self, filename):
-        fid = open(filename)
-        file_string = fid.read()
+        with open(filename) as fid:
+            file_string = fid.read()
+            
         file_string = re.sub("\n\s*\n*", "\n", file_string) #remove blank lines
         file_string = re.sub(";.*\n*", "", file_string)     #remove comment lines
         file_string = re.sub("\t", "", file_string)         #remove tabs
