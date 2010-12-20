@@ -18,22 +18,22 @@ default_timezone = cst
 class Sonde(object):
     def __init__(self):
         """ Plugin is used to open a file """
-        self.master_param_list = {'TEM01' : ('Water Temperature', pq.degC),
-                                  'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
-                                  'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
-                                  'SAL01' : ('Salinity', sq.psu),
-                                  'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', pq.m),
-                                  'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', pq.m),
-                                  'BAT01' : ('Battery Voltage', pq.volt),
-                                  'PHL01' : ('pH Level', pq.dimensionless),
-                                  'DOX01' : ('Dissolved Oxygen Concentration', sq.mgl),
-                                  'DOX02' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
-                                  'ATM01' : ('Atmospheric Pressure', pq.pascal),
-                                  'TEM02' : ('Air Temperature', pq.degC),
-                                  'TUR01' : ('Turbidity', sq.ntu),
-                                  }
+        self.master_parameter_list = {'TEM01' : ('Water Temperature', pq.degC),
+                                      'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
+                                      'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
+                                      'SAL01' : ('Salinity', sq.psu),
+                                      'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', pq.m),
+                                      'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', pq.m),
+                                      'BAT01' : ('Battery Voltage', pq.volt),
+                                      'PHL01' : ('pH Level', pq.dimensionless),
+                                      'DOX01' : ('Dissolved Oxygen Concentration', sq.mgl),
+                                      'DOX02' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
+                                      'ATM01' : ('Atmospheric Pressure', pq.pascal),
+                                      'TEM02' : ('Air Temperature', pq.degC),
+                                      'TUR01' : ('Turbidity', sq.ntu),
+                                      }
         
-        self.available_params = {}
+        self.parameters = {}
         self.read_data()
         self.convert_to_stdunits()
 
@@ -45,28 +45,20 @@ class Sonde(object):
         #TODO ADD COMMENTS FIELD
 
     
-    def set_params(self,plist):
-        """ set list parameters and their units provided by this instrument """
-        self.available_params = plist
-
-    def get_params(self):
-        """ Return List of Parameters Provided by this plugin"""
-        return self.available_params
-
     def get_std_unit(self,code):
         """ Return Standard Unit for given param code"""
-        return self.master_param_list[code][1]
+        return self.master_parameter_list[code][1]
 
     def set_unit(self, code, unit):
         """ set unit """
-        self.available_params[code][1] = unit
+        self.parameters[code][1] = unit
 
     def convert_to_stdunits(self):
         """ Cycle through paramlist and convert units for each. """
-        self.available_params_orig = self.available_params.copy()
+        self.available_params_orig = self.parameters.copy()
 
         new_params = dict()
-        for param, unit in self.available_params.iteritems():
+        for param, unit in self.parameters.iteritems():
             std_unit = self.get_std_unit(param)
             if unit == std_unit:
                 new_params[param] = unit
@@ -76,14 +68,14 @@ class Sonde(object):
                 self.data[param] = self.data[param].rescale(std_unit)
                 if param[0:3] == 'TEM': #assumes TEMP is in degF
                     self.data[param] = 32 * pq.degC + self.data[param]             
-                
-            self.set_params(new_params)
+
+        self.parameters = new_params
             
     def calc_salinity(self):
         """ If SAL field is missing but conductivity is present then calculate salinity
         should be used after salinity is rescaled ie after running convert_to_si
         """
-        params = self.available_params.keys()
+        params = self.parameters.keys()
         if 'SAL01' in params:
             return
         else:
@@ -108,7 +100,7 @@ class Sonde(object):
             sal = seawater.salt(R,T,P)
 
             #add salinity to list of available params
-            self.available_params['SAL01'] = sq.psu
+            self.parameters['SAL01'] = sq.psu
             self.data['SAL01'] = sal * sq.psu
 
     def convert_timezones(self, to_tzinfo):

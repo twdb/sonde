@@ -13,7 +13,6 @@ import time
 import traceback
 
 
-
 class Dataset(sonde.Sonde):
     def __init__(self, filename, param_file='ysi_param.def', tzinfo=None):
         self.filename = filename
@@ -50,13 +49,13 @@ class Dataset(sonde.Sonde):
         ysi_data = YSIReader(self.filename, self.param_file, self.default_tzinfo)
 
         #determine parameters provided and in what units
-        params = dict()
+        self.parameters = dict()
         self.data = dict()
         for parameter in ysi_data.parameters:
             try:
                 pname = param_map[(parameter.name).strip()]
                 punit = unit_map[(parameter.unit).strip()]
-                params[pname] = punit
+                self.parameters[pname] = punit
                 self.data[param_map[parameter.name]] = parameter.data * punit
             except:
                 print 'Un-mapped Parameter/Unit Type'
@@ -64,7 +63,6 @@ class Dataset(sonde.Sonde):
                 print 'YSI Unit Name:', parameter.unit
                 raise
 
-        self.set_params(params)
         self.dates = ysi_data.dates
 
 
