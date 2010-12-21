@@ -1,3 +1,11 @@
+"""
+    sonde.Sonde
+    ~~~~~~~~~~~
+
+    This module implements the main Sonde object.
+    
+"""
+
 from __future__ import absolute_import
 
 import datetime
@@ -16,8 +24,19 @@ default_timezone = cst
 
 
 class Sonde(object):
+    """The main Sonde class that all data format objects inherit. The
+    Sonde object is not intended to be instantiated directly; this
+    class contains all the attributes and methods that are common to
+    all data formats.
+    """
+
     def __init__(self):
-        """ Plugin is used to open a file """
+        #: A dict that contains all the parameters that could
+        #: potentially be read from a data file, along with their
+        #: standard units. This list is exhaustive and will be fully
+        #: populated whether or not data is or even available in a
+        #: particular format. See the `parameters` attribute for
+        #: parameters that are available for a particular file.
         self.master_parameter_list = {'TEM01' : ('Water Temperature', pq.degC),
                                       'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
                                       'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
@@ -32,8 +51,11 @@ class Sonde(object):
                                       'TEM02' : ('Air Temperature', pq.degC),
                                       'TUR01' : ('Turbidity', sq.ntu),
                                       }
-        
+
+        #: A dict containing the parameters read from a data file and
+        #: their values
         self.parameters = {}
+
         self.read_data()
         self.convert_to_stdunits()
 
@@ -46,15 +68,16 @@ class Sonde(object):
 
     
     def get_std_unit(self,code):
-        """ Return Standard Unit for given param code"""
+        """Returns the standard unit for given parameter `code`"""
         return self.master_parameter_list[code][1]
 
     def set_unit(self, code, unit):
-        """ set unit """
+        """Sets the standard unit for a given parameter `code` to `unit`"""
         self.parameters[code][1] = unit
 
     def convert_to_stdunits(self):
-        """ Cycle through paramlist and convert units for each. """
+        """Cycles through the parameter list and normalizes all data
+        values to their standard units."""
         self.available_params_orig = self.parameters.copy()
 
         new_params = dict()
@@ -72,8 +95,10 @@ class Sonde(object):
         self.parameters = new_params
             
     def calc_salinity(self):
-        """ If SAL field is missing but conductivity is present then calculate salinity
-        should be used after salinity is rescaled ie after running convert_to_si
+        """Calculates salinity if salinity parameter is missing but
+        conductivity is present. This method assumes that conductivity
+        parameters are in standard units (i.e. :attr:`convert_to_stdunits`
+        has been run).
         """
         params = self.parameters.keys()
         if 'SAL01' in params:
@@ -105,10 +130,9 @@ class Sonde(object):
 
     def convert_timezones(self, to_tzinfo):
         """
-        convert all dates to some timezone
-
-        to_tzinfo must be an instance of tzinfo, either from the
-        datetime library or pytz
+        Converts all dates to some timezone. The argument `to_tzinfo`
+        must be an instance of datetime.tzinfo, either from the
+        datetime library itself or the pytz library.
         """
 
         # If to_tzinfo is a pytz timezone, then use the normalize
@@ -122,14 +146,12 @@ class Sonde(object):
                                    for date in self.dates])
 
     def read_data(self):
-        """ use numpy genfromtxt to read in data from filename """
-        dates = np.array([])
-        data = np.array([])
-
-        return [dates,data]
+        """Reads data from a file. This method should be implemented
+        by each format module."""
+        return [np.array([]),np.array([])]
 
     def write_data_to_file(self, split=True):
-        """ Write data to disk
+        """Writes data to a file. 
         If split=True then write one file per parameter. If split=False write a single merged file
         """
         prefix = self.filename.split('.')[0]
@@ -139,7 +161,7 @@ class Sonde(object):
 
 
     def write_data(self,filename):
-        """ write final data to file """
+        """Writes final data to a file"""
         #import os
         print '~~~~~~~~ writing data from ' + self.filename + ' to ' + filename
         data = self.finaldata.filled(-999)
