@@ -31,9 +31,10 @@ setup(
     packages=['sonde'],
     platforms='any',
     install_requires=[
-        'pytz>=2010o',
-        'seawater>=1.0.5',
         'numpy>=1.5.0',
+        'pytz>=2010o',
+        'quantities>=0.9.0',
+        'seawater>=1.0.5',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
