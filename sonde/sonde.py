@@ -57,7 +57,7 @@ class Sonde(object):
         self.parameters = {}
 
         self.read_data()
-        self.convert_to_stdunits()
+        self.normalize_data()
 
         if default_timezone:
             self.convert_timezones(default_timezone)
@@ -67,22 +67,22 @@ class Sonde(object):
         #TODO ADD COMMENTS FIELD
 
     
-    def get_std_unit(self,code):
+    def get_standard_unit(self,code):
         """Returns the standard unit for given parameter `code`"""
         return self.master_parameter_list[code][1]
 
-    def set_unit(self, code, unit):
+    def set_standard_unit(self, code, unit):
         """Sets the standard unit for a given parameter `code` to `unit`"""
         self.parameters[code][1] = unit
 
-    def convert_to_stdunits(self):
+    def normalize_data(self):
         """Cycles through the parameter list and normalizes all data
         values to their standard units."""
         self.available_params_orig = self.parameters.copy()
 
         new_params = dict()
         for param, unit in self.parameters.iteritems():
-            std_unit = self.get_std_unit(param)
+            std_unit = self.get_standard_unit(param)
             if unit == std_unit:
                 new_params[param] = unit
                 continue
@@ -94,7 +94,7 @@ class Sonde(object):
 
         self.parameters = new_params
             
-    def calc_salinity(self):
+    def calculate_salinity(self):
         """Calculates salinity if salinity parameter is missing but
         conductivity is present. This method assumes that conductivity
         parameters are in standard units (i.e. :attr:`convert_to_stdunits`
@@ -141,6 +141,8 @@ class Sonde(object):
             self.dates = np.array([to_tzinfo.normalize(date.astimezone(to_tzinfo))
                                    for date in self.dates])
 
+        # If to_tzinfo is a regular tz_info instance, then just call
+        # astimezone
         else:
             self.dates = np.array([date.astimezone(to_tzinfo)
                                    for date in self.dates])
