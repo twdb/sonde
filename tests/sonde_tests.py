@@ -24,8 +24,8 @@ import unittest
 #sonde_path = os.path.join(os.path.dirname(__file__), '..')
 #sys.path.append(os.path.join(sonde_path))
 
-from ..sonde.timezones import cdt, cst
-from ..sonde.formats import ysi
+from sonde.timezones import cdt, cst
+from sonde.formats import ysi
 
 
 ysi_test_files_path = os.path.join(os.path.dirname(__file__), 'ysi_test_files')
