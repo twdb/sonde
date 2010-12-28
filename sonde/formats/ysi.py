@@ -1,3 +1,10 @@
+"""
+    sonde.formats.ysi
+    ~~~~~~~~~~~
+
+    This module implements the YSI format 
+    
+"""
 from __future__ import absolute_import
 
 from ..timezones import cdt, cst
@@ -14,6 +21,13 @@ import traceback
 
 
 class Dataset(sonde.Sonde):
+    """
+    Dataset object that represents the data contained in a YSI binary
+    file. It accepts two optional parameters, `param_file` is a
+    ysi_param.def definition file and `tzinfo` is a datetime.tzinfo
+    object that represents the timezone of the timestamps in the
+    binary file.
+    """
     def __init__(self, filename, param_file='ysi_param.def', tzinfo=None):
         self.filename = filename
         self.param_file = param_file
@@ -22,7 +36,9 @@ class Dataset(sonde.Sonde):
 
     
     def read_data(self):
-        """ read YSI binary data files """
+        """
+        Read the YSI binary data file
+        """
         param_map = {'Temperature' : 'TEM01',
                      'Conductivity' : 'CON02',
                      'Specific Cond' : 'CON01',
@@ -48,7 +64,7 @@ class Dataset(sonde.Sonde):
 
         ysi_data = YSIReader(self.filename, self.param_file, self.default_tzinfo)
 
-        #determine parameters provided and in what units
+        # determine parameters provided and in what units
         self.parameters = dict()
         self.data = dict()
         for parameter in ysi_data.parameters:
@@ -69,9 +85,9 @@ class Dataset(sonde.Sonde):
 
 class ChannelRec:
     """
-    A class that holds YSI Channel Record data
+    Class that implements the channel record data structure used by
+    the YSI binary file format
     """
-    
     def __init__(self, rec, param_def):
         self.sonde_channel_num = rec[0]
         self.sensor_type = rec[1]
@@ -87,8 +103,14 @@ class ChannelRec:
 
 
 class YSIReader:
+    """
+    A reader object that opens and reads `filename`, a YSI binary
+    file. It accepts two optional parameters, `param_file` is a
+    ysi_param.def definition file and `tzinfo` is a datetime.tzinfo
+    object that represents the timezone of the timestamps in the
+    binary file.
+    """
     def __init__(self, filename, param_file='ysi_param.def', tzinfo=None):
-        """ opens filename and reads in ysi data """
         self.filename = filename
         self.default_tzinfo = tzinfo
         self.num_params = 0
@@ -114,7 +136,11 @@ class YSIReader:
         self.begin_log_time = datetime.datetime.fromtimestamp(self.begin_log_time + ysi_epoch_in_seconds)
         self.first_sample_time = datetime.datetime.fromtimestamp(self.first_sample_time + ysi_epoch_in_seconds)
 
+
     def read_param_def(self, filename):
+        """
+        Open and read a YSI param definition file.
+        """
         with open(filename) as fid:
             file_string = fid.read()
             
@@ -132,7 +158,11 @@ class YSIReader:
                           ('num_dec_places', '<i8')])
         self.ysi_param_def = np.genfromtxt(StringIO(file_string), delimiter=',', usecols=(0,1,3,5,7) , skip_header=3, dtype=dtype)
         
+
     def read_ysi(self):
+        """
+        Open and read a YSI binary file.
+        """
         with open(self.filename) as fid:
             type = []
             self.num_params=0

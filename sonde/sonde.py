@@ -24,62 +24,69 @@ default_timezone = cst
 
 
 class Sonde(object):
-    """The main Sonde class that all data format objects inherit. The
-    Sonde object is not intended to be instantiated directly; this
-    class contains all the attributes and methods that are common to
-    all data formats.
+    """
+    The main Sonde class that all data format objects should
+    inherit. The Sonde object is not intended to be instantiated
+    directly; this class contains all the attributes and methods that
+    are common to all data formats.
     """
 
+    #: A dict that contains all the parameters that could potentially
+    #: be read from a data file, along with their standard units. This
+    #: list is exhaustive and will be fully populated whether or not
+    #: data is or even available in a particular format. See the
+    #: `parameters` attribute for parameters that are available for a
+    #: particular file.
+    master_parameter_list = {'TEM01' : ('Water Temperature', pq.degC),
+                             'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
+                             'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
+                             'SAL01' : ('Salinity', sq.psu),
+                             'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', pq.m),
+                             'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', pq.m),
+                             'BAT01' : ('Battery Voltage', pq.volt),
+                             'PHL01' : ('pH Level', pq.dimensionless),
+                             'DOX01' : ('Dissolved Oxygen Concentration', sq.mgl),
+                             'DOX02' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
+                             'ATM01' : ('Atmospheric Pressure', pq.pascal),
+                             'TEM02' : ('Air Temperature', pq.degC),
+                             'TUR01' : ('Turbidity', sq.ntu),
+                             }
+
+    #: A dict containing the parameters read from a data file and
+    #: their values
+    parameters = {}
+
+
     def __init__(self):
-        #: A dict that contains all the parameters that could
-        #: potentially be read from a data file, along with their
-        #: standard units. This list is exhaustive and will be fully
-        #: populated whether or not data is or even available in a
-        #: particular format. See the `parameters` attribute for
-        #: parameters that are available for a particular file.
-        self.master_parameter_list = {'TEM01' : ('Water Temperature', pq.degC),
-                                      'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
-                                      'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
-                                      'SAL01' : ('Salinity', sq.psu),
-                                      'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', pq.m),
-                                      'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', pq.m),
-                                      'BAT01' : ('Battery Voltage', pq.volt),
-                                      'PHL01' : ('pH Level', pq.dimensionless),
-                                      'DOX01' : ('Dissolved Oxygen Concentration', sq.mgl),
-                                      'DOX02' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
-                                      'ATM01' : ('Atmospheric Pressure', pq.pascal),
-                                      'TEM02' : ('Air Temperature', pq.degC),
-                                      'TUR01' : ('Turbidity', sq.ntu),
-                                      }
-
-        #: A dict containing the parameters read from a data file and
-        #: their values
-        self.parameters = {}
-
         self.read_data()
         self.normalize_data()
 
         if default_timezone:
             self.convert_timezones(default_timezone)
 
-        #self.remove_abnormal_ECNorm()
-        #self.convert_data_to_common_fmt()
         #TODO ADD COMMENTS FIELD
 
     
     def get_standard_unit(self,code):
-        """Returns the standard unit for given parameter `code`"""
+        """
+        Return the standard unit for given parameter `code`
+        """
         return self.master_parameter_list[code][1]
 
+
     def set_standard_unit(self, code, unit):
-        """Sets the standard unit for a given parameter `code` to `unit`"""
+        """
+        Set the standard unit for a given parameter `code` to `unit`
+        """
         self.parameters[code][1] = unit
 
-    def normalize_data(self):
-        """Cycles through the parameter list and normalizes all data
-        values to their standard units."""
-        self.available_params_orig = self.parameters.copy()
 
+    def normalize_data(self):
+        """
+        Cycle through the parameter list and normalize all data values
+        to their standard units.
+        """
+        self.available_params_orig = self.parameters.copy()
         new_params = dict()
         for param, unit in self.parameters.iteritems():
             std_unit = self.get_standard_unit(param)
@@ -93,12 +100,14 @@ class Sonde(object):
                     self.data[param] = 32 * pq.degC + self.data[param]             
 
         self.parameters = new_params
+
             
     def calculate_salinity(self):
-        """Calculates salinity if salinity parameter is missing but
+        """
+        Calculate salinity if salinity parameter is missing but
         conductivity is present. This method assumes that conductivity
-        parameters are in standard units (i.e. :attr:`convert_to_stdunits`
-        has been run).
+        parameters are in standard units
+        (i.e. :attr:`normalize_data` has been run).
         """
         params = self.parameters.keys()
         if 'SAL01' in params:
@@ -128,9 +137,10 @@ class Sonde(object):
             self.parameters['SAL01'] = sq.psu
             self.data['SAL01'] = sal * sq.psu
 
+
     def convert_timezones(self, to_tzinfo):
         """
-        Converts all dates to some timezone. The argument `to_tzinfo`
+        Convert all dates to some timezone. The argument `to_tzinfo`
         must be an instance of datetime.tzinfo, either from the
         datetime library itself or the pytz library.
         """
@@ -148,13 +158,17 @@ class Sonde(object):
                                    for date in self.dates])
 
     def read_data(self):
-        """Reads data from a file. This method should be implemented
-        by each format module."""
+        """
+        Read data from a file. This method should be implemented by
+        each format module.
+        """
         return [np.array([]),np.array([])]
 
+
     def write_data_to_file(self, split=True):
-        """Writes data to a file. 
-        If split=True then write one file per parameter. If split=False write a single merged file
+        """
+        Write data to a file.  If `split` is True then write one file
+        per parameter. If `split` is False write a single merged file.
         """
         prefix = self.filename.split('.')[0]
         if split:
@@ -163,7 +177,9 @@ class Sonde(object):
 
 
     def write_data(self,filename):
-        """Writes final data to a file"""
+        """
+        Write final data to a file
+        """
         #import os
         print '~~~~~~~~ writing data from ' + self.filename + ' to ' + filename
         data = self.finaldata.filled(-999)
