@@ -35,7 +35,7 @@ class Dataset(sonde.Sonde):
         super(Dataset, self).__init__()
 
     
-    def read_data(self):
+    def _read_data(self):
         """
         Read the YSI binary data file
         """

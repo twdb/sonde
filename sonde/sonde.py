@@ -58,7 +58,7 @@ class Sonde(object):
 
 
     def __init__(self):
-        self.read_data()
+        self._read_data()
         self.normalize_data()
 
         if default_timezone:
@@ -157,7 +157,7 @@ class Sonde(object):
             self.dates = np.array([date.astimezone(to_tzinfo)
                                    for date in self.dates])
 
-    def read_data(self):
+    def _read_data(self):
         """
         Read data from a file. This method should be implemented by
         each format module.
