@@ -7,6 +7,6 @@
     
 """
 
-from .sonde import Sonde
+from .sonde import BaseSondeDataset, Sonde
 from . import quantities
 from . import formats

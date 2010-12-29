@@ -10,6 +10,7 @@ from __future__ import absolute_import
 
 import datetime
 import numpy as np
+from exceptions import NotImplementedError
 import quantities as pq
 import pytz
 import re
@@ -23,9 +24,24 @@ from .timezones import cst
 default_timezone = cst
 
 
-class Sonde(object):
+def Sonde(filename, file_format, *args, **kwargs):
     """
-    The main Sonde class that all data format objects should
+    Return a Sonde instance for a particular format. This function
+    provides a uniform interface to the various supported file
+    formats. At some point in the future, it may be also be able to
+    auto-detect formats.
+    """
+    if file_format.lower() == 'ysi':
+        from sonde.formats.ysi import YSIDataset
+        return YSIDataset(filename, *args, **kwargs)
+
+    raise NotImplementedError, "file format '%s' is not supported"
+
+
+
+class BaseSondeDataset(object):
+    """
+    The main Sonde Dataset class that all data format objects should
     inherit. The Sonde object is not intended to be instantiated
     directly; this class contains all the attributes and methods that
     are common to all data formats.

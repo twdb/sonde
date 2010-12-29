@@ -20,7 +20,7 @@ import time
 import traceback
 
 
-class Dataset(sonde.Sonde):
+class YSIDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a YSI binary
     file. It accepts two optional parameters, `param_file` is a
@@ -32,7 +32,7 @@ class Dataset(sonde.Sonde):
         self.filename = filename
         self.param_file = param_file
         self.default_tzinfo = tzinfo
-        super(Dataset, self).__init__()
+        super(YSIDataset, self).__init__()
 
     
     def _read_data(self):

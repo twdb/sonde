@@ -24,6 +24,7 @@ import unittest
 #sonde_path = os.path.join(os.path.dirname(__file__), '..')
 #sys.path.append(os.path.join(sonde_path))
 
+from sonde import Sonde
 from sonde.timezones import cdt, cst
 from sonde.formats import ysi
 
@@ -91,7 +92,7 @@ class YSIDatasetTestCase(unittest.TestCase):
         ysi_test_file_path = ysi_test_files_path + '/BAYT_20070323_CDT_YS1772AA_000.dat'
         ysi_param_file_path = ysi_test_files_path + '/ysi_param.def'
 
-        self.ysi_dataset = ysi.Dataset(ysi_test_file_path, param_file=ysi_param_file_path, tzinfo=cdt)
+        self.ysi_dataset = ysi.YSIDataset(ysi_test_file_path, param_file=ysi_param_file_path, tzinfo=cdt)
         self.ysi_csv = ysi_csv_read(csv_test_file_path)
 
     def test_ysi_dataset_dates_match_csv(self):
@@ -111,11 +112,38 @@ class YSIDatasetTestCase(unittest.TestCase):
         compare_quantity_and_csv_str(self.ysi_dataset.data['DOX02'], self.ysi_csv.odos)
 
 
+class SondeYSIFormatTestCase(unittest.TestCase):
+    def setUp(self):
+        csv_test_file_path = ysi_test_files_path + '/BAYT_20070323_CDT_YS1772AA_000.csv'
+        ysi_test_file_path = ysi_test_files_path + '/BAYT_20070323_CDT_YS1772AA_000.dat'
+        ysi_param_file_path = ysi_test_files_path + '/ysi_param.def'
+
+        self.ysi_dataset = Sonde(ysi_test_file_path, file_format='ysi', param_file=ysi_param_file_path, tzinfo=cdt)
+        self.ysi_csv = ysi_csv_read(csv_test_file_path)
+
+    def test_sonde_ysi_format_dates_match_csv(self):
+        for date_pair in zip(self.ysi_dataset.dates, self.ysi_csv.dates):
+            assert date_pair[0] == date_pair[1], "%r != %r" % (str(date_pair[0]), str(date_pair[1]))
+
+    def test_sonde_ysi_format_temps_match_csv(self):
+        compare_quantity_and_csv_str(self.ysi_dataset.data['TEM01'], self.ysi_csv.temps)
+
+    def test_sonde_ysi_format_spconds_match_csv(self):
+        compare_quantity_and_csv_str(self.ysi_dataset.data['CON01'], self.ysi_csv.spconds)
+
+    def test_sonde_ysi_format_depths_match_csv(self):
+        compare_quantity_and_csv_str(self.ysi_dataset.data['WSE01'], self.ysi_csv.depths)
+
+    def test_sonde_ysi_format_odos_match_csv(self):
+        compare_quantity_and_csv_str(self.ysi_dataset.data['DOX02'], self.ysi_csv.odos)
+
+
 
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(YSIReaderTestCase))
     suite.addTest(unittest.makeSuite(YSIDatasetTestCase))
+    suite.addTest(unittest.makeSuite(SondeYSIFormatTestCase))
     return suite
 
 
