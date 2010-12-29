@@ -53,19 +53,19 @@ class BaseSondeDataset(object):
     #: data is or even available in a particular format. See the
     #: `parameters` attribute for parameters that are available for a
     #: particular file.
-    master_parameter_list = {'TEM01' : ('Water Temperature', pq.degC),
-                             'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
-                             'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
-                             'SAL01' : ('Salinity', sq.psu),
-                             'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', pq.m),
-                             'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', pq.m),
-                             'BAT01' : ('Battery Voltage', pq.volt),
-                             'PHL01' : ('pH Level', pq.dimensionless),
-                             'DOX01' : ('Dissolved Oxygen Concentration', sq.mgl),
-                             'DOX02' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
-                             'ATM01' : ('Atmospheric Pressure', pq.pascal),
-                             'TEM02' : ('Air Temperature', pq.degC),
-                             'TUR01' : ('Turbidity', sq.ntu),
+    master_parameter_list = {'TEM01' : ['Water Temperature', pq.degC],
+                             'CON01' : ['Specific Conductance(Normalized @25degC)', sq.mScm],
+                             'CON02' : ['Conductivity(Not Normalized)', sq.mScm],
+                             'SAL01' : ['Salinity', sq.psu],
+                             'WSE01' : ['Water Surface Elevation (No Atm Pressure Correction)', pq.m],
+                             'WSE02' : ['Water Surface Elevation (Atm Pressure Corrected)', pq.m],
+                             'BAT01' : ['Battery Voltage', pq.volt],
+                             'PHL01' : ['pH Level', pq.dimensionless],
+                             'DOX01' : ['Dissolved Oxygen Concentration', sq.mgl],
+                             'DOX02' : ['Dissolved Oxygen Saturation Concentration', pq.percent],
+                             'ATM01' : ['Atmospheric Pressure', pq.pascal],
+                             'TEM02' : ['Air Temperature', pq.degC],
+                             'TUR01' : ['Turbidity', sq.ntu],
                              }
 
     #: A dict containing the parameters read from a data file and
@@ -87,7 +87,7 @@ class BaseSondeDataset(object):
         """
         Return the standard unit for given parameter `code`
         """
-        return self.parameters[code][1]
+        return self.master_parameter_list[code][1]
 
 
     def set_standard_unit(self, code, unit):
@@ -102,27 +102,20 @@ class BaseSondeDataset(object):
         Cycle through the parameter list and convert all data values
         to their standard units.
         """
-        self.available_params_orig = self.parameters.copy()
-        new_params = dict()
         for param, unit in self.parameters.iteritems():
             std_unit = self.get_standard_unit(param)
-            if unit == std_unit:
-                new_params[param] = unit
-                continue
-            else:
-                new_params[param] = std_unit
+            if unit != std_unit:
                 self.data[param] = self.data[param].rescale(std_unit)
+                self.parameters[param][1] = std_unit
                 if param[0:3] == 'TEM': #assumes TEMP is in degF
                     self.data[param] = 32 * pq.degC + self.data[param]             
-
-        self.parameters = new_params
 
             
     def calculate_salinity(self):
         """
         Calculate salinity if salinity parameter is missing but
         conductivity is present. This method assumes that conductivity
-        parameters are in standard units (i.e. :attr:`rescale_data`
+        parameters are in standard units (i.e. :attr:`normalize_data`
         has been run).
         """
         
