@@ -87,7 +87,7 @@ class BaseSondeDataset(object):
         """
         Return the standard unit for given parameter `code`
         """
-        return self.master_parameter_list[code][1]
+        return self.parameters[code][1]
 
 
     def set_standard_unit(self, code, unit):
