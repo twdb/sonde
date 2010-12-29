@@ -75,7 +75,7 @@ class BaseSondeDataset(object):
 
     def __init__(self):
         self._read_data()
-        self.normalize_data()
+        self.rescale_data()
 
         if default_timezone:
             self.convert_timezones(default_timezone)
@@ -97,9 +97,9 @@ class BaseSondeDataset(object):
         self.parameters[code][1] = unit
 
 
-    def normalize_data(self):
+    def rescale_data(self):
         """
-        Cycle through the parameter list and normalize all data values
+        Cycle through the parameter list and convert all data values
         to their standard units.
         """
         self.available_params_orig = self.parameters.copy()
@@ -122,9 +122,10 @@ class BaseSondeDataset(object):
         """
         Calculate salinity if salinity parameter is missing but
         conductivity is present. This method assumes that conductivity
-        parameters are in standard units
-        (i.e. :attr:`normalize_data` has been run).
+        parameters are in standard units (i.e. :attr:`rescale_data`
+        has been run).
         """
+        
         params = self.parameters.keys()
         if 'SAL01' in params:
             return
