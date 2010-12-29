@@ -87,7 +87,7 @@ class BaseSondeDataset(object):
         """
         Return the standard unit for given parameter `code`
         """
-        return self.master_parameter_list[code][1]
+        return self.parameters[code][1]
 
 
     def set_standard_unit(self, code, unit):
@@ -102,13 +102,15 @@ class BaseSondeDataset(object):
         Cycle through the parameter list and convert all data values
         to their standard units.
         """
-        for param, unit in self.parameters.iteritems():
-            std_unit = self.get_standard_unit(param)
+        for param_code, param_val in self.parameters.iteritems():
+            std_unit = param_val[1]
+            unit = self.data[param_code].units
+            
             if unit != std_unit:
-                self.data[param] = self.data[param].rescale(std_unit)
-                self.parameters[param][1] = std_unit
-                if param[0:3] == 'TEM': #assumes TEMP is in degF
-                    self.data[param] = 32 * pq.degC + self.data[param]             
+                self.data[param_code] = self.data[param_code].rescale(std_unit)
+                self.parameters[param_code][1] = std_unit
+                if param_code[0:3] == 'TEM': #assumes TEMP is in degF
+                    self.data[param_code] = 32 * pq.degC + self.data[param_code]             
 
             
     def calculate_salinity(self):

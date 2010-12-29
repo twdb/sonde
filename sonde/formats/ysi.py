@@ -69,9 +69,9 @@ class YSIDataset(sonde.BaseSondeDataset):
         self.data = dict()
         for parameter in ysi_data.parameters:
             try:
-                pname = param_map[(parameter.name).strip()]
+                pcode = param_map[(parameter.name).strip()]
                 punit = unit_map[(parameter.unit).strip()]
-                self.parameters[pname] = punit
+                self.parameters[pcode] = self.master_parameter_list[pcode]
                 self.data[param_map[parameter.name]] = parameter.data * punit
             except:
                 print 'Un-mapped Parameter/Unit Type'

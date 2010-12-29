@@ -83,9 +83,8 @@ class BaseSondeDatasetTestCase(unittest.TestCase):
         self.test_dataset = SondeTestDataset()
 
     def test_set_and_get_standard_unit(self):
-        self.test_dataset.set_standard_unit('WSE01', pq.m)
-        unit = self.test_dataset.get_standard_unit('WSE01')
-
+        self.test_dataset.set_standard_unit('WSE01', pq.ft)
+        assert pq.ft == self.test_dataset.get_standard_unit('WSE01')
 
 
 
