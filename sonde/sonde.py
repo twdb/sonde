@@ -20,8 +20,33 @@ from . import quantities as sq
 #import logging
 from .timezones import cst
 
-# XXX: put this into a proper config file
+
+#XXX: put this into a proper config file
+#: The default timezone to use when reading files
 default_timezone = cst
+
+
+#: A dict that contains all the parameters that could potentially be
+#: read from a data file, along with their standard units. This list
+#: is exhaustive and will be fully populated whether or not data is or
+#: even available in a particular format. See the `parameters`
+#: attribute for parameters that are available for a particular file.
+master_parameter_list = {
+    'ATM01' : ('Atmospheric Pressure', pq.pascal),
+    'BAT01' : ('Battery Voltage', pq.volt),
+    'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
+    'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
+    'DOX01' : ('Dissolved Oxygen Concentration', sq.mgl),
+    'DOX02' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
+    'PHL01' : ('pH Level', pq.dimensionless),
+    'SAL01' : ('Salinity', sq.psu),
+    'TEM01' : ('Water Temperature', pq.degC),
+    'TEM02' : ('Air Temperature', pq.degC),
+    'TUR01' : ('Turbidity', sq.ntu),
+    'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', pq.m),
+    'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', pq.m),
+    }
+
 
 
 def Sonde(filename, file_format, *args, **kwargs):
@@ -46,32 +71,9 @@ class BaseSondeDataset(object):
     directly; this class contains all the attributes and methods that
     are common to all data formats.
     """
-
-    #: A dict that contains all the parameters that could potentially
-    #: be read from a data file, along with their standard units. This
-    #: list is exhaustive and will be fully populated whether or not
-    #: data is or even available in a particular format. See the
-    #: `parameters` attribute for parameters that are available for a
-    #: particular file.
-    master_parameter_list = {'TEM01' : ['Water Temperature', pq.degC],
-                             'CON01' : ['Specific Conductance(Normalized @25degC)', sq.mScm],
-                             'CON02' : ['Conductivity(Not Normalized)', sq.mScm],
-                             'SAL01' : ['Salinity', sq.psu],
-                             'WSE01' : ['Water Surface Elevation (No Atm Pressure Correction)', pq.m],
-                             'WSE02' : ['Water Surface Elevation (Atm Pressure Corrected)', pq.m],
-                             'BAT01' : ['Battery Voltage', pq.volt],
-                             'PHL01' : ['pH Level', pq.dimensionless],
-                             'DOX01' : ['Dissolved Oxygen Concentration', sq.mgl],
-                             'DOX02' : ['Dissolved Oxygen Saturation Concentration', pq.percent],
-                             'ATM01' : ['Atmospheric Pressure', pq.pascal],
-                             'TEM02' : ['Air Temperature', pq.degC],
-                             'TUR01' : ['Turbidity', sq.ntu],
-                             }
-
     #: A dict containing the parameters read from a data file and
     #: their values
     parameters = {}
-
 
     def __init__(self):
         self._read_data()
@@ -83,18 +85,19 @@ class BaseSondeDataset(object):
         #TODO ADD COMMENTS FIELD
 
     
-    def get_standard_unit(self,code):
+    def get_standard_unit(self, param_code):
         """
-        Return the standard unit for given parameter `code`
+        Return the standard unit for given parameter `param_code`
         """
-        return self.parameters[code][1]
+        return self.parameters[param_code][1]
 
 
-    def set_standard_unit(self, code, unit):
+    def set_standard_unit(self, param_code, param_unit):
         """
-        Set the standard unit for a given parameter `code` to `unit`
+        Set the standard param_unit for a given parameter `param_code`
+        to `param_unit`
         """
-        self.parameters[code][1] = unit
+        self.parameters[param_code] = (self.parameters[param_code][0], param_unit)
 
 
     def rescale_data(self):
@@ -103,14 +106,14 @@ class BaseSondeDataset(object):
         to their standard units.
         """
         for param_code, param_val in self.parameters.iteritems():
-            std_unit = param_val[1]
+            std_unit = self.get_standard_unit(param_code)
             unit = self.data[param_code].units
             
             if unit != std_unit:
                 self.data[param_code] = self.data[param_code].rescale(std_unit)
                 self.parameters[param_code][1] = std_unit
                 if param_code[0:3] == 'TEM': #assumes TEMP is in degF
-                    self.data[param_code] = 32 * pq.degC + self.data[param_code]             
+                    self.data[param_code] = 32 * pq.degC + self.data[param_code]
 
             
     def calculate_salinity(self):
@@ -120,7 +123,6 @@ class BaseSondeDataset(object):
         parameters are in standard units (i.e. :attr:`normalize_data`
         has been run).
         """
-        
         params = self.parameters.keys()
         if 'SAL01' in params:
             return
