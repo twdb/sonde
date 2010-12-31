@@ -12,32 +12,24 @@ import csv
 from datetime import datetime
 import os
 import nose
-from nose.tools import assert_almost_equal, set_trace
+from nose.tools import assert_almost_equal, eq_, set_trace
 import numpy as np
 import quantities as pq
-import re
-import sys
-
-
-# Add path to sonde to sys.path for development
-#sonde_path = os.path.join(os.path.dirname(__file__), '..')
-#sys.path.append(os.path.join(sonde_path))
-
 
 from sonde import BaseSondeDataset, Sonde
 from sonde import quantities as sq
 from sonde.timezones import cdt, cst
 from sonde.formats import ysi
 
-
 ysi_test_files_path = os.path.join(os.path.dirname(__file__), 'ysi_test_files')
+
 
 
 class SondeTestDataset(BaseSondeDataset):
     """
-    A test dataset
+    A dummy test dataset - so aspects of BaseSondeDataset can be
+    tested independent of parsing logic
     """
-
     def __init__(self):
         super(SondeTestDataset, self).__init__()
 
@@ -78,14 +70,129 @@ class SondeTestDataset(BaseSondeDataset):
 
                  
 class BaseSondeDataset_Test():
-    def setUp(self):
-        self.test_dataset = SondeTestDataset()
+    def setup(self):
+        self.dataset = SondeTestDataset()
+
+        self.fahrenheit_temps = [23,
+                                 55,
+                                 3994,
+                                 -99.67,
+                                 0,
+                                 32,
+                                 ]
+
+        self.celcius_temps = [-5,
+                              12.77777777778,
+                              2201.11111111111,
+                              -73.15,
+                              -17.7777777778,
+                              0,
+                              ]
+
+        self.kelvin_temps = [268.15,
+                             285.92777777778,
+                             2474.261111111111,
+                             200,
+                             255.37222222222,
+                             273.15,
+                             ]
+
+
 
     def test_set_and_get_standard_unit(self):
-        self.test_dataset.set_standard_unit('WSE01', pq.ft)
-        assert pq.ft == self.test_dataset.get_standard_unit('WSE01')
+        self.dataset.set_standard_unit('WSE01', pq.ft)
+
+        # make sure the standard unit has been set
+        assert pq.ft == self.dataset.get_standard_unit('WSE01')
+
+        # make sure unit conversion happened
+        for value in self.dataset.data["WSE01"]:
+            assert_almost_equal(value.magnitude,
+                                3.280839895013123)
 
 
+    def test_rescale_parameter_elevation(self):
+        self.dataset.data['WSE01'] = np.ones(6) * 3.280839895013123 * pq.ft
+        self.dataset.rescale_parameter('WSE01')
 
+        for value in self.dataset.data["WSE01"]:
+            eq_(value.units, pq.m)
+            assert_almost_equal(value.magnitude,
+                                1)
+
+
+    def test_rescale_parameter_temperature_celsius_to_fahrenheit(self):
+        self.dataset.set_standard_unit('TEM01', pq.degF)
+
+        self.dataset.data['TEM01'] = np.array(self.celcius_temps) * pq.degC
+        self.dataset.rescale_parameter('TEM01')
+
+        for converted, expected in zip(self.dataset.data["TEM01"],
+                                       self.fahrenheit_temps):
+            assert_almost_equal(converted.magnitude,
+                                expected)
+
+
+    def test_rescale_parameter_temperature_celsius_to_kelvin(self):
+        self.dataset.set_standard_unit('TEM01', pq.degK)
+
+        self.dataset.data['TEM01'] = np.array(self.celcius_temps) * pq.degC
+        self.dataset.rescale_parameter('TEM01')
+
+        for converted, expected in zip(self.dataset.data["TEM01"],
+                                       self.kelvin_temps):
+            assert_almost_equal(converted.magnitude,
+                                expected)
+
+
+    def test_rescale_parameter_temperature_fahrenheit_to_celsius(self):
+        self.dataset.set_standard_unit('TEM01', pq.degC)
+
+        self.dataset.data['TEM01'] = np.array(self.fahrenheit_temps) * pq.degF
+        self.dataset.rescale_parameter('TEM01')
+
+        for converted, expected in zip(self.dataset.data["TEM01"],
+                                       self.celcius_temps):
+            assert_almost_equal(converted.magnitude,
+                                expected)
+
+
+    def test_rescale_parameter_temperature_fahrenheit_to_kelvin(self):
+        self.dataset.set_standard_unit('TEM01', pq.degK)
+
+        self.dataset.data['TEM01'] = np.array(self.fahrenheit_temps) * pq.degF
+        self.dataset.rescale_parameter('TEM01')
+
+        for converted, expected in zip(self.dataset.data["TEM01"],
+                                       self.kelvin_temps):
+            assert_almost_equal(converted.magnitude,
+                                expected)
+
+
+    def test_rescale_parameter_temperature_kelvin_to_celsius(self):
+        self.dataset.set_standard_unit('TEM01', pq.degC)
+
+        self.dataset.data['TEM01'] = np.array(self.kelvin_temps) * pq.degK
+        self.dataset.rescale_parameter('TEM01')
+
+        for converted, expected in zip(self.dataset.data["TEM01"],
+                                       self.celcius_temps):
+            assert_almost_equal(converted.magnitude,
+                                expected)
+
+
+    def test_rescale_parameter_temperature_kelvin_to_fahrenheit(self):
+        self.dataset.set_standard_unit('TEM01', pq.degF)
+
+        self.dataset.data['TEM01'] = np.array(self.kelvin_temps) * pq.degK
+        self.dataset.rescale_parameter('TEM01')
+
+        for converted, expected in zip(self.dataset.data["TEM01"],
+                                       self.fahrenheit_temps):
+            assert_almost_equal(converted.magnitude,
+                                expected)
+
+
+    
 if __name__ == '__main__':
     nose.run()

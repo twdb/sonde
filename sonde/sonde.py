@@ -118,13 +118,60 @@ class BaseSondeDataset(object):
         Convert the data for a parameter to its standard unit.
         """
         std_unit = self.get_standard_unit(param_code)
-        unit = self.data[param_code].units
-        
-        if unit != std_unit:
+        current_unit = self.data[param_code].units
+
+
+        # XXX: Todo: Fix upstream (see comment in _temperature_offset)
+        std_symbol = std_unit.dimensionality.keys()[0].symbol
+        current_symbol = current_unit.dimensionality.keys()[0].symbol
+
+        #if current_unit != std_unit:        
+        if current_symbol != std_symbol:
             self.data[param_code] = self.data[param_code].rescale(std_unit)
 
-            if param_code[0:3] == 'TEM': #assumes TEMP is in degF
-                self.data[param_code] = 32 * pq.degC + self.data[param_code]
+            # Add temperature offset depending on the temperature scales
+            if isinstance(std_unit, pq.UnitTemperature):
+                self.data[param_code] += self._temperature_offset(current_unit, std_unit)
+
+
+    def _temperature_offset(self, from_unit, to_unit):
+        """
+        Return the offset that should be applied when converting from
+        quantities units `from_unit` to `to_unit`. The quantities
+        package purposely avoids converting absolute temperature
+        scales to avoid ambiguity.
+        """
+
+        # This looks is a bit hacky because it is. In the quantities
+        # package, comparing the units for celcius and kelvin evaluates to true, which
+        from_symbol = from_unit.dimensionality.keys()[0].symbol
+        to_symbol = to_unit.dimensionality.keys()[0].symbol
+
+        if from_symbol == to_symbol:
+            return np.array([0]) * to_symbol
+
+        elif from_symbol == 'degC' and to_symbol == 'degF':
+            return 32 * pq.degF
+
+        elif from_symbol == 'degC' and to_symbol == 'K':
+            return 273.15 * pq.degK
+
+        elif from_symbol == 'degF' and to_symbol == 'degC':
+            return -(32*(5.0/9)) * pq.degC
+
+        elif from_symbol == 'degF' and to_symbol == 'K':
+            return 459.67 * (5.0/9) * pq.degK
+
+        elif from_symbol == 'K' and to_symbol == 'degC':
+            return -273.15 * pq.degC
+
+        elif from_symbol == 'K' and to_symbol == 'degF':
+            return -459.67 * pq.degF
+
+        else:
+            raise NotImplementedError, "conversion between %s and %s not supported" % (from_symbol, to_symbol)
+        
+
 
             
     def calculate_salinity(self):
