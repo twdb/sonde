@@ -95,9 +95,13 @@ class BaseSondeDataset(object):
     def set_standard_unit(self, param_code, param_unit):
         """
         Set the standard param_unit for a given parameter `param_code`
-        to `param_unit`
+        to `param_unit`. This method automatically rescales the data
+        to the standard unit.
         """
-        self.parameters[param_code] = (self.parameters[param_code][0], param_unit)
+        self.parameters[param_code] = (self.parameters[param_code][0],
+                                       param_unit)
+
+        self.rescale_parameter(param_code)
 
 
     def rescale_data(self):
@@ -105,22 +109,29 @@ class BaseSondeDataset(object):
         Cycle through the parameter list and convert all data values
         to their standard units.
         """
-        for param_code, param_val in self.parameters.iteritems():
-            std_unit = self.get_standard_unit(param_code)
-            unit = self.data[param_code].units
-            
-            if unit != std_unit:
-                self.data[param_code] = self.data[param_code].rescale(std_unit)
-                self.parameters[param_code][1] = std_unit
-                if param_code[0:3] == 'TEM': #assumes TEMP is in degF
-                    self.data[param_code] = 32 * pq.degC + self.data[param_code]
+        for param_code in self.parameters.keys():
+            self.rescale_parameter(param_code)
+
+
+    def rescale_parameter(self, param_code):
+        """
+        Convert the data for a parameter to its standard unit.
+        """
+        std_unit = self.get_standard_unit(param_code)
+        unit = self.data[param_code].units
+        
+        if unit != std_unit:
+            self.data[param_code] = self.data[param_code].rescale(std_unit)
+
+            if param_code[0:3] == 'TEM': #assumes TEMP is in degF
+                self.data[param_code] = 32 * pq.degC + self.data[param_code]
 
             
     def calculate_salinity(self):
         """
         Calculate salinity if salinity parameter is missing but
         conductivity is present. This method assumes that conductivity
-        parameters are in standard units (i.e. :attr:`normalize_data`
+        parameters are in standard units (i.e. :attr:`rescale_parameter`
         has been run).
         """
         params = self.parameters.keys()
