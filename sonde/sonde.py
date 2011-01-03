@@ -82,7 +82,7 @@ class BaseSondeDataset(object):
         if 'CON01' in self.data or 'CON02' in self.data:
             self._calculate_salinity()
 
-        if default_timezone:
+        if default_timezone and self.dates[0].tzinfo != None:
             self.convert_timezones(default_timezone)
 
         #TODO ADD COMMENTS FIELD
