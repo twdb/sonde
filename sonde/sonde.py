@@ -79,6 +79,9 @@ class BaseSondeDataset(object):
         self._read_data()
         self.rescale_data()
 
+        if 'CON01' in self.data or 'CON02' in self.data:
+            self._calculate_salinity()
+
         if default_timezone:
             self.convert_timezones(default_timezone)
 
@@ -98,10 +101,15 @@ class BaseSondeDataset(object):
         to `param_unit`. This method automatically rescales the data
         to the standard unit.
         """
-        self.parameters[param_code] = (self.parameters[param_code][0],
-                                       param_unit)
+        if param_code in self.parameters:
+            param_description = self.parameters[param_code][0]
+        else:
+            param_description = master_parameter_list[param_code][0]
 
-        self.rescale_parameter(param_code)
+        self.parameters[param_code] = (param_description, param_unit)
+                                       
+        if param_code in self.data:
+            self.rescale_parameter(param_code)
 
 
     def rescale_data(self):
@@ -136,19 +144,23 @@ class BaseSondeDataset(object):
 
     def _temperature_offset(self, from_unit, to_unit):
         """
-        Return the offset that should be applied when converting from
-        quantities units `from_unit` to `to_unit`. The quantities
-        package purposely avoids converting absolute temperature
-        scales to avoid ambiguity.
+        Return the offset in degrees of `to_unit` that should be
+        applied when converting from quantities units `from_unit` to
+        `to_unit`. The quantities package purposely avoids converting
+        absolute temperature scales to avoid ambiguity.
         """
 
         # This looks is a bit hacky because it is. In the quantities
-        # package, comparing the units for celcius and kelvin evaluates to true, which
+        # package, comparing the units for celcius and kelvin
+        # evaluates to true because it only considers relative
+        # temperatures. We need to compare the symbol string. We
+        # should talk to the quantities maintainers and see if we can
+        # come up with a cleaner way to do this.
         from_symbol = from_unit.dimensionality.keys()[0].symbol
         to_symbol = to_unit.dimensionality.keys()[0].symbol
 
         if from_symbol == to_symbol:
-            return np.array([0]) * to_symbol
+            return np.array([0]) * to_unit
 
         elif from_symbol == 'degC' and to_symbol == 'degF':
             return 32 * pq.degF
@@ -169,17 +181,13 @@ class BaseSondeDataset(object):
             return -459.67 * pq.degF
 
         else:
-            raise NotImplementedError, "conversion between %s and %s not supported" % (from_symbol, to_symbol)
-        
-
+            raise NotImplementedError, "conversion from %s to %s not supported" % (from_symbol, to_symbol)
 
             
-    def calculate_salinity(self):
+    def _calculate_salinity(self):
         """
         Calculate salinity if salinity parameter is missing but
-        conductivity is present. This method assumes that conductivity
-        parameters are in standard units (i.e. :attr:`rescale_parameter`
-        has been run).
+        conductivity is present.
         """
         params = self.parameters.keys()
         if 'SAL01' in params:
@@ -187,26 +195,28 @@ class BaseSondeDataset(object):
         else:
             if 'CON01' in params:
                 T = 25.0
-                cond = self.data['CON01'].magnitude
+                cond = self.data['CON01'].rescale(sq.mScm).magnitude
             elif 'CON02' in params:
-                T = self.data['TEM01'].magnitude
-                cond = self.data['CON02'].magnitude
+                current_unit = self.data['TEM01'].units
+                temp_celsius = self.data['TEM01'].rescale(pq.degC)
+                temp_celsius += self._temperature_offset(current_unit, pq.degC)
+                T = temp_celsius.magnitude
+                cond = self.data['CON02'].rescale(sq.mScm).magnitude
             else:
                 return
             
-            #absolute pressure in dbar
+            # absolute pressure in dbar
             if 'WSE01' in params:
-                P = self.data['WSE01'].magnitude * 1.0197 + 10.1325
+                P = self.data['WSE01'].rescale(pq.m).magnitude * 1.0197 + 10.1325
             elif 'WSE02' in params:
-                P = self.data['WSE02'].magnitude * 1.0197 
+                P = self.data['WSE02'].rescale(pq.m).magnitude * 1.0197 
             else:
                 P = 10.1325
             
             R = cond / 42.914
-            sal = seawater.salt(R,T,P)
+            sal = seawater.csiro.salt(R,T,P)
 
-            #add salinity to list of available params
-            self.parameters['SAL01'] = sq.psu
+            self.set_standard_unit('SAL01', sq.psu)
             self.data['SAL01'] = sal * sq.psu
 
 
@@ -228,6 +238,7 @@ class BaseSondeDataset(object):
         else:
             self.dates = np.array([date.astimezone(to_tzinfo)
                                    for date in self.dates])
+
 
     def _read_data(self):
         """
@@ -302,4 +313,3 @@ class BaseSondeDataset(object):
         np.savetxt('tmpdata.txt',data,fmt='%08.5f',delimiter=',')
         os.popen('paste -d, tmpdates.txt tmpdata.txt >> ' + filename)
         os.popen('rm tmp*.txt')
-    
