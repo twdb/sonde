@@ -81,7 +81,7 @@ class BaseSondeDataset_Test():
                                  32,
                                  ]
 
-        self.celcius_temps = [-5,
+        self.celsius_temps = [-5,
                               12.77777777778,
                               2201.11111111111,
                               -73.15,
@@ -124,7 +124,7 @@ class BaseSondeDataset_Test():
     def test_rescale_parameter_temperature_celsius_to_fahrenheit(self):
         self.dataset.set_standard_unit('TEM01', pq.degF)
 
-        self.dataset.data['TEM01'] = np.array(self.celcius_temps) * pq.degC
+        self.dataset.data['TEM01'] = np.array(self.celsius_temps) * pq.degC
         self.dataset.rescale_parameter('TEM01')
 
         for converted, expected in zip(self.dataset.data["TEM01"],
@@ -136,11 +136,23 @@ class BaseSondeDataset_Test():
     def test_rescale_parameter_temperature_celsius_to_kelvin(self):
         self.dataset.set_standard_unit('TEM01', pq.degK)
 
-        self.dataset.data['TEM01'] = np.array(self.celcius_temps) * pq.degC
+        self.dataset.data['TEM01'] = np.array(self.celsius_temps) * pq.degC
         self.dataset.rescale_parameter('TEM01')
 
         for converted, expected in zip(self.dataset.data["TEM01"],
                                        self.kelvin_temps):
+            assert_almost_equal(converted.magnitude,
+                                expected)
+
+
+    def test_rescale_parameter_temperature_celsius_to_celsius(self):
+        self.dataset.set_standard_unit('TEM01', pq.degC)
+
+        self.dataset.data['TEM01'] = np.array(self.celsius_temps) * pq.degC
+        self.dataset.rescale_parameter('TEM01')
+
+        for converted, expected in zip(self.dataset.data["TEM01"],
+                                       self.celsius_temps):
             assert_almost_equal(converted.magnitude,
                                 expected)
 
@@ -152,7 +164,7 @@ class BaseSondeDataset_Test():
         self.dataset.rescale_parameter('TEM01')
 
         for converted, expected in zip(self.dataset.data["TEM01"],
-                                       self.celcius_temps):
+                                       self.celsius_temps):
             assert_almost_equal(converted.magnitude,
                                 expected)
 
@@ -176,7 +188,7 @@ class BaseSondeDataset_Test():
         self.dataset.rescale_parameter('TEM01')
 
         for converted, expected in zip(self.dataset.data["TEM01"],
-                                       self.celcius_temps):
+                                       self.celsius_temps):
             assert_almost_equal(converted.magnitude,
                                 expected)
 
