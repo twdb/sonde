@@ -1,6 +1,6 @@
 """
     sonde.formats.ysi
-    ~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~
 
     This module implements the YSI format 
     

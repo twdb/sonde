@@ -27,6 +27,10 @@ import sys, os
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.coverage']
 
+# Have autodoc generate docs for code in the order that the code is
+# organized in the source files
+autodoc_member_order = 'bysource'
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

@@ -49,16 +49,17 @@ master_parameter_list = {
 
 
 
-def Sonde(filename, file_format, *args, **kwargs):
+def Sonde(file_path, file_format, *args, **kwargs):
     """
-    Return a Sonde instance for a particular format. This function
-    provides a uniform interface to the various supported file
-    formats. At some point in the future, it may be also be able to
-    auto-detect formats.
+    Create a sonde instance for a particular `file_format`. This
+    function provides a uniform interface to the various supported
+    file formats.
+    Currently supported file formats are:
+    - ysi
     """
     if file_format.lower() == 'ysi':
         from sonde.formats.ysi import YSIDataset
-        return YSIDataset(filename, *args, **kwargs)
+        return YSIDataset(file_path, *args, **kwargs)
 
     raise NotImplementedError, "file format '%s' is not supported"
 
@@ -66,13 +67,12 @@ def Sonde(filename, file_format, *args, **kwargs):
 
 class BaseSondeDataset(object):
     """
-    The main Sonde Dataset class that all data format objects should
-    inherit. The Sonde object is not intended to be instantiated
-    directly; this class contains all the attributes and methods that
-    are common to all data formats.
+    The base class that all sonde format objects should inherit. This
+    class contains all the attributes and methods that are common to
+    all data formats; it is not intended to be instantiated directly.
     """
-    #: A dict containing the parameters read from a data file and
-    #: their values
+    #: A dict that maps parameter codes to long descriptions and their
+    #: standard units
     parameters = {}
 
     def __init__(self):

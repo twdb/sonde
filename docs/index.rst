@@ -6,15 +6,44 @@
 Welcome to PySonde's documentation!
 ===================================
 
-
-
-Contents:
-
 .. toctree::
    :maxdepth: 2
 
-   api
+.. module:: sonde
+
+
+Quick start
+-----------
+
+The easiest way to read a data file is by using the Sonde function,
+which takes a file path, a file format and then a series of
+format-specific arguments::
+
+    from sonde import Sonde
+    dataset = Sonde('path/to/ysi_file.dat', 'ysi', param_def='path/to/ysi_param.def')
+
+    dataset.dates   # contains a numpy array of datetime objects
+    dataset.data    # contains a dict with numpy arrays for each data field mapped to the field name
+
+
+    
+Sonde Object
+------------
+
+.. autofunction:: Sonde
+
+.. autoclass:: BaseSondeDataset
+   :members:
+
+
    
+Formats
+-------
+   
+.. autoclass:: sonde.formats.ysi.YSIDataset
+   :members:
+
+
    
 Indices and tables
 ==================
