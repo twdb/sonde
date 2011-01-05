@@ -54,8 +54,9 @@ def Sonde(file_path, file_format, *args, **kwargs):
     Create a sonde instance for a particular `file_format`. This
     function provides a uniform interface to the various supported
     file formats.
+
     Currently supported file formats are:
-    - ysi
+      - `ysi`
     """
     if file_format.lower() == 'ysi':
         from sonde.formats.ysi import YSIDataset

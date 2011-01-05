@@ -12,6 +12,15 @@ Welcome to PySonde's documentation!
 .. module:: sonde
 
 
+Installation
+------------
+
+From the pysonde directory, run::
+
+    python setup.py install
+
+
+
 Quick start
 -----------
 

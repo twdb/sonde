@@ -1,0 +1,60 @@
+PySonde is a module for reading water quality data from various sensor
+formats. 
+
+
+
+REQUIREMENTS
+------------
+
+Pysonde requires a few libraries:
+  - numpy
+  - pytz
+  - quantities
+  - seawater
+  - nose (for tests)
+  - sphinx (for docs)
+
+
+  
+  
+INSTALL
+-------
+
+From the pysonde directory, run::
+
+    $ python setup.py install
+
+
+    
+TESTS
+-----
+
+PySonde unit tests are written for the nose testing framework. To run
+the full test suite, install nose and run ``nosetests`` from either
+the pysonde root directory or the tests directory.
+
+
+
+
+
+DOCUMENTATION
+-------------
+
+Pysonde is documented with sphinx. To generate html documentation
+enter the directory and run::
+
+    make html
+
+
+Other output formats are available, for that refer to the sphinx
+website at:  http://sphinx.pocoo.org/
+
+
+
+
+LICENSE
+-------
+
+PySonde is licensed under the three-clause Modified BSD License, the
+full terms of which can be found in the LICENSE file in the root
+directory of this distribution.
