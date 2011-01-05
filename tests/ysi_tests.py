@@ -12,11 +12,11 @@ import collections
 import csv
 from datetime import datetime
 import os
+
 import nose
 from nose.tools import assert_almost_equal, set_trace
 import numpy as np
 import quantities as pq
-
 
 from sonde import Sonde
 from sonde import quantities as sq
@@ -24,7 +24,7 @@ from sonde.timezones import cdt, cst
 from sonde.formats import ysi
 
 
-ysi_test_files_path = os.path.join(os.path.dirname(__file__), 'ysi_test_files')
+YSI_TEST_FILES_PATH = os.path.join(os.path.dirname(__file__), 'ysi_test_files')
 
 
 def ysi_csv_read(filename):
@@ -72,9 +72,9 @@ def compare_quantity_and_csv_str(quantities, str_list):
 
 class YSIReader_Test():
     def setup(self):
-        csv_test_file_path = ysi_test_files_path + '/BAYT_20070323_CDT_YS1772AA_000.csv'
-        ysi_test_file_path = ysi_test_files_path + '/BAYT_20070323_CDT_YS1772AA_000.dat'
-        ysi_param_file_path = ysi_test_files_path + '/ysi_param.def'
+        csv_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.csv'
+        ysi_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.dat'
+        ysi_param_file_path = YSI_TEST_FILES_PATH + '/ysi_param.def'
 
         self.ysi_reader = ysi.YSIReader(ysi_test_file_path, param_file=ysi_param_file_path, tzinfo=cdt)
         self.ysi_csv = ysi_csv_read(csv_test_file_path)
@@ -105,24 +105,50 @@ class YSITestBase():
     
 
 
-class YSIDataset_Test(YSITestBase):
+class YSIDatasetFilePath_Test(YSITestBase):
     def setup(self):
-        csv_test_file_path = ysi_test_files_path + '/BAYT_20070323_CDT_YS1772AA_000.csv'
-        ysi_test_file_path = ysi_test_files_path + '/BAYT_20070323_CDT_YS1772AA_000.dat'
-        ysi_param_file_path = ysi_test_files_path + '/ysi_param.def'
+        csv_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.csv'
+        ysi_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.dat'
+        ysi_param_file_path = YSI_TEST_FILES_PATH + '/ysi_param.def'
 
         self.ysi_dataset = ysi.YSIDataset(ysi_test_file_path, param_file=ysi_param_file_path, tzinfo=cdt)
         self.ysi_csv = ysi_csv_read(csv_test_file_path)
 
 
 
-class SondeYSIFormat_Test(YSITestBase):
+class SondeYSIFormatFilePath_Test(YSITestBase):
     def setup(self):
-        csv_test_file_path = ysi_test_files_path + '/BAYT_20070323_CDT_YS1772AA_000.csv'
-        ysi_test_file_path = ysi_test_files_path + '/BAYT_20070323_CDT_YS1772AA_000.dat'
-        ysi_param_file_path = ysi_test_files_path + '/ysi_param.def'
+        csv_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.csv'
+        ysi_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.dat'
+        ysi_param_file_path = YSI_TEST_FILES_PATH + '/ysi_param.def'
 
         self.ysi_dataset = Sonde(ysi_test_file_path, file_format='ysi', param_file=ysi_param_file_path, tzinfo=cdt)
+        self.ysi_csv = ysi_csv_read(csv_test_file_path)
+
+
+
+class YSIDatasetFileObject_Test(YSITestBase):
+    def setup(self):
+        csv_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.csv'
+        ysi_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.dat'
+        ysi_param_file_path = YSI_TEST_FILES_PATH + '/ysi_param.def'
+
+        with open(ysi_test_file_path) as fid:
+            self.ysi_dataset = ysi.YSIDataset(fid, param_file=ysi_param_file_path, tzinfo=cdt)
+
+        self.ysi_csv = ysi_csv_read(csv_test_file_path)
+
+
+
+class SondeYSIFormatFileObject_Test(YSITestBase):
+    def setup(self):
+        csv_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.csv'
+        ysi_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.dat'
+        ysi_param_file_path = YSI_TEST_FILES_PATH + '/ysi_param.def'
+
+        with open(ysi_test_file_path) as fid:
+            self.ysi_dataset = ysi.YSIDataset(fid, param_file=ysi_param_file_path, tzinfo=cdt)
+
         self.ysi_csv = ysi_csv_read(csv_test_file_path)
 
 

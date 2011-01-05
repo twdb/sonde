@@ -49,20 +49,23 @@ master_parameter_list = {
 
 
 
-def Sonde(file_path, file_format, *args, **kwargs):
+def Sonde(data_file, file_format, *args, **kwargs):
     """
-    Create a sonde instance for a particular `file_format`. This
-    function provides a uniform interface to the various supported
-    file formats.
+    Read `data_file` and create a sonde dataset instance for
+    it. `data_file` must be either a file path string or a file-like
+    object. `file_format` should be a string containing the format
+    that the file is in.
 
     Currently supported file formats are:
-      - `ysi`
+      - `ysi`: a YSI binary file
     """
     if file_format.lower() == 'ysi':
         from sonde.formats.ysi import YSIDataset
-        return YSIDataset(file_path, *args, **kwargs)
+        return YSIDataset(data_file, *args, **kwargs)
 
-    raise NotImplementedError, "file format '%s' is not supported"
+    else:
+        raise NotImplementedError, "file format '%s' is not supported" % \
+                                   (file_format,)
 
 
 

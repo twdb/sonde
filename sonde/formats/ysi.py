@@ -28,8 +28,8 @@ class YSIDataset(sonde.BaseSondeDataset):
     object that represents the timezone of the timestamps in the
     binary file.
     """
-    def __init__(self, filename, param_file='ysi_param.def', tzinfo=None):
-        self.filename = filename
+    def __init__(self, data_file, param_file='ysi_param.def', tzinfo=None):
+        self.data_file = data_file
         self.param_file = param_file
         self.default_tzinfo = tzinfo
         super(YSIDataset, self).__init__()
@@ -62,7 +62,7 @@ class YSIDataset(sonde.BaseSondeDataset):
                     }
 
 
-        ysi_data = YSIReader(self.filename, self.param_file, self.default_tzinfo)
+        ysi_data = YSIReader(self.data_file, self.param_file, self.default_tzinfo)
 
         # determine parameters provided and in what units
         self.parameters = dict()
@@ -104,20 +104,21 @@ class ChannelRec:
 
 class YSIReader:
     """
-    A reader object that opens and reads `filename`, a YSI binary
-    file. It accepts two optional parameters, `param_file` is a
+    A reader object that opens and reads a YSI binary file.
+    
+    `data_file` should be either a file path string or a file-like
+    object. It accepts two optional parameters, `param_file` is a
     ysi_param.def definition file and `tzinfo` is a datetime.tzinfo
     object that represents the timezone of the timestamps in the
     binary file.
     """
-    def __init__(self, filename, param_file='ysi_param.def', tzinfo=None):
-        self.filename = filename
+    def __init__(self, data_file, param_file='ysi_param.def', tzinfo=None):
         self.default_tzinfo = tzinfo
         self.num_params = 0
         self.parameters = []
         self.julian_time = []
         self.read_param_def(param_file)
-        self.read_ysi()
+        self.read_ysi(data_file)
 
         ysi_epoch = datetime.datetime(year=1984,
                                       month=3,
@@ -137,13 +138,17 @@ class YSIReader:
         self.first_sample_time = datetime.datetime.fromtimestamp(self.first_sample_time + ysi_epoch_in_seconds)
 
 
-    def read_param_def(self, filename):
+    def read_param_def(self, param_file):
         """
         Open and read a YSI param definition file.
         """
-        with open(filename) as fid:
-            file_string = fid.read()
-            
+        if type(param_file) == str:
+            with open(param_file) as fid:
+                file_string = fid.read()
+
+        else:
+            file_string = param_file.read()
+    
         file_string = re.sub("\n\s*\n*", "\n", file_string) #remove blank lines
         file_string = re.sub(";.*\n*", "", file_string)     #remove comment lines
         file_string = re.sub("\t", "", file_string)         #remove tabs
@@ -159,42 +164,51 @@ class YSIReader:
         self.ysi_param_def = np.genfromtxt(StringIO(file_string), delimiter=',', usecols=(0,1,3,5,7) , skip_header=3, dtype=dtype)
         
 
-    def read_ysi(self):
+    def read_ysi(self, ysi_file):
         """
         Open and read a YSI binary file.
         """
-        with open(self.filename) as fid:
-            type = []
-            self.num_params=0
-            while 1:
-                type = fid.read(1)
+        if type(ysi_file) == str:
+            fid = open(ysi_file)
 
-                if not type:
-                    break
+        else:
+            fid = ysi_file
+            
+        record_type = []
+        self.num_params=0
 
-                if type=='A':
-                    fmt = '<HLH16s32s6sLll36s'
-                    fmt_size = struct.calcsize(fmt)
-                    self.instr_type, self.system_sig, self.prog_ver, \
-                                     self.serial_num, site_name, self.pad1,\
-                                     self.logging_interval, self.begin_log_time, \
-                                     self.first_sample_time, self.pad2 \
-                                     = struct.unpack(fmt,fid.read(fmt_size))
+        record_type = fid.read(1)
+        while record_type:
 
-                elif type=='B':
-                    self.num_params = self.num_params + 1
-                    fmt = '<hhHff'
-                    fmt_size = struct.calcsize(fmt)
-                    self.parameters.append(ChannelRec(struct.unpack(fmt,fid.read(fmt_size)),self.ysi_param_def))
+            if record_type == 'A':
+                fmt = '<HLH16s32s6sLll36s'
+                fmt_size = struct.calcsize(fmt)
+                self.instr_type, self.system_sig, self.prog_ver, \
+                                 self.serial_num, site_name, self.pad1,\
+                                 self.logging_interval, self.begin_log_time, \
+                                 self.first_sample_time, self.pad2 \
+                                 = struct.unpack(fmt, fid.read(fmt_size))
 
-                elif type=='D':
-                    fmt = '<l' + str(self.num_params) + 'f'
-                    fmt_size = struct.calcsize(fmt)
-                    recs = struct.unpack(fmt,fid.read(fmt_size))
-                    self.julian_time.append(recs[0])
-                    for ii in range(self.num_params):
-                        self.parameters[ii].data.append(recs[ii+1])
+            elif record_type == 'B':
+                self.num_params = self.num_params + 1
+                fmt = '<hhHff'
+                fmt_size = struct.calcsize(fmt)
+                self.parameters.append(ChannelRec(struct.unpack(fmt, fid.read(fmt_size)), self.ysi_param_def))
 
-                else:
-                    print 'Type not implemented yet:',type
-                    break
+            elif record_type == 'D':
+                fmt = '<l' + str(self.num_params) + 'f'
+                fmt_size = struct.calcsize(fmt)
+                recs = struct.unpack(fmt, fid.read(fmt_size))
+                self.julian_time.append(recs[0])
+                for ii in range(self.num_params):
+                    self.parameters[ii].data.append(recs[ii+1])
+
+            else:
+                print 'Type not implemented yet:', record_type
+                break
+
+            record_type = fid.read(1)
+
+
+        if type(ysi_file) == str:
+            fid.close()
