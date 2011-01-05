@@ -1,0 +1,560 @@
+;============================================================================
+; File: _param.def
+; Last modified: May 28, 2004 (nc)
+;
+;	Table to convert from parm type or sensor type to name
+;
+;  (NC)File used for conversion of Ecoww.par entries to ZenoCompatible names
+;
+;		Column	Description
+;
+;		0		YSI official sensor ID
+;		1		Parameter name
+;		2		- RESERVED ("")
+;		3		Parameter unit
+;		4		- RESERVED ("")
+;		5		Short name (9 chars or less) used in 6200 sensor record
+;		6		- RESERVED ("")
+;		7		Num decimal places
+;
+;-------------------Version 5.00 ------------------------------------------
+; Revision Log:
+; 	05/28/04	- Added TSS- (514-516) and Cl2 (210) 
+;	05/05/04	- Added parameters for TSS+ calcs
+;	04/06/04	- Changed PAR units from none to uMoles  &
+;                         added 510 RainRate mm/hr to accomudate the Metric RainGauge
+;	01/15/04	- Updated Sonteks Units to include ft/s  
+;	11/17/03	- UNIVERSAL file for ALL ecowatch versions (NC)
+;----------------------------------------------------------------------------
+;	11/06/03	- Added sensors 505, 506, 507 (Nitrate Monitor)
+;	12/28/02	- Changed the naming and number of parameter to [345 (Sample)] to
+;			  be compatible with Ohios needs.
+;	12/07/01	- Added all of sontek(v7.9) and sidekick(v7.5)parameters
+;
+;----------------------- Version 3.0 (universal file) ----------------------
+;
+;	10/13/99	- Add CO2 Temp (325)
+;				- Add Chlorophyll, Fluorescence, and Optic (193 to 195)
+;					(from ewdcp-std)
+;	08/06/99	- Change 318 to 319 to CO2 R1 and R2
+;				  Add 325, 326 for CO2 CR and partial CO2
+;	08/03/99	- Change 316 to 319 to CO2 FL1, CO2 FL2, CO2 CR, and
+;					CO2 uATM
+;	10/22/98	- copy WorkHorse sensors (298 to 315) from Fred
+;				  add CO2 sensors 316 to 319
+;				  copy Sontek V4.2 from Fred (316 to 318) but move
+;					to 320-322
+;	10/14/98	- adjust displayed unit for flow to match sonde
+;
+;----------------------------------------------------------------------------
+
+; Version 4, made it Universal for all Eng. Versions of Ecowwin.exe
+FileVersion=5
+EcoWatchVer=318
+NumParam=380
+
+;												     123456789
+0,	"None",			"",	"none",			"",	"_none_",		"", 0
+1,	"Temperature",		"",	"C",			"",	"_TempC",		"", 2
+2,	"Temperature",		"",	"F",			"",	"_TempF",		"", 2
+3,	"Temperature",		"",	"K",			"",	"_TempK",		"", 0
+
+4,	"Conductivity",		"",	"mS/cm",		"",	"_CmS/cm",		"", 3
+5,	"Conductivity",		"",	"uS/cm",		"",	"_CuS/cm",		"", 1
+6,	"Specific Cond",	"",	"mS/cm",		"",	"_sCmS/cm",		"", 3
+7,	"Specific Cond",	"",	"uS/cm",		"",	"_sCuS/cm",		"", 1
+
+8,	"Resistivity",		"",	"KOhm.cm",		"",	"_RKOcm",		"", 2
+9,	"Resistivity",		"",	"MOhm.cm",		"",	"_RMOcm",		"", 3
+
+10,	"TDS",			"",	"g/L",			"",	"_TDSgL",		"", 3
+11,	"TDS coeff",		"",	"TDScoef",		"",	"_TDSCoef",		"", 3
+
+12,	"Salinity",		"",	"PPT",			"",	"_SalPPT",		"", 2
+13,	"Salinity",		"",	"ppt",			"",	"_Salppt",		"", 2
+
+14,	"DO",			"",	"%",			"",	"_DO%",			"", 1
+15,	"DO",			"",	"mg/L",			"",	"_DOmg",		"", 2
+16,	"DO",			"",	"uMol/L",		"",	"_DOuMol",		"", 2
+
+17,	"pH",			"",	"mV",			"",	"_pHmV",		"", 1
+18,	"pH",			"",	"pH",			"",	"_pH",			"", 2
+19,	"ORP",			"",	"mV",			"",	"_ORPmV",		"", 0
+
+20,	"Pressure-Abs",		"",	"psia",			"",	"_Prespsia",	"", 2
+21,	"Pressure-Gau",		"",	"psig",			"",	"_Prespsig",	"", 2
+
+22,	"Depth",		"",	"meters",		"",	"_Depm",		"", 3
+23,	"Depth",		"",	"ft",			"",	"_Depft",		"", 3
+
+24,	"Barometer",		"",	"psi",			"",	"_BPpsi",		"", 3
+25,	"Barometer",		"",	"Atm",			"",	"_BPatm",		"", 3
+26,	"Barometer",		"",	"mmHg",			"",	"_BPmmHg",		"", 1
+27,	"Barometer",		"",	"in.Hg",		"",	"_BPinHg",		"", 2
+
+28,	"Battery",		"",	"volts",		"",	"_BattV",		"", 1
+29,	"Voltage",		"",	"volts",		"",	"_VoltV",		"", 3
+30,	"Current",		"",	"mAmps",		"",	"_CurrentmA",	"", 2
+31,	"Density",		"",	"g/cm3",		"",	"_DensG/cm3",	"", 2
+32,	"Density",		"",	"Kg/m3",		"",	"_DensKg/m3",	"", 2
+33,	"Density",		"",	"lb/ft3",		"",	"_DensLb/ft3",	"", 2
+
+34,	"Current Speed",	"",	"cm/sec",		"",	"_CurSpCm/s",	"", 2
+35,	"Current Speed",	"",	"knots",		"",	"_CurSpKnot",	"", 2
+36,	"Current Dir",		"",	"degrees",		"",	"_CurDirDeg",	"", 1
+
+37,	"Turbidity",		"",	"NTU",			"",	"_TurNTU",		"", 2
+38,	"Rainfall",		"",	"cm",			"",	"_Raincm",		"", 4
+39,	"Rainfall",		"",	"inches",		"",	"_Rainin",		"", 4
+40,	"Solar Rad",		"",	"c/cm2/m",		"",	"_Solar",		"", 3
+41,	"Refract Index",	"",	"N",			"",	"_RefIdxN",		"", 2
+42,	"Rel.Humidity",		"",	"%",			"",	"_RH%",			"", 1
+
+43,	"Displacement",		"",	"meters",		"",	"_DispM",		"", 2
+44,	"Displacement",		"",	"ft",			"",	"_DispFt",		"", 2
+45,	"Tilt",			"",	"degrees",		"",	"_TiltDeg",		"", 2
+46,	"Frequency",		"",	"Hertz",		"",	"_FreqHz",		"", 0
+47,	"Ammonia",		"", 	"mg N/L",		"",	"_NH3mg/L",		"", 2
+48,	"Ammonium",		"", 	"mg N/L",		"",	"_NH4+mg/L",	"", 2
+
+49,	"ISE",			"", 	"mV",			"",	"_ISEmV",		"", 1
+50,	"Voltage",		"", 	"mV",			"",	"_VoltmV",		"", 2
+
+51,	"Date",			"", 	"ddmmyy",		"",	"_DateDMY",		"", 0
+52,	"Date",			"", 	"mmddyy",		"",	"_DateMDY",		"", 0
+53,	"Date",			"", 	"yymmdd",		"",	"_DateYMD",		"", 0
+54,	"Time",			"", 	"hhmmss",		"",	"_TimeHMS",		"", 0
+55,	"Logic Level",		"", 	"Logic",		"",	"_Logic",		"", 0
+
+56,	"Air Temp",		"", 	"C",			"",	"_ATempC",		"", 2
+57,	"Air Temp",		"", 	"F",			"",	"_ATempF",		"", 2
+58,	"Soil Temp",		"", 	"C",			"",	"_STempC",		"", 2
+59,	"Soil Temp",		"", 	"F",			"",	"_STempF",		"", 2
+60,	"Elec Temp",		"", 	"C",			"",	"_ETempC",		"", 2
+61,	"Elec Temp",		"", 	"F",			"",	"_ETempF",		"", 2
+
+62,	"Heave",		"",	"meters",		"",	"_HeaveM",		"", 2
+63,	"Heave",		"", 	"ft",			"",	"_HeaveFt",		"", 2
+64,	"Height",		"",	"meters",		"",	"_HeightM",		"", 2
+65,	"Height",		"", 	"ft",			"",	"_HeightFt",		"", 2
+66,	"Distance",		"",	"meters",		"",	"_DistM",		"", 2
+67,	"Distance",		"",	"ft",			"",	"_DistFt",		"", 2
+68,	"Soil Moisture",	"",	"%",			"",	"_SMoist%",		"", 2
+69,	"Pitch",		"", 	"degrees",		"",	"_PitchDeg",		"", 1
+70,	"Roll",			"", 	"degrees",		"",	"_RollDeg",		"", 1
+71,	"Slope",		"", 	"degrees",		"",	"_SlopeDeg",		"", 2
+72,	"Slope East",		"", 	"degrees",		"",	"_SlopeEDeg",		"", 2
+73,	"Slope North",		"", 	"degrees",		"",	"_SlopeNDeg",		"", 2
+74,	"Slope X",		"", 	"degrees",		"",	"_SlopeXDeg",		"", 2
+75,	"Slope Y",		"", 	"degrees",		"",	"_SlopeYDeg",		"", 2
+76,	"Tilt East",		"", 	"degrees",		"",	"_TiltEDeg",		"", 2
+77,	"Tilt North",		"", 	"degrees",		"",	"_TiltNDeg",		"", 2
+78,	"Tilt X",		"", 	"degrees",		"",	"_TiltXDeg",		"", 2
+79,	"Tilt Y",		"", 	"degrees",		"",	"_TiltYDeg",		"", 2
+80,	"Barometer",		"", 	"mBar",			"",	"_BPmBar",		"", 1
+
+81,	"Wind Dir",		"", 	"degrees",		"",	"_WDirD",		"", 0
+82,	"Wind Speed",		"", 	"knots",		"",	"_WSpKnot",		"", 1
+83,	"Wind Speed",		"", 	"m/sec",		"",	"_WSm/s",		"", 1
+84,	"Wind Speed",		"", 	"mph",			"",	"_WSmph",		"", 1
+85,	"Fluorescence",		"", 	"ug/L",			"",	"_FlourUg/L",		"", 5
+
+86,	"Free Space",		"", 	"bytes",		"",	"_FreeSb",		"", 0
+87,	"Free Space",		"", 	"KBytes",		"",	"_FreeSKb",		"", 0
+88,	"Error Code",		"", 	"Error",		"",	"_ECode",		"", 0
+89,	"Verify",		"", 	"Verify",		"",	"_Verify",		"", 0
+
+90,	"Generic",		"", 	"Gen",			"",	"_Generic",		"", 2
+91,	"User",			"", 	"User",			"",	"_User",		"", 2
+92,	"Barometer",		"", 	"kPa",			"",	"_BPkPa",		"", 2
+93,	"Wind Speed",		"", 	"km/h",			"",	"_WSkm/h",		"", 1
+
+94,	"Resistivity",		"", 	"Ohm.cm",		"",	"_ROcm",		"", 1
+95,	"TDS",			"", 	"Kg/L",			"",	"_TDSKg/L",		"", 3
+96,	"DO Charge",		"", 	"DOchrg",		"",	"_DOchrg",		"", 0
+97,	"Chloroform",		"", 	"ppb",			"",	"_",			"", 1
+98,	"Ground",		"", 	"Hertz",		"",	"_GroundHz",		"", 3
+99,	"Full Scale",		"", 	"Hertz",		"",	"_FScaleHz",		"", 3
+100,	"PresComp",		"",	"PresCmp",		"",	"_PresCmp",		"", 5
+
+101,	"Nitrate",		"",	"mV",			"",	"_NO3-mV",		"", 2
+102,	"Pressure",		"",	"kPaa",			"",	"_PresKPaa",		"", 2
+103,	"Pressure",		"",	"kPag",			"",	"_PresKPag",		"", 2
+104,	"Pressure",		"",	"psir",			"",	"_PresPsir",		"", 2
+105,	"Pressure",		"",	"kPar",			"",	"_PresKPar",		"", 2
+
+106,	"NitrateN",		"",	"mg/L",			"",	"_NO3-mg/L",		"", 2
+107,	"Ammonia",		"",	"mV",			"",	"_NH3mV",		"", 1
+108,	"Ammonium",		"",	"mV",			"",	"_NH4+mV",		"", 1
+109,	"TCE",			"",	"ppb",			"",	"_TCEppb",		"", 1
+110,	"TDS",			"",	"mg/L",			"",	"_TDSmg/L",		"", 1
+
+111,	"Pressure",		"",	"psi",			"",	"_PresPsi",		"", 2
+112,	"Chloride",		"",	"mg/L",			"",	"_Cl-mg/L",		"", 2
+113,	"Chlorophyll",		"",	"mg/L",			"",	"_",			"", 1
+114,	"Calcium",		"",	"mg/L",			"",	"_CalcMg/L",		"", 1
+115,	"Sulfide",		"",	"mg/L",			"",	"_SulfMg/L",		"", 1
+
+116,	"Bottle",		"",	"Bot",			"",	"_Bottle",		"", 0
+117,	"Site",			"",	"Sam",			"",	"_Site",		"", 0
+
+118,	"Flow",			"",	"ft3/s",		"",	"_FlowFt3/s",		"", 3
+119,	"Flow",			"",	"gal/min",		"",	"_FlowG/min",		"", 2
+120,	"Flow",			"",	"Mgal/day",		"",	"_FlowMg/d",		"", 4
+121,	"Flow",			"",	"m3/sec",		"",	"_FlowM3/s",		"", 4
+122,	"Flow",			"",	"L/s",			"",	"_FlowL/s",		"", 3
+
+123,	"Volume",		"",	"ft3",			"",	"_VolFt3",		"", 1
+124,	"Volume",		"",	"gal",			"",	"_VolGal",		"", 1
+125,	"Volume",		"",	"m3",			"",	"_VolM3",		"", 1
+126,	"Volume",		"",	"L",			"",	"_VolL",		"", 1
+
+127,	"Custom  1",		"",	"Cust 1",		"",	"_Cust1",		"", 2
+128,	"Custom  2",		"",	"Cust 2",		"",	"_Cust2",		"", 2
+129,	"Custom  3",		"",	"Cust 3",		"",	"_Cust3",		"", 2
+130,	"Custom  4",		"",	"Cust 4",		"",	"_Cust4",		"", 2
+131,	"Custom  5",		"",	"Cust 5",		"",	"_Cust5",		"", 2
+132,	"Custom  6",		"",	"Cust 6",		"",	"_Cust6",		"", 2
+133,	"Custom  7",		"",	"Cust 7",		"",	"_Cust7",		"", 2
+134,	"Custom  8",		"",	"Cust 8",		"",	"_Cust8",		"", 2
+135,	"Custom  9",		"",	"Cust 9",		"",	"_Cust9",		"", 2
+136,	"Custom 10",		"",	"Cust 10",		"",	"_Cust10",		"", 2
+137,	"Custom 11",		"",	"Cust 11",		"",	"_Cust11",		"", 2
+138,	"Custom 12",		"",	"Cust 12",		"",	"_Cust12",		"", 2
+139,	"Custom 13",		"",	"Cust 13",		"",	"_Cust13",		"", 2
+140,	"Custom 14",		"",	"Cust 14",		"",	"_Cust14",		"", 2
+141,	"Custom 15",		"",	"Cust 15",		"",	"_Cust15",		"", 2
+142,	"Custom 16",		"",	"Cust 16",		"",	"_Cust16",		"", 2
+143,	"Custom 17",		"",	"Cust 17",		"",	"_Cust17",		"", 2
+
+144,	"TurbComp",		"",	"TurbC",		"",	"_TurbCmp",		"", 5
+145,	"Chloride nc",		"",	"mV",			"",	"_ClmV",		"", 1
+146,	"TDG",			"",	"mmHg",			"",	"_TDGmmHg",		"", 1
+
+147,	"Custom 18",		"",	"Cust 18",		"",	"_Cust18",		"", 2
+148,	"Custom 19",		"",	"Cust 19",		"",	"_Cust19",		"", 2
+149,	"Custom 20",		"",	"Cust 20",		"",	"_Cust20",		"", 2
+150,	"Custom 21",		"",	"Cust 21",		"",	"_Cust21",		"", 2
+
+; 
+; commented out for now
+;147,	"Latitude",		"",	"deg.min",		"",	"_LatDegM",		"", 2
+;148,	"Latitude",		"",	"sec",			"",	"_LatSec",		"", 2
+;149,	"Longitude",		"",	"deg.min",		"",	"_LongDegM",		"", 2
+;150,	"Longitude",		"",	"sec",			"",	"_LongSec",		"", 2
+
+151,	"Altitude",		"",	"meters",		"",	"_AltM",		"", 1
+152,	"Altitude",		"",	"ft",			"",	"_AltFt",		"", 1
+153,	"Date",			"",	"",			"",	"_Date",		"", 0
+
+154,	"Rainfall",		"",	"mm",			"",	"_Rainmm",		"", 3
+155,	"Rain Rate",		"",	"cm/hr",		"",	"_RRcm/h",		"", 4
+156,	"Rain Rate",		"",	"in/hr",		"",	"_RRin/h",		"", 4
+
+157,	"Salinity",		"",	"ppt",			"",	"_SalUSGS",		"", 2
+158,	"Solar Rad",		"",	"Lg/min",		"",	"_SolaLg/m",		"", 2
+159,	"Solar Rad",		"",	"W/m^2",		"",	"_SolaW/m2",		"", 0
+160,	"Solar Rad",		"",	"KW/m^2",		"",	"_SolaKW/m2",		"", 3
+
+161,	"Barometer",		"",	"hPa",			"",	"_BPhPa",		"", 1
+162,	"H2S",			"",	"ppm",			"",	"_H2Sppm",		"", 2
+163,	"BIT Alarm",		"",	"",			"",	"_BITAlarm",		"", 0
+
+164,	"Flow",			"",	"gal/sec",		"",	"_FlowG/s",		"", 3
+165,	"Flow",			"",	"gal/hour",		"",	"_FlowG/h",		"", 3
+166,	"Flow",			"",	"ft3/min",		"",	"_FlowCfm",		"", 3
+167,	"Flow",			"",	"ft3/hour",		"",	"_FlowCfh",		"", 3
+168,	"Flow",			"",	"ft3/day",		"",	"_FlowCfd",		"", 3
+169,	"Flow",			"",	"m3/min",		"",	"_FlowCmm",		"", 3
+170,	"Flow",			"",	"m3/hour",		"",	"_FlowCmh",		"", 3
+171,	"Flow",			"",	"m3/day",		"",	"_FlowCmd",		"", 3
+172,	"Flow",			"",	"AF/day",		"",	"_FlowAft/d",		"", 3
+173,	"Volume",		"",	"Mgal",			"",	"_VolMgal",		"", 1
+174,	"Volume",		"",	"acre.ft",		"",	"_VolAft",		"", 1
+
+175,	"Latitude",		"",	"DDMM.mm",		"",	"_LatDM.m",		"", 3
+176,	"Longitude",		"",	"DDMM.mm",		"",	"_LongDM.m",		"", 3
+177,	"UTC",			"",	"hhmmss.ss",		"",	"_UTChms.s",		"", 3
+178,	"GPS Quality",		"",	"",			"",	"_GPSQualit",		"", 0
+179,	"Num Satellite",	"",	"",			"",	"_NumSat",		"", 0
+180,	"HDOP",			"",	"%",			"",	"_HDOP%",		"", 1
+181,	"Geo Sep.",		"",	"m",			"",	"_GeoSepM",		"", 1
+182,	"DGPS Data Age",	"",	"sec",			"",	"_DGPSDAgeS",		"", 0
+183,	"DGPS Ref ID",		"",	"",			"",	"_DGPSRefID",		"", 0
+184,	"SOG",			"",	"mph",			"",	"_SOGmph",		"", 1
+185,	"SOG",			"",	"km/h",			"",	"_SOGkm/h",		"", 1
+186,	"SOG",			"",	"m/sec",		"",	"_SOGm/s",		"", 1
+187,	"SOG",			"",	"knots",		"",	"_SOGKnot",		"", 1
+188,	"COG",			"",	"degrees",		"",	"_COGDeg",		"", 1
+189,	"GPS Variation",	"",	"degrees",		"",	"_GPSVarDeg",		"", 1
+
+190,	"TSS",			"",	"mg/L",			"",	"_TSSmg/L",		"", 1
+191,	"TSS",			"",	"g/L",			"",	"_TSSg/L",		"", 3
+192,	"TSS",			"",	"%",			"",	"_TSS%",		"", 4
+
+193,	"Chlorophyll",		"",	"ug/L",			"",	"_Chlug/L",		"", 1
+194,	"%Fluorescence",	"",	"%FS",			"",	"_Fluo%FS",		"", 1
+
+195,	"Optic",		"",	"count",		"",	"_OpticCnt",		"", 0
+
+196,	"Latitude",		"",	"DDdddd",		"",	"_LatDDdd",		"", 1
+197,	"Longitude",		"",	"DDdddd",		"",	"_LongDDdd",		"", 1
+
+198,	"RTC Batt",		"",	"none",			"",	"_RTCbatt",		"", 1
+199,	"PCB Temp",		"",	"none",			"",	"_PCBtemp",		"", 1
+
+200,	"DO% Local",		"",	"%Local",		"",	"_DOsat",		"", 1
+201,	"PAR1",			"",	"uMoles",		"",	"_Par1",		"", 1
+202,	"PAR2",			"",	"uMoles",		"",	"_PAR2",		"", 1
+203,	"Turbidity+",		"",	"NTU",			"",	"_TurbNTU",		"", 2
+204,	"Rhodamine",		"",	"ug/L",			"",	"_RhodUg/L",		"", 2
+
+205,	"DO T1",		"",	"none",			"",	"_DOT1",		"", 1
+206,	"DO PE1",		"",	"none",			"",	"_DOPE1",		"", 1
+207,	"DO PE2",		"",	"none",			"",	"_DOPE2",		"", 1
+208,	"Turbidity-",		"",	"NTU",			"",	"_TurbNTU",		"", 1
+
+209,	"Free Cl2",		"",	"mg/L",			"",	"_Cl2mgl",		"", 2
+210,	"Cl2 Charge",		"",	"none",			"",	"_CL2chrg",		"", 3
+
+211,	"DO+",				"",	"%",			"",	"_DO%+",		"",	3
+212,	"DO Conc+",			"",	"none",			"",	"_DOconc+",		"", 3
+213,	"Reserve",			"",	"",				"",	"_Resv213",		"", 1
+214,	"Reserve",			"",	"",				"",	"_Resv214",		"", 1
+215,	"Reserve",			"",	"",				"",	"_Resv215",		"", 1
+216,	"Reserve",			"",	"",				"",	"_Resv216",		"", 1
+217,	"Reserve",			"",	"",				"",	"_Resv217",		"", 1
+218,	"Reserve",			"",	"",				"",	"_Resv218",		"", 1
+219,	"Reserve",			"",	"",				"",	"_Resv219",		"", 1
+220,	"Reserve",			"", "",				"", "_Resv220",		"", 1
+221,	"Reserve",			"", "",				"", "_Resv221",		"", 1
+222,	"Reserve",			"", "",				"", "_Resv222",		"", 1
+223,	"Reserve",			"", "",				"", "_Resv223",		"", 1
+224,	"Reserve",			"", "",				"", "_Resv224",		"", 1
+225,	"Reserve",			"", "",				"", "_Resv225",		"", 1
+226,	"Reserve",			"", "",				"", "_Resv226",		"", 1
+227,	"Reserve",			"", "",				"", "_Resv227",		"", 1
+228,	"Reserve",			"", "",				"", "_Resv228",		"", 1
+229,	"Reserve",			"", "",				"", "_Resv229",		"", 1
+230,	"Reserve",			"", "",				"", "_Resv230",		"", 1
+231,	"Reserve",			"", "",				"", "_Resv231",		"", 1
+232,	"Reserve",			"", "",				"", "_Resv232",		"", 1
+233,	"Reserve",			"", "",				"", "_Resv233",		"", 1
+234,	"Reserve",			"", "",				"", "_Resv234",		"", 1
+235,	"Reserve",			"", "",				"", "_Resv235",		"", 1
+236,	"Reserve",			"", "",				"", "_Resv236",		"", 1
+237,	"Reserve",			"", "",				"", "_Resv237",		"", 1
+238,	"Reserve",			"", "",				"", "_Resv238",		"", 1
+239,	"Reserve",			"", "",				"", "_Resv239",		"", 1
+240,	"Reserve",			"", "",				"", "_Resv240",		"", 1
+241,	"Reserve",			"", "",				"", "_Resv241",		"", 1
+242,	"Reserve",			"", "",				"", "_Resv242",		"", 1
+243,	"Reserve",			"", "",				"", "_Resv243",		"", 1
+244,	"Reserve",			"", "",				"", "_Resv244",		"", 1
+245,	"Reserve",			"", "",				"", "_Resv245",		"", 1
+246,	"Reserve",			"", "",				"", "_Resv246",		"", 1
+247,	"Reserve",			"", "",				"", "_Resv247",		"", 1
+248,	"Reserve",			"", "",				"", "_Resv248",		"", 1
+249,	"Reserve",			"", "",				"", "_Resv249",		"", 1
+250,	"Reserve",			"", "",				"", "_Resv250",		"", 1
+251,	"Reserve",			"", "",				"", "_Resv251",		"", 1
+252,	"Reserve",			"", "",				"", "_Resv252",		"", 1
+253,	"Reserve",			"", "",				"", "_Resv253",		"", 1
+254,	"Reserve",			"", "",				"", "_Resv254",		"", 1
+255,	"Reserve",			"", "",				"", "_Resv255",		"", 1
+
+;
+;  Sondtek
+;
+256,	"Year",				"",	"",				"",	"_Year",		"", 0
+257,	"Month",			"",	"",				"",	"_Month",		"", 0
+258,	"Date Only",		"",	"",				"",	"_DateOnly",	"", 0
+259,	"Hour",				"",	"",				"",	"_Hour",		"", 0
+260,	"Minute",			"",	"",				"",	"_Minute",		"", 0
+261,	"Second",			"",	"",				"",	"_Second",		"", 0
+
+262,	"Vel. East",		"",	"cm/s",			"",	"_VEcm/s",		"", 1
+263,	"Vel. North",		"",	"cm/s",			"",	"_VNcm/s",		"", 1
+264,	"Vel. Up",			"",	"cm/s",			"",	"_VUcm/s",		"", 1
+265,	"Vel. ENU",			"", "cm/s",			"", "_VENUcm/s",	"", 1
+
+266,	"Vel. East Std",	"",	"cm/s",			"",	"_VEStdCm/s",	"", 1
+267,	"Vel. North Std",	"",	"cm/s",			"",	"_VNStdCm/s",	"", 1
+268,	"Vel. Up Std",		"",	"cm/s",			"",	"_VUStdCm/s",	"", 1
+
+269,	"Signal Power E",	"",	"count",		"",	"_SigPcntE",	"", 0
+270,	"Signal Power N",	"",	"count",		"",	"_SigPcntN",	"", 0
+271,	"Signal Power U",	"",	"count",		"",	"_SigPcntU",	"", 0
+
+272,	"Vel. X",			"",	"cm/s",			"",	"_VXcm/s",		"", 1
+273,	"Vel. Y",			"",	"cm/s",			"",	"_VYcm/s",		"", 1
+274,	"Vel. Z",			"",	"cm/s",			"",	"_VZcm/s",		"", 1
+275,	"Vel. XYZ",			"", "cm/s",			"", "_VXYZcm/s",	"", 1
+
+276,	"Vel. X Std",		"",	"cm/s",			"",	"_VXStdCm/s",	"", 1
+277,	"Vel. Y Std",		"",	"cm/s",			"",	"_VYStdCm/s",	"", 1
+278,	"Vel. Z Std",		"",	"cm/s",			"",	"_VZStdCm/s",	"", 1
+279,	"Signal Power X",	"",	"count",		"",	"_SigPcntX",	"", 0
+280,	"Signal Power Y",	"",	"count",		"",	"_SigPcntY",	"", 0
+281,	"Signal Power Z",	"",	"count",		"",	"_SigPcntZ",	"", 0
+
+282,	"Vel. 1",			"",	"cm/s",			"",	"_V1cm/s",		"", 1
+283,	"Vel. 2",			"",	"cm/s",			"",	"_V2cm/s",		"", 1
+284,	"Vel. 3",			"",	"cm/s",			"",	"_V3cm/s",		"", 1
+285,	"Vel. Mag",			"", "cm/s",			"", "_VMagcm/s",	"", 1
+
+286,	"Vel. 1 Std",		"",	"cm/s",			"",	"_V1StdCm/s",	"", 1
+287,	"Vel. 2 Std",		"",	"cm/s",			"",	"_V2StdCm/s",	"", 1
+288,	"Vel. 3 Std",		"",	"cm/s",			"",	"_V3StdCm/s",	"", 1
+289,	"Signal Power 1",	"",	"count",		"",	"_SigPcnt1",	"", 0
+290,	"Signal Power 2",	"",	"count",		"",	"_SigPcnt2",	"", 0
+291,	"Signal Power 3",	"",	"count",		"",	"_SigPcnt3",	"", 0
+
+292,	"Compass Heading",	"",	"degrees",		"",	"_CpHeadDeg",	"", 1
+293,	"Raw Pressure",		"",	"count",		"",	"_PresCnt",		"", 0
+294,	"Raw Pressure Std",	"",	"count",		"",	"_PresStdCn",	"", 0
+
+295,	"Good Ping",		"",	"%",			"",	"_GPing%",		"", 0
+296,	"Vert Dist Start",	"",	"m",			"",	"_VDistStaM",	"", 1
+297,	"Vert Dist End",	"",	"m",			"",	"_VDistEndM",	"", 1
+
+;
+; for RDI work horse
+;
+298,	"SoS",			"", 	"m/sec",		"",	"_SndSpeed",	"",	0
+299,	"BIT",			"",	"none",			"",	"_BIT",			"",	0
+300,	"bin",			"",	"none",			"",	"_bin",			"",	0
+301,	"DirFlow",		"",	"mm/sec",		"",	"_Dirflow",		"",	1
+302,	"Mag",			"",	"mm/sec", 		"",	"_Mag",  		"",	1	 	
+303,	"E/W",			"",	"mm/sec", 		"",	"_EW",			"",	1
+304,	"N/S",			"",	"mm/sec", 		"",	"_NS",			"",	1
+305,	"Vert",			"",	"mm/sec", 		"",	"_Vert",		"",	1
+306,	"Err",			"",	"mm/sec", 		"",	"_Err",			"",	1	
+307,	"Echo1",		"",	"Count",		"",	"_Echo1",		"",	0
+308,	"Echo2",		"",	"Count",		"",	"_Echo2",		"",	0
+309,	"Echo3",		"",	"Count",		"",	"_Echo3",		"",	0
+310,	"Echo4",		"",	"Count",		"",	"_Echo4",		"",	0
+311,	"Sample Count",		"",	"",			"",	"_SampCnt",		"",	0
+312,	"Echo1",		"",	"db",			"",	"_Echo1",		"",	0
+313,	"Echo2",		"",	"db",			"",	"_Echo2",		"",	0
+314,	"Echo3",		"",	"db",			"",	"_Echo3",		"",	0
+315,	"Echo4",		"",	"db",			"",	"_Echo4",		"",	0
+
+;
+; CO2
+;
+316,	"CO2 F1",		"", 	"Count",		"", 	"_CO2F1_Ct",	"",	0
+317,	"CO2 F2",		"", 	"Count",		"", 	"_CO2F2_Ct",	"",	0
+318,	"CO2 R1",		"", 	"Count",		"", 	"_CO2R1_Ct",	"",	0
+319,	"CO2 R2",		"", 	"Count",		"",	"_CO2R2_Ct",	"",	0
+
+;
+;Sontek rev4.2 new outputs
+;
+320,	"Heading Std",		"", 	"Degree",		"", 	"_HeadStd",		"",	1
+321,	"Pitch Std",		"", 	"Degree", 		"", 	"_PitchStd",	"",	1
+322,	"Roll Std",		"", 	"Degree", 		"",	"_RollStd",		"",	1
+
+323,	"CO2 CR",		"",	"", 			"", 	"_CO2CR",		"",	2
+324,	"PCO2",			"", 	"uAtm", 		"", 	"_PCO2_uATM",	"",	2
+325,	"CO2Temp",		"",	"C", 			"", 	"_CO2Temp_C",	"",	1
+
+;
+;Sontek - firmware v7.9
+;
+326,	"Mean Pressure",	"", 	"dB", 		"", 	"_MpresDbar",		"",	3
+327,	"Mean Pressure",	"", 	"psi", 			"", 	"_MpresPsi",		"",	3
+328,	"Level",		"", 	"cm", 			"", 	"_LevelCm",		"",	3
+329,	"Level",		"", 	"ft", 			"", 	"_LevelFt",		"",	3
+330,	"Cell Begin",		"",	"meters", 		"", 	"_CellBm",		"",	2
+331,	"Cell Begin",		"",	"ft", 			"", 	"_CellBft",		"",	2
+332,	"Cell End",		"",	"meters", 		"", 	"_CellEm",		"",	2
+333,	"Cell End",		"",	"ft", 			"", 	"_CellEft",		"",	2
+
+334,	"Cell Size",		"",	"meters", 		"", 	"_CellSzm",		"",	2
+335,	"Cell Size",		"",	"ft", 			"", 	"_CellSzft",		"",	2
+336,	"Blank Distance",	"",	"meters", 		"", 	"_CellDm",		"",	2
+337,	"Blank Distance",	"",	"ft", 			"", 	"_CellDft",		"",	2
+
+
+338,	"Velocity Mag",		"",	"cm/s", 		"", 	"_vMagCm/s",		"",	2
+339,	"Velocity Mag",		"",	"ft/s", 		"", 	"_vMagFt/s",		"",	2
+340,	"Mean Sig. Strength",	"", 	"counts", 		"", 	"_MsigScnt",		"",	0
+;
+;Sontek SIDEKICK - firmware v7.5
+; most sideckick parameters are already defined in the Sontek(v7.9 above)
+;
+341,	"Velocity Vector",	"",	"cm/s", 		"", 	"_vVectCm/s",		"",	2
+342,	"Velocity Vector",	"",	"ft/s", 		"", 	"_vVectFt/s",		"",	2
+343,	"Mean Std Dev",		"", 	"cm/s", 		"", 	"_MsDcm/s",		"",	2
+344,	"Mean Std Dev",		"", 	"ft/s", 		"", 	"_MsDft/s",		"",	2
+345,	"Sample",		"", 	"none", 		"", 	"_none_",		"",	0
+
+;-------- Sonteks corresponding English units (262 - 288) -------------------
+; nc - 01.15.04 
+346,	"Vel. East",		"",	"ft/s",			"",	"_VEft/s",		"", 1
+347,	"Vel. North",		"",	"ft/s",			"",	"_VNft/s",		"", 1
+348,	"Vel. Up",			"",	"ft/s",			"",	"_VUft/s",		"", 1
+349,	"Vel. ENU",			"", "ft/s",			"", "_VENUft/s",	"", 1
+
+350,	"Vel. East Std",	"",	"ft/s",			"",	"_VEStdFt/s",	"", 1
+351,	"Vel. North Std",	"",	"ft/s",			"",	"_VNStdFt/s",	"", 1
+352,	"Vel. Up Std",		"",	"ft/s",			"",	"_VUStdFt/s",	"", 1
+
+353,	"Vel. X",			"",	"ft/s",			"",	"_VXft/s",		"", 1
+354,	"Vel. Y",			"",	"ft/s",			"",	"_VYft/s",		"", 1
+355,	"Vel. Z",			"",	"ft/s",			"",	"_VZft/s",		"", 1
+356,	"Vel. XYZ",			"", "ft/s",			"", "_VXYZft/s",	"", 1
+
+357,	"Vel. X Std",		"",	"ft/s",			"",	"_VXStdFt/s",	"", 1
+358,	"Vel. Y Std",		"",	"ft/s",			"",	"_VYStdFt/s",	"", 1
+359,	"Vel. Z Std",		"",	"ft/s",			"",	"_VZStdFt/s",	"", 1
+
+360,	"Vel. 1",			"",	"ft/s",			"",	"_V1ft/s",		"", 1
+361,	"Vel. 2",			"",	"ft/s",			"",	"_V2ft/s",		"", 1
+362,	"Vel. 3",			"",	"ft/s",			"",	"_V3ft/s",		"", 1
+363,	"Vel. Mag",			"", "ft/s",			"", "_VMagft/s",	"", 1
+
+364,	"Vel. 1 Std",		"",	"ft/s",			"",	"_V1StdFt/s",	"", 1
+365,	"Vel. 2 Std",		"",	"ft/s",			"",	"_V2StdFt/s",	"", 1
+366,	"Vel. 3 Std",		"",	"ft/s",			"",	"_V3StdFt/s",	"", 1
+
+
+;New parameters as of 11/01/2003
+500,	"NO3-N Conc",		"", 	"mg/L", 		"", 	"_NO3mgL",		"",	3
+501,	"NO3-N Conc",		"", 	"uM", 			"", 	"_NO3uM",		"",	2
+502,	"NO3-N Absorb",		"", 	"none", 		"", 	"_none_",		"",	4
+503,	"PO4-P Conc",		"", 	"mg/L", 		"", 	"_PO4PmgL",		"",	3
+504,	"PO4-P Conc",		"", 	"uM", 			"", 	"_PO4PuM",		"",	2
+505,	"PO4-P Absorb",		"", 	"none", 		"", 	"_none_",		"",	4
+510,	"RainRate",		"", 	"mm/hr", 		"", 	"_RRmm/h",		"",	3
+
+;TSS using turb+
+511,	"TSS",			"", 	"mg/L", 		"", 	"_TSS+mg/L",		"",	4
+512,	"TSS",			"", 	"gperL", 		"", 	"_TSS+g/L",		"",	4
+513,	"TSS",			"", 	"%", 			"", 	"_TSS+&",		"",	4
+
+;TSS using turb- 
+514,	"TSS",			"", 	"mg/L", 		"", 	"_TSS-mg/L",		"",	4
+515,	"TSS",			"", 	"gperL", 		"", 	"_TSS-g/L",		"",	4
+516,	"TSS",			"", 	"%", 			"", 	"_TSS-&",		"",	4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

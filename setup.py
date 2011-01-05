@@ -6,7 +6,7 @@ PySonde is a module for reading water quality data from various sensor
 formats.
 
 """
-from setuptools import Command, setup
+from setuptools import Command, setup, find_packages
 
 def run_tests():
     import os, sys
@@ -28,7 +28,8 @@ setup(
                 'data formats',
     long_description=__doc__,
     keywords='sonde water quality format environment ysi',
-    packages=['sonde'],
+    packages=find_packages(),
+    package_data={'': ['data/ysi_param.def']},
     platforms='any',
     install_requires=[
         'numpy>=1.5.0',

@@ -20,6 +20,9 @@ import time
 import traceback
 
 
+DEFAULT_YSI_PARAM_DEF = 'data/ysi_param.def'
+
+
 class YSIDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a YSI binary
@@ -28,7 +31,7 @@ class YSIDataset(sonde.BaseSondeDataset):
     object that represents the timezone of the timestamps in the
     binary file.
     """
-    def __init__(self, data_file, param_file='ysi_param.def', tzinfo=None):
+    def __init__(self, data_file, param_file=DEFAULT_YSI_PARAM_DEF, tzinfo=None):
         self.data_file = data_file
         self.param_file = param_file
         self.default_tzinfo = tzinfo
@@ -112,7 +115,7 @@ class YSIReader:
     object that represents the timezone of the timestamps in the
     binary file.
     """
-    def __init__(self, data_file, param_file='ysi_param.def', tzinfo=None):
+    def __init__(self, data_file, param_file=DEFAULT_YSI_PARAM_DEF, tzinfo=None):
         self.default_tzinfo = tzinfo
         self.num_params = 0
         self.parameters = []
