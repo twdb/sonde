@@ -7,17 +7,19 @@
 """
 from __future__ import absolute_import
 
-from ..timezones import cdt, cst
 import datetime
-import numpy as np
-import quantities as pq
+import pkg_resources
 import re
-from .. import sonde
-from .. import quantities as sq
 from StringIO import StringIO
 import struct
 import time
-import traceback
+
+import numpy as np
+import quantities as pq
+
+from .. import sonde
+from .. import quantities as sq
+from ..timezones import cdt, cst
 
 
 DEFAULT_YSI_PARAM_DEF = 'data/ysi_param.def'
@@ -31,7 +33,7 @@ class YSIDataset(sonde.BaseSondeDataset):
     object that represents the timezone of the timestamps in the
     binary file.
     """
-    def __init__(self, data_file, param_file=DEFAULT_YSI_PARAM_DEF, tzinfo=None):
+    def __init__(self, data_file, tzinfo=None, param_file=None):
         self.data_file = data_file
         self.param_file = param_file
         self.default_tzinfo = tzinfo
@@ -65,7 +67,7 @@ class YSIDataset(sonde.BaseSondeDataset):
                     }
 
 
-        ysi_data = YSIReader(self.data_file, self.param_file, self.default_tzinfo)
+        ysi_data = YSIReader(self.data_file, self.default_tzinfo, self.param_file)
 
         # determine parameters provided and in what units
         self.parameters = dict()
@@ -115,7 +117,7 @@ class YSIReader:
     object that represents the timezone of the timestamps in the
     binary file.
     """
-    def __init__(self, data_file, param_file=DEFAULT_YSI_PARAM_DEF, tzinfo=None):
+    def __init__(self, data_file, tzinfo=None, param_file=None):
         self.default_tzinfo = tzinfo
         self.num_params = 0
         self.parameters = []
@@ -145,11 +147,14 @@ class YSIReader:
         """
         Open and read a YSI param definition file.
         """
-        if type(param_file) == str:
+        if param_file == None:
+            file_string = pkg_resources.resource_string('sonde',
+                                                        DEFAULT_YSI_PARAM_DEF)
+        elif type(param_file) == str:
             with open(param_file) as fid:
                 file_string = fid.read()
 
-        else:
+        elif type(param_file) == file:
             file_string = param_file.read()
     
         file_string = re.sub("\n\s*\n*", "\n", file_string) #remove blank lines
