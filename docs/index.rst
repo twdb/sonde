@@ -12,13 +12,28 @@ Welcome to PySonde's documentation!
 .. module:: sonde
 
 
+
+REQUIREMENTS
+------------
+
+Before installation, make sure you have the required libraries:
+
+  - setuptools
+  - numpy
+  - pytz
+  - quantities
+  - seawater
+  - nose (for tests)
+  - sphinx (for docs)
+
+
+  
 Installation
 ------------
 
 From the pysonde directory, run::
 
     python setup.py install
-
 
 
 Quick start
