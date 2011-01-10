@@ -66,7 +66,6 @@ class YSIDataset(sonde.BaseSondeDataset):
                     'volts' : pq.volt,
                     }
 
-
         ysi_data = YSIReader(self.data_file, self.default_tzinfo, self.param_file)
 
         # determine parameters provided and in what units
@@ -83,6 +82,20 @@ class YSIDataset(sonde.BaseSondeDataset):
                 print 'YSI Parameter Name:', parameter.name
                 print 'YSI Unit Name:', parameter.unit
                 raise
+
+        self.format_parameters = {
+            'site_name': ysi_data.site_name,
+            'instr_type': ysi_data.instr_type,
+            'system_sig': ysi_data.system_sig,
+            'prog_ver': ysi_data.prog_ver,
+            'serial_num': ysi_data.serial_num,
+            'site_name': ysi_data.site_name,
+            'pad1': ysi_data.pad1,
+            'logging_interval': ysi_data.logging_interval,
+            'begin_log_time': ysi_data.begin_log_time,
+            'first_sample_time': ysi_data.first_sample_time,
+            'pad2' : ysi_data.pad2
+            }
 
         self.dates = ysi_data.dates
 
