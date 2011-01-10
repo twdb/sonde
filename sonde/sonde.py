@@ -5,20 +5,19 @@
     This module implements the main Sonde object.
     
 """
-
 from __future__ import absolute_import
 
 import datetime
-import numpy as np
 from exceptions import NotImplementedError
+import re
+
+import numpy as np
 import quantities as pq
 import pytz
-import re
 import seawater
 
-from . import quantities as sq
-#import logging
-from .timezones import cst
+from sonde import quantities as sq
+from sonde.timezones import cst
 
 
 #XXX: put this into a proper config file
@@ -131,7 +130,6 @@ class BaseSondeDataset(object):
         """
         std_unit = self.get_standard_unit(param_code)
         current_unit = self.data[param_code].units
-
 
         # XXX: Todo: Fix upstream (see comment in _temperature_offset)
         std_symbol = std_unit.dimensionality.keys()[0].symbol

@@ -4,9 +4,9 @@
 
     This module contains some convenient tzinfo handling methods
 """
+from datetime import timedelta
 
 from pytz.tzinfo import StaticTzInfo
-from datetime import timedelta
 
 
 class UTCStaticOffset(StaticTzInfo):
