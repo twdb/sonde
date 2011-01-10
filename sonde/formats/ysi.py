@@ -125,9 +125,7 @@ class YSIReader:
         self.read_param_def(param_file)
         self.read_ysi(data_file)
 
-        ysi_epoch = datetime.datetime(year=1984,
-                                      month=3,
-                                      day=1,
+        ysi_epoch = datetime.datetime(year=1984, month=3, day=1,
                                       tzinfo=tzinfo)
 
         ysi_epoch_in_seconds = time.mktime(ysi_epoch.timetuple())
@@ -192,7 +190,7 @@ class YSIReader:
                 fmt = '<HLH16s32s6sLll36s'
                 fmt_size = struct.calcsize(fmt)
                 self.instr_type, self.system_sig, self.prog_ver, \
-                                 self.serial_num, site_name, self.pad1,\
+                                 self.serial_num, self.site_name, self.pad1,\
                                  self.logging_interval, self.begin_log_time, \
                                  self.first_sample_time, self.pad2 \
                                  = struct.unpack(fmt, fid.read(fmt_size))
