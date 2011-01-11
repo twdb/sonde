@@ -146,7 +146,7 @@ class YSIDatasetFileObject_Test(YSICompareWithCSVTestBase):
         csv_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.csv'
         ysi_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.dat'
 
-        with open(ysi_test_file_path) as fid:
+        with open(ysi_test_file_path, 'rb') as fid:
             self.ysi_dataset = ysi.YSIDataset(fid, tzinfo=cdt)
 
         self.ysi_csv = ysi_csv_read(csv_test_file_path)
@@ -157,7 +157,7 @@ class YSIDatasetFileObject_Test(YSICompareWithCSVTestBase):
         csv_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.csv'
         ysi_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.dat'
 
-        with open(ysi_test_file_path) as fid:
+        with open(ysi_test_file_path, 'rb') as fid:
             self.ysi_dataset = ysi.YSIDataset(fid, tzinfo=cdt)
 
         self.ysi_csv = ysi_csv_read(csv_test_file_path)
@@ -206,7 +206,7 @@ class SondeYSIFormatFileObject_Test(YSICompareWithCSVTestBase):
         csv_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.csv'
         ysi_test_file_path = YSI_TEST_FILES_PATH + '/BAYT_20070323_CDT_YS1772AA_000.dat'
 
-        with open(ysi_test_file_path) as fid:
+        with open(ysi_test_file_path, 'rb') as fid:
             self.ysi_dataset = Sonde(fid, file_format='ysi', tzinfo=cdt)
 
         self.ysi_csv = ysi_csv_read(csv_test_file_path)

@@ -162,7 +162,7 @@ class YSIReader:
             file_string = pkg_resources.resource_string('sonde',
                                                         DEFAULT_YSI_PARAM_DEF)
         elif type(param_file) == str:
-            with open(param_file) as fid:
+            with open(param_file, 'rb') as fid:
                 file_string = fid.read()
 
         elif type(param_file) == file:
@@ -188,7 +188,7 @@ class YSIReader:
         Open and read a YSI binary file.
         """
         if type(ysi_file) == str:
-            fid = open(ysi_file)
+            fid = open(ysi_file, 'rb')
 
         else:
             fid = ysi_file
