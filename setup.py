@@ -49,5 +49,5 @@ setup(
     tests_require=[
         'nose>=0.11.4',
     ],
-    test_suite='__main__.run_tests',
+    test_suite='nose.collector',
 )
