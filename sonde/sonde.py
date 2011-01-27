@@ -80,7 +80,7 @@ class BaseSondeDataset(object):
 
     def __init__(self):
         self._read_data()
-        self.rescale_data()
+        self.rescale_all()
 
         if 'CON01' in self.data or 'CON02' in self.data:
             self._calculate_salinity()
@@ -115,7 +115,7 @@ class BaseSondeDataset(object):
             self.rescale_parameter(param_code)
 
 
-    def rescale_data(self):
+    def rescale_all(self):
         """
         Cycle through the parameter list and convert all data values
         to their standard units.
