@@ -8,12 +8,6 @@ formats.
 """
 from setuptools import Command, setup, find_packages
 
-def run_tests():
-    import os, sys
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'tests'))
-    from tests import suite
-    return suite()
-
 # note: the minimum version numbers are just what I know will work,
 # but they could probably be a few versions lower
 setup(
