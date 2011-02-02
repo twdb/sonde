@@ -61,6 +61,9 @@ def Sonde(data_file, file_format, *args, **kwargs):
     if file_format.lower() == 'ysi':
         from sonde.formats.ysi import YSIDataset
         return YSIDataset(data_file, *args, **kwargs)
+    if file_format.lower() == 'hydrolab':
+        from sonde.formats.hydrolab import HydrolabDataset
+        return HydrolabDataset(data_file, *args, **kwargs)
 
     else:
         raise NotImplementedError, "file format '%s' is not supported" % \
