@@ -48,12 +48,14 @@ class HydrolabDataset(sonde.BaseSondeDataset):
                      'DO mg/l' : 'DOX01',
                      'pH' : 'PHL01',
                      'Depth' : 'WSE01',
+                     'Level' : 'WSE01',
                      'Batt' : 'BAT01',
+                     'Turb' : 'TUR01',
                      }
         
-        unit_map = {'C' : pq.degC,
-                    'F' : pq.degF,
-                    'K' : pq.degK,
+        unit_map = {'deg C' : pq.degC,
+                    'deg F' : pq.degF,
+                    'deg K' : pq.degK,
                     'mS/cm' : sq.mScm,
                     'uS/cm' : sq.uScm,
                     '% Sat' : pq.percent,
@@ -63,6 +65,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
                     'feet' : pq.ft,
                     'volts' : pq.volt,
                     'ppt' : sq.psu,
+                    'NTU' : sq.ntu,
                     }
 
         hydrolab_data = HydrolabReader(self.data_file, self.default_tzinfo)
@@ -91,7 +94,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
             'start_time': hydrolab_data.start_time,
             'stop_time': hydrolab_data.start_time,
             'logging_interval': hydrolab_data.logging_interval,
-            'header_lines': hydrolab_data..header_lines,
+            'header_lines': hydrolab_data.header_lines,
             }
 
         self.dates = hydrolab_data.dates
@@ -147,7 +150,7 @@ class HydrolabReader:
         self.setup_time = datetime.datetime.strptime(setup_date + setup_time, fmt)
         self.start_time = datetime.datetime.strptime(start_date + start_time, fmt)
         self.stop_time = datetime.datetime.strptime(stop_date + stop_time, fmt)
-        self.logging_interval = int(interval[0:2])*3600 + int(interval[2:4])*60 + int(interval(4:6]) 
+        self.logging_interval = int(interval[0:2])*3600 + int(interval[2:4])*60 + int(interval[4:6]) 
         self.header_lines = []
         
         #read variables and units.
@@ -163,11 +166,11 @@ class HydrolabReader:
                 for param,unit in zip(params,units):
                     self.num_params += 1
                     if param=='DO':
-                        name = param + ' ' unit
+                        name = param + ' ' + unit
                     else:
                         name = param
                         
-                    self.parameters.append(Parameter(name, unit)
+                    self.parameters.append(Parameter(name, unit))
               
                 break
             else:
@@ -176,7 +179,7 @@ class HydrolabReader:
 
     def read_data(self, fid):
 
-        buf = fid.readlines()
+
         log_time = []
         fmt = '%m%d%y%H%M%S'
         data_str = ''
@@ -186,20 +189,29 @@ class HydrolabReader:
         # re_data = re.compile('((?!Date)(?![0-9]))', re.M) matches only junk lines
         # might be more efficient to work out how to use the above to strip out all
         # junk lines in one go.
-        
-        while buf:
+        for buf in fid.readlines():
             if re_date.match(buf):
                 log_date = buf.split(':')[-1].strip()
                 
             if re_data.match(buf):
-                log_time, data_line = buf.rstrip('&').split(None, 1)
-                log_time.append(datetime.datetime.strptime(log_date + fields[0], fmt))
-                data_str = data_str + data_line + '\n'
-
-            buf = fid.readline()
+                try:
+                    time_field, data_line = buf.split(None, 1)
+                    log_time.append(datetime.datetime.strptime(log_date + time_field, fmt))
+                    data_str = data_str + data_line
+                except:
+                    continue
             
         self.dates = np.array(log_time)
-        data = np.genfromtxt(StringIO(data_str), dtype=float)
+        data_str = re.sub('#', 'N', data_str)
+        data_str = re.sub('&', '', data_str)
+        data_str = re.sub('*', '', data_str)
+        try:
+            data = np.genfromtxt(StringIO(data_str), dtype=float)
+        except:
+            #no data in file
+            print 'No Data Found In File'
+            raise
+    
         for ii in range(self.num_params):
             self.parameters[ii].data = data[:,ii]
 
