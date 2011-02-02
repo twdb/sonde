@@ -57,6 +57,7 @@ def Sonde(data_file, file_format, *args, **kwargs):
 
     Currently supported file formats are:
       - `ysi`: a YSI binary file
+      - `hydrolab`: a Hydrolab txt file
     """
     if file_format.lower() == 'ysi':
         from sonde.formats.ysi import YSIDataset
@@ -133,6 +134,10 @@ class BaseSondeDataset(object):
         """
         std_unit = self.get_standard_unit(param_code)
         current_unit = self.data[param_code].units
+
+        # return if dimensionless parameter
+        if not len(std_unit.dimensionality.keys()):
+            return
 
         # XXX: Todo: Fix upstream (see comment in _temperature_offset)
         std_symbol = std_unit.dimensionality.keys()[0].symbol

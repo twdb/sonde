@@ -51,6 +51,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
                      'Level' : 'WSE01',
                      'Batt' : 'BAT01',
                      'Turb' : 'TUR01',
+                     'Redox': 'NotImplemented',
                      }
         
         unit_map = {'deg C' : pq.degC,
@@ -59,13 +60,14 @@ class HydrolabDataset(sonde.BaseSondeDataset):
                     'mS/cm' : sq.mScm,
                     'uS/cm' : sq.uScm,
                     '% Sat' : pq.percent,
-                    'mg/l' : pq.mgl,
+                    'mg/l' : sq.mgl,
                     'units' : pq.dimensionless,
                     'meters' : pq.m,
                     'feet' : pq.ft,
                     'volts' : pq.volt,
                     'ppt' : sq.psu,
                     'NTU' : sq.ntu,
+                    'mV'  : 'not_implemented',
                     }
 
         hydrolab_data = HydrolabReader(self.data_file, self.default_tzinfo)
@@ -89,7 +91,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
                 raise
 
         self.format_parameters = {
-            'log_file_name': hydrolab.log_file_name,
+            'log_file_name': hydrolab_data.log_file_name,
             'setup_time': hydrolab_data.setup_time,
             'start_time': hydrolab_data.start_time,
             'stop_time': hydrolab_data.start_time,
@@ -204,7 +206,7 @@ class HydrolabReader:
         self.dates = np.array(log_time)
         data_str = re.sub('#', 'N', data_str)
         data_str = re.sub('&', '', data_str)
-        data_str = re.sub('*', '', data_str)
+        data_str = re.sub('\*', '', data_str)
         try:
             data = np.genfromtxt(StringIO(data_str), dtype=float)
         except:
