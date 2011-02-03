@@ -67,7 +67,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
                     'volts' : pq.volt,
                     'ppt' : sq.psu,
                     'NTU' : sq.ntu,
-                    'mV'  : 'not_implemented',
+                    'mV'  : 'NotImplemented',
                     }
 
         hydrolab_data = HydrolabReader(self.data_file, self.default_tzinfo)
@@ -114,8 +114,6 @@ class HydrolabReader:
         self.default_tzinfo = tzinfo
         self.num_params = 0
         self.parameters = []
-        #self.julian_time = []
-        #self.read_param_def(param_file)
         self.read_hydrolab(data_file)
 
     def read_hydrolab(self, hydrolab_file):
@@ -180,8 +178,6 @@ class HydrolabReader:
                 buf = fid.readline()
 
     def read_data(self, fid):
-
-
         log_time = []
         fmt = '%m%d%y%H%M%S'
         data_str = ''
