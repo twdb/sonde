@@ -42,8 +42,8 @@ master_parameter_list = {
     'TEM01' : ('Water Temperature', pq.degC),
     'TEM02' : ('Air Temperature', pq.degC),
     'TUR01' : ('Turbidity', sq.ntu),
-    'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', pq.m),
-    'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', pq.m),
+    'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', sq.mH20),
+    'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', sq.mH20),
     }
 
 

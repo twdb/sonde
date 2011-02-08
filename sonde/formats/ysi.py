@@ -61,8 +61,8 @@ class YSIDataset(sonde.BaseSondeDataset):
                     'uS/cm' : sq.uScm,
                     '%' : pq.percent,
                     'pH' : pq.dimensionless,
-                    'meters' : pq.m,
-                    'feet' : pq.ft,
+                    'meters' : sq.mH20,
+                    'feet' : sq.ftH20,
                     'volts' : pq.volt,
                     }
 

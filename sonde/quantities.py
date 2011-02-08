@@ -33,3 +33,7 @@ psu = pq.UnitQuantity('Salinity',
 uScm = pq.UnitQuantity('Specific Conductivity',
                        pq.CompoundUnit("1e-6*S/cm"),
                        symbol='uS/cm')
+
+#: Units of Depth/Water Surface Elevation - meters/ft of water
+mH20 = pq.m * pq.conventional_water
+ftH20 = pq.ft * pq.conventional_water

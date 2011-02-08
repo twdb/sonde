@@ -66,18 +66,14 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                     'deg_K' : pq.degK,
                     'mS/cm' : sq.mScm,
                     'uS/cm' : sq.uScm,
-                    #'% Sat' : pq.percent,
                     'mg/l' : sq.mgl,
-                    #'ppm' : ,
                     'pH' : pq.dimensionless,
-                    'm' : pq.m,
-                    'Metres' : pq.m,
-                    'ft' : pq.ft,
+                    'm' : sq.mH20,
+                    'Metres' : sq.mH20,
+                    'ft' : sq.ftH20,
                     'volts' : pq.volt,
                     'volt' : pq.volt,
                     'psu' : sq.psu,
-                    #'NTU' : sq.ntu,
-                    #'mV'  : 'NotImplemented',
                     }
 
         greenspan_data = GreenspanReader(self.data_file, self.default_tzinfo)
