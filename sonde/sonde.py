@@ -58,13 +58,24 @@ def Sonde(data_file, file_format, *args, **kwargs):
     Currently supported file formats are:
       - `ysi`: a YSI binary file
       - `hydrolab`: a Hydrolab txt file
+      - `greenspan`: a Greenspan txt/csv/xls file
+      
     """
     if file_format.lower() == 'ysi':
         from sonde.formats.ysi import YSIDataset
         return YSIDataset(data_file, *args, **kwargs)
+    
     if file_format.lower() == 'hydrolab':
         from sonde.formats.hydrolab import HydrolabDataset
         return HydrolabDataset(data_file, *args, **kwargs)
+    
+    if file_format.lower() == 'greenspan':
+        from sonde.formats.greenspan import GreenspanDataset
+        return GreenspanDataset(data_file, *args, **kwargs)
+
+    if file_format.lower() == 'eureka':
+        from sonde.formats.eureka import EurekaDataset
+        return EurekaDataset(data_file, *args, **kwargs)
 
     else:
         raise NotImplementedError, "file format '%s' is not supported" % \
