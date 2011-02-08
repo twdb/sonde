@@ -77,6 +77,10 @@ def Sonde(data_file, file_format, *args, **kwargs):
         from sonde.formats.eureka import EurekaDataset
         return EurekaDataset(data_file, *args, **kwargs)
 
+    if file_format.lower() == 'macroctd':
+        from sonde.formats.macroctd import MacroctdDataset
+        return MacroctdDataset(data_file, *args, **kwargs)
+
     else:
         raise NotImplementedError, "file format '%s' is not supported" % \
                                    (file_format,)
@@ -227,12 +231,19 @@ class BaseSondeDataset(object):
                 return
             
             # absolute pressure in dbar
+            #if 'WSE01' in params:
+            #    P = self.data['WSE01'].rescale(pq.m).magnitude * 1.0197 + 10.1325
+            #elif 'WSE02' in params:
+            #    P = self.data['WSE02'].rescale(pq.m).magnitude * 1.0197 
+            #else:
+            #    P = 10.1325
+
             if 'WSE01' in params:
-                P = self.data['WSE01'].rescale(pq.m).magnitude * 1.0197 + 10.1325
+                P = self.data['WSE01'].rescale(sq.dbar).magnitude + (pq.atm).rescale(dbar).magnitude
             elif 'WSE02' in params:
-                P = self.data['WSE02'].rescale(pq.m).magnitude * 1.0197 
+                P = self.data['WSE02'].rescale(sq.dbar).magnitude 
             else:
-                P = 10.1325
+                P = (pq.atm).rescale(dbar).magnitude
             
             R = cond / 42.914
             sal = seawater.csiro.salt(R,T,P)

@@ -35,7 +35,7 @@ class MacroctdDataset(sonde.BaseSondeDataset):
         Read the macroctd data file
         """
         param_map = {'Temperature' : 'TEM01',
-                     'EC_Norm' : 'CON01',
+                     'EC' : 'CON01',
                      'Pressure' : 'WSE01',
                      'Battery' : 'BAT01',
                      }

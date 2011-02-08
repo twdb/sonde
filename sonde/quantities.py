@@ -37,3 +37,6 @@ uScm = pq.UnitQuantity('Specific Conductivity',
 #: Units of Depth/Water Surface Elevation - meters/ft of water
 mH20 = pq.m * pq.conventional_water
 ftH20 = pq.ft * pq.conventional_water
+
+#: Pressure in dbar
+dbar = pq.UnitQuantity('decibar', pq.CompoundUnit('0.1*bar'), symbol='dbar'
