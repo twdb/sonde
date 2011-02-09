@@ -89,7 +89,6 @@ class YSIDataset(sonde.BaseSondeDataset):
             'system_sig': ysi_data.system_sig,
             'prog_ver': ysi_data.prog_ver,
             'serial_number': ysi_data.serial_number,
-            'site_name': ysi_data.site_name,
             'pad1': ysi_data.pad1,
             'logging_interval': ysi_data.logging_interval,
             'begin_log_time': ysi_data.begin_log_time,
