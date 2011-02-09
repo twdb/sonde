@@ -87,6 +87,10 @@ def Sonde(data_file, file_format, *args, **kwargs):
         from sonde.formats.hydrotech import HydrotechDataset
         return HydrotechDataset(data_file, *args, **kwargs)
 
+    if file_format.lower() == 'solinst':
+        from sonde.formats.solinst import SolinstDataset
+        return SolinstDataset(data_file, *args, **kwargs)
+
     else:
         raise NotImplementedError, "file format '%s' is not supported" % \
                                    (file_format,)
