@@ -28,6 +28,8 @@ ntu = pq.UnitQuantity('Turbidity',
 psu = pq.UnitQuantity('Salinity',
                       pq.dimensionless,
                       symbol='PSU')
+ppt = psu
+
 
 #: Unit of specific conductivity - microSiemens per centimeter
 uScm = pq.UnitQuantity('Specific Conductivity',
