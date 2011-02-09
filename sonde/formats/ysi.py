@@ -45,10 +45,18 @@ class YSIDataset(sonde.BaseSondeDataset):
         Read the YSI binary data file
         """
         param_map = {'Temperature' : 'TEM01',
+                     'Temp' : 'TEM01',
                      'Conductivity' : 'CON02',
+                     'Cond' : 'CON02',
                      'Specific Cond' : 'CON01',
+                     'SpCond' : 'CON01',
                      'Salinity' : 'SAL01',
+                     'Sal' : 'SAL01',
                      'DO+' : 'DOX02',
+                     'ODOSat' : 'DOX02',
+                     'ODO%' : 'DOX02',
+                     'ODO' : 'DOX01',
+                     'ODO Conc' : 'DOX01',
                      'pH' : 'PHL01',
                      'Depth' : 'WSE01',
                      'Battery' : 'BAT01',
@@ -60,14 +68,34 @@ class YSIDataset(sonde.BaseSondeDataset):
                     'mS/cm' : sq.mScm,
                     'uS/cm' : sq.uScm,
                     '%' : pq.percent,
+                    'mg/L' : sq.mgl,
                     'pH' : pq.dimensionless,
                     'meters' : sq.mH20,
                     'feet' : sq.ftH20,
                     'volts' : pq.volt,
+                    'V' : pq.volt,
+                    'ppt' : sq.psu,
                     }
 
-        ysi_data = YSIReader(self.data_file, self.default_tzinfo, self.param_file)
-
+        if self.data_file.split('.')[-1]=='dat':
+            ysi_data = YSIReaderBin(self.data_file, self.default_tzinfo, self.param_file)
+            self.format_parameters = {
+                'site_name': ysi_data.site_name,
+                'instr_type': ysi_data.instr_type,
+                'system_sig': ysi_data.system_sig,
+                'prog_ver': ysi_data.prog_ver,
+                'serial_num': ysi_data.serial_num,
+                'pad1': ysi_data.pad1,
+                'logging_interval': ysi_data.logging_interval,
+                'begin_log_time': ysi_data.begin_log_time,
+                'first_sample_time': ysi_data.first_sample_time,
+                'pad2' : ysi_data.pad2
+                }
+        else:
+            ysi_data = YSIReaderTxt(self.data_file, self.default_tzinfo, self.param_file)
+            self.format_parameters = {
+                }
+            
         # determine parameters provided and in what units
         self.parameters = dict()
         self.data = dict()
@@ -82,19 +110,6 @@ class YSIDataset(sonde.BaseSondeDataset):
                 print 'YSI Parameter Name:', parameter.name
                 print 'YSI Unit Name:', parameter.unit
                 raise
-
-        self.format_parameters = {
-            'site_name': ysi_data.site_name,
-            'instr_type': ysi_data.instr_type,
-            'system_sig': ysi_data.system_sig,
-            'prog_ver': ysi_data.prog_ver,
-            'serial_number': ysi_data.serial_number,
-            'pad1': ysi_data.pad1,
-            'logging_interval': ysi_data.logging_interval,
-            'begin_log_time': ysi_data.begin_log_time,
-            'first_sample_time': ysi_data.first_sample_time,
-            'pad2' : ysi_data.pad2
-            }
 
         self.dates = ysi_data.dates
 
@@ -118,8 +133,103 @@ class ChannelRec:
         self.data = []
 
 
+class YSIReaderTxt:
+    """
+    A reader object that opens and reads a YSI txt/cdf file.
+    
+    `data_file` should be either a file path string or a file-like
+    object. It one optional parameters, `tzinfo` is a datetime.tzinfo
+    object that represents the timezone of the timestamps in the
+    text file.
+    """
+    def __init__(self, data_file, tzinfo=None, param_file=None):
+        self.default_tzinfo = tzinfo
+        self.num_params = 0
+        self.parameters = []
+        self.read_ysi(data_file)
 
-class YSIReader:
+    def read_ysi(self, data_file):
+        """
+        Open and read a YSI text file.
+        """
+        if type(data_file) == str:
+            fid = open(data_file, 'r')
+
+        else:
+            fid = data_file
+
+        #read header
+        buf = fid.readline().strip('\r\n')
+        if buf.find(',')>0:
+            dlm = ','
+        else:
+            dlm = None
+
+        while buf:
+            if dlm==',':
+                if buf.split(',')[0].strip(' "').lower()=='date':
+                    param_fields = buf.split(',')
+                    param_units = fid.readline().strip('\r\n').split(',')
+                    
+                if len(buf.split(',')[0].strip(' "').split('/'))==3: #i.e if date in first column
+                    break
+            else:
+                if buf.split()[0].strip(' "').lower()=='date':
+                    param_fields = buf.split()
+                    units_fields = fid.readline().strip('\r\n').split()
+                    
+                if len(buf.split()[0].strip(' "').split('/'))==3:
+                    break
+            
+            buf = fid.readline().strip('\r\n') #i.e if date in first column
+
+        #clean up names & units
+        fmt = re.sub('([mMdD])', '%\\1', param_units[0].lower()).replace('y','%Y').strip(' "')
+        fmt += '%H:%M:%S'
+
+        fields = []
+        params = []
+        units = []
+        for param,unit in zip(param_fields,param_units):
+            fields.append(param.strip(' "'))
+            units.append(unit.strip(' "'))
+
+        params = fields[2:]
+        units = units[2:]
+
+        fid.seek(-1,1) #move back to above first line of data
+        if dlm==',':
+            data = np.genfromtxt(fid, dtype=None, names=fields, delimiter=',')
+        else:
+            data = np.genfromtxt(fid, dtype=None, names=fields)
+
+        self.dates = np.array(
+            [datetime.datetime.strptime(d + t, fmt)
+             for d,t in zip(data['Date'],data['Time'])]
+            )
+        
+        #assign param & unit names 
+        for param,unit in zip(params,units):
+            self.num_params += 1    
+            self.parameters.append(Parameter(param.strip(), unit.strip()))
+                
+        for ii in range(self.num_params):
+            param = re.sub('[?.:]', '', self.parameters[ii].name).replace(' ','_') 
+            self.parameters[ii].data = data[param]
+
+class Parameter:
+    """
+    Class that implements the a structure to return a parameters
+    name, unit and data
+    """
+    def __init__(self, param_name, param_unit):
+        
+        self.name = param_name
+        self.unit = param_unit
+        self.data = []
+
+        
+class YSIReaderBin:
     """
     A reader object that opens and reads a YSI binary file.
     
