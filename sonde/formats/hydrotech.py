@@ -77,7 +77,7 @@ class HydrotechDataset(sonde.BaseSondeDataset):
 
         self.format_parameters = {
             'model' : hydrotech_data.model,
-            'serial_num' : hydrotech_data.serial_num,
+            'serial_number' : hydrotech_data.serial_number,
             'log_file_name' : hydrotech_data.log_file_name,
             'setup_time' : hydrotech_data.setup_time,
             'start_time' : hydrotech_data.start_time,
@@ -143,7 +143,7 @@ class HydrotechReader:
         while buf[0:9]!='MiniSonde':
             buf = fid.readline().strip(strp)
 
-        self.model, self.serial_num = buf.split()
+        self.model, self.serial_number = buf.split()
         self.log_file_name = fid.readline().strip(strp).split(':')[-1].strip()
         d = fid.readline().strip(strp).split(':')[-1].strip()
         t = fid.readline().strip(strp).split(':')[-1].strip()

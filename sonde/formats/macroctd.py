@@ -69,7 +69,7 @@ class MacroctdDataset(sonde.BaseSondeDataset):
 
         self.format_parameters = {
             'header_lines' : macroctd_data.header_lines,
-            'serial_num' : macroctd_data.serial_num,
+            'serial_number' : macroctd_data.serial_number,
             }
             
         self.dates = macroctd_data.dates
@@ -101,7 +101,7 @@ class MacroctdReader:
         self.header_lines.append(buf)
         buf = fid.readline()
         self.header_lines.append(buf)
-        self.serial_num = buf.split(',')[3]
+        self.serial_number = buf.split(',')[3]
         
         while buf:
             if buf[0:9]=='@AVERAGES':

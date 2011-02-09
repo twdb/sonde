@@ -88,7 +88,7 @@ class YSIDataset(sonde.BaseSondeDataset):
             'instr_type': ysi_data.instr_type,
             'system_sig': ysi_data.system_sig,
             'prog_ver': ysi_data.prog_ver,
-            'serial_num': ysi_data.serial_num,
+            'serial_number': ysi_data.serial_number,
             'site_name': ysi_data.site_name,
             'pad1': ysi_data.pad1,
             'logging_interval': ysi_data.logging_interval,
@@ -203,7 +203,7 @@ class YSIReader:
                 fmt = '<HLH16s32s6sLll36s'
                 fmt_size = struct.calcsize(fmt)
                 self.instr_type, self.system_sig, self.prog_ver, \
-                                 self.serial_num, self.site_name, self.pad1,\
+                                 self.serial_number, self.site_name, self.pad1,\
                                  self.logging_interval, self.begin_log_time, \
                                  self.first_sample_time, self.pad2 \
                                  = struct.unpack(fmt, fid.read(fmt_size))
