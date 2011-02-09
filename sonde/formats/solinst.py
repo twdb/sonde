@@ -71,7 +71,7 @@ class SolinstDataset(sonde.BaseSondeDataset):
 
 
         self.format_parameters = {
-            'serial_num' : solinst_data.serial_num,
+            'serial_number' : solinst_data.serial_number,
             'project_id' : solinst_data.project_id,
             'site_name' : solinst_data.site_name,
             }
@@ -117,7 +117,7 @@ class SolinstReader:
                 self.model = fields[1].strip() + fields[2].strip()
 
             if fields[0].strip()=='Serial number':
-                self.serial_num = fields[1].split()[0].split('-')[-1]
+                self.serial_number = fields[1].split()[0].split('-')[-1]
 
             if fields[0].strip()=='Instrument number':
                 self.project_id = fields[1].strip()
