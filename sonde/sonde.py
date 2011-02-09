@@ -59,6 +59,8 @@ def Sonde(data_file, file_format, *args, **kwargs):
       - `ysi`: a YSI binary file
       - `hydrolab`: a Hydrolab txt file
       - `greenspan`: a Greenspan txt/csv/xls file
+      - `macroctd` : a Macroctd csv file
+      - `hydrotech` : a Hydrotech csv file
       
     """
     if file_format.lower() == 'ysi':
@@ -80,6 +82,10 @@ def Sonde(data_file, file_format, *args, **kwargs):
     if file_format.lower() == 'macroctd':
         from sonde.formats.macroctd import MacroctdDataset
         return MacroctdDataset(data_file, *args, **kwargs)
+
+    if file_format.lower() == 'hydrotech':
+        from sonde.formats.hydrotech import HydrotechDataset
+        return HydrotechDataset(data_file, *args, **kwargs)
 
     else:
         raise NotImplementedError, "file format '%s' is not supported" % \
@@ -239,7 +245,7 @@ class BaseSondeDataset(object):
             #    P = 10.1325
 
             if 'WSE01' in params:
-                P = self.data['WSE01'].rescale(sq.dbar).magnitude + (pq.atm).rescale(dbar).magnitude
+                P = self.data['WSE01'].rescale(sq.dbar).magnitude + (pq.atm).rescale(sq.dbar).magnitude
             elif 'WSE02' in params:
                 P = self.data['WSE02'].rescale(sq.dbar).magnitude 
             else:

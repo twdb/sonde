@@ -120,7 +120,9 @@ class MacroctdReader:
             [datetime.datetime.strptime(d + t, '%m/%d/%y%H:%M')
              for d,t in zip(data['Date'],data['Time'])]
             )
-        
+
+        #atm pressure correction for macroctd
+        data['Pressure'] -= 14.7 
         #assign param & unit names 
         for param,unit in zip(params,units):
             self.num_params += 1    

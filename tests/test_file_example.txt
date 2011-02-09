@@ -1,0 +1,64 @@
+# format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka
+format :
+
+# instrument serial number, if present in file else leave blank
+serial_num :
+
+# site name: if present in file else leave blank
+site_name :
+
+# timezone: if present in file else leave blank
+tz : 
+
+# datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
+# file header then setup_time & start_time are values from first line of data
+# and stop_time is value from last line of data
+setup_time :
+start_time :
+stop_time :
+
+# parameters provided (comma delimited, in column order)
+# ATM01 : Atmospheric Pressure
+# BAT01 : Battery Voltage
+# CON01 : Specific Conductance(Normalized @25degC)
+# CON02 : Conductivity(Not Normalized)
+# DOX01 : Dissolved Oxygen Concentration
+# DOX02 : Dissolved Oxygen Saturation Concentration
+# PHL01 : pH Level
+# SAL01 : Salinity
+# TEM01 : Water Temperature
+# TEM02 : Air Temperature
+# TUR01 : Turbidity
+# WSE01 : Water Surface Elevation (No Atm Pressure Correction)
+# WSE02 : Water Surface Elevation (Atm Pressure Corrected)
+parameters :
+
+# units (comma delimited, in column order)
+# depth:ft,m,psi
+# conductivity:uScm,mScm
+# salinity: ppt,psu
+# temperature: degC, degF
+# battery: volts
+# dissolved oxygen: mg/l, %sat
+# turbidity: ntu
+# ph (dimensionless): dl 
+units :
+
+#first three records of data in line format
+#datetime (MM/DD/YYYY hh:mm:ss), comma delimited parameters values
+data :
+data :
+data :
+
+#random 3 records of data in line format
+#datetime (MM/DD/YYYY hh:mm:ss), comma delimited parameters values
+data :
+data :
+data :
+
+#last three records of data in line format
+#datetime (MM/DD/YYYY hh:mm:ss), comma delimited parameters values
+data :
+data :
+data :
+
