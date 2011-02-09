@@ -15,6 +15,9 @@ import numpy as np
 import quantities as pq
 import pytz
 import seawater
+import xlrd
+import csv
+from StringIO import StringIO
 
 from sonde import quantities as sq
 from sonde.timezones import cst
@@ -48,21 +51,28 @@ master_parameter_list = {
 
 
 
-def Sonde(data_file, file_format, *args, **kwargs):
+def Sonde(data_file, file_format=None , *args, **kwargs):
     """
     Read `data_file` and create a sonde dataset instance for
     it. `data_file` must be either a file path string or a file-like
     object. `file_format` should be a string containing the format
-    that the file is in.
+    that the file is in. if `file_format` not provided function will
+    try to autodetect format.
 
     Currently supported file formats are:
       - `ysi`: a YSI binary file
       - `hydrolab`: a Hydrolab txt file
       - `greenspan`: a Greenspan txt/csv/xls file
+      - `eureka` : a Eureka Manta xls/csv file
       - `macroctd` : a Macroctd csv file
       - `hydrotech` : a Hydrotech csv file
+      - `solinst` : a solinst lev file
       
     """
+
+    if not file_format:
+        file_format = autodetect(data_file)
+    
     if file_format.lower() == 'ysi':
         from sonde.formats.ysi import YSIDataset
         return YSIDataset(data_file, *args, **kwargs)
@@ -91,11 +101,101 @@ def Sonde(data_file, file_format, *args, **kwargs):
         from sonde.formats.solinst import SolinstDataset
         return SolinstDataset(data_file, *args, **kwargs)
 
+    if file_format == False:
+        print "File Format Autodetection Failed"
+        raise
+
     else:
         raise NotImplementedError, "file format '%s' is not supported" % \
                                    (file_format,)
 
+def autodetect(data_file):
+    """
+    autodetect file_format based on file
+    return file_format string if successful or
+    False if unable to determine format
+    """
 
+    fid = StringIO()
+    file_ext = data_file.split('.')[-1].lower()
+        
+    if file_ext=='xls':
+        xls2csv(data_file, fid)
+    else:
+        fid.write(open(data_file).read())
+
+    fid.seek(0)
+
+    #read first line
+    line1 = fid.readline()
+
+    if line1.lower().find('greenspan')!=-1:
+        return 'greenspan'
+
+    if line1.lower().find('macrocdt')!=-1:
+        return 'macroctd'
+
+    if line1.lower().find('minisonde4a')!=-1:
+        return 'hydrotech'
+
+    if line1.lower().find('data file for datadogger.')!=-1:
+        return 'solinst'
+
+    if line1.lower().find('log file name')!=-1:
+        return 'hydrolab'
+
+    #read second line
+    line2 = fid.readline()
+    
+    if line2.lower().find('log file name')!=-1: #binary junk in first line
+        return 'hydrotech'
+
+    #check for ysi 
+    if line1[0]=='A':
+        return 'ysi' #binary
+
+    if line1.find('=')!=-1:
+        return 'ysi' #txt file
+
+    if file_ext=='cdf':
+        return 'ysi' #cdf file
+
+    #eureka try and detect degree symbol
+    print line2
+    if line2.find('\xb0')!=-1:
+        return 'eureka'
+
+    else:
+        return False
+
+    
+
+def xls2csv(data_file, csv_file):
+    """
+    Converts excel files to csv equivalents
+    assumes all data is in first worksheet
+    """
+    wb = xlrd.open_workbook(data_file)
+    sh = wb.sheet_by_index(0)
+
+    if type(csv_file) == str:
+        bc = open(csv_file, 'w')
+
+    else:
+        bc = csv_file
+        
+    bcw = csv.writer(bc,csv.excel)
+        
+    for row in range(sh.nrows):
+        this_row = []
+        for col in range(sh.ncols):
+            val = sh.cell_value(row, col)
+            if isinstance(val, unicode):
+                val = val.encode('utf8')
+            this_row.append(val)
+                
+        bcw.writerow(this_row)
+    
 
 class BaseSondeDataset(object):
     """

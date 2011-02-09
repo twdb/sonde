@@ -104,7 +104,7 @@ class EurekaReader:
         self.num_params = 0
         self.parameters = []
         file_buf = StringIO()
-        self.file_ext = data_file.split('.')[-1]
+        self.file_ext = data_file.split('.')[-1].lower()
         
         if self.file_ext =='xls':
             self.xls2csv(data_file, file_buf)

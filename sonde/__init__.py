@@ -7,6 +7,6 @@
     
 """
 
-from .sonde import BaseSondeDataset, master_parameter_list, Sonde
+from .sonde import BaseSondeDataset, master_parameter_list, Sonde, autodetect
 from . import quantities
 from . import formats
