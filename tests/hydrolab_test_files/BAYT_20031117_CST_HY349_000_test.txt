@@ -1,5 +1,5 @@
 [header]
-# format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka
+# format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka,solinst
 format = 'hydrolab'
 
 
