@@ -30,6 +30,7 @@ setup(
         'pytz>=2010o',
         'quantities>=0.9.0',
         'seawater>=1.0.5',
+        'xlrd>=0.7.1',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
