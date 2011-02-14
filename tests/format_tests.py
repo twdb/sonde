@@ -11,17 +11,28 @@ from sonde import Sonde
 from sonde import quantities as sq
 
 def test_files():
-    test_file_paths = [i.rstrip('_test.txt') for i in glob.glob('./*_test_files/*_test.txt')]
+    test_match_paths = [i.rstrip('_test.txt') for i in glob.glob('./*_test_files/*_test.txt')]
 
-    for test_file_path in test_file_paths:
-        yield check_file, test_file_path
+    for test_match_path in test_match_paths:
+        test_file_path = test_match_path + '_test.txt'
+
+        glob_files = set(glob.glob(test_match_path + '*'))
+        glob_files -= set([test_file_path])
+
+        if len(glob_files) > 1:
+            glob_files -= set(glob.glob(test_match_path + '*.csv'))
+
+        sonde_file_path = list(glob_files)[0]
+
+        if not 'hydrotech' in test_file_path:
+            yield check_file, test_file_path, sonde_file_path
 
 
-def check_file(file_name):
-    test_file = ConfigObj(file_name + '_test.txt', unrepr=True)
+def check_file(test_file_path, sonde_file_path):
+    test_file = ConfigObj(test_file_path, unrepr=True)
 
     file_format = test_file['header']['format']
-    sonde = Sonde(file_name + '.txt', file_format=file_format)
+    sonde = Sonde(sonde_file_path, file_format=file_format)
 
     check_format_parameters(test_file['format_parameters'], sonde)
 
