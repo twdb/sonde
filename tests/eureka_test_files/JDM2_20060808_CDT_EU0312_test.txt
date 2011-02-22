@@ -1,0 +1,78 @@
+[header]
+# format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka
+format = 'eureka'
+
+
+[format_parameters]
+# log file name: if present in file else leave blank
+log_file_name = 
+
+# timezone: if present in file else leave blank
+tz = 
+
+# site name: if present in file else leave blank
+site_name = 
+
+# instrument serial number, if present in file else leave blank
+serial_number = 
+
+# datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
+# file header then use first and last line in data
+# datetime provided in first line of data
+setup_time = '08/08/2006 11:15:00'
+start_time = '08/08/2006 11:15:00'
+stop_time = '08/26/2006 01:45:00'
+
+
+[data]
+# parameters provided (comma delimited, in column order)
+# 'ATM01' : Atmospheric Pressure
+# 'BAT01' : Battery Voltage
+# 'CON01' : Specific Conductance(Normalized @25degC)
+# 'CON02' : Conductivity(Not Normalized)
+# 'DOX01' : Dissolved Oxygen Concentration
+# 'DOX02' : Dissolved Oxygen Saturation Concentration
+# 'PHL01' : pH Level
+# 'SAL01' : Salinity
+# 'TEM01' : Water Temperature
+# 'TEM02' : Air Temperature
+# 'TUR01' : Turbidity
+# 'WSE01' : Water Surface Elevation (No Atm Pressure Correction)
+# 'WSE02' : Water Surface Elevation (Atm Pressure Corrected)
+# These are the header of parameters = [Date,Time,Temp.,SC,DO,pH,Depth,SAL,DO SAT,Bat]
+parameters = ['TEM01', 'CON01', 'DOX01','PHL01','WSE01','SAL01','DOX02','BAT01']
+
+
+# units (comma delimited, in column order)
+# depth: ftH2O (feet), mH2O (meters), psi
+# conductivity: uScm (uS/cm), mScm (mS/cm)
+# salinity: ppt, psu
+# temperature: degC, degF
+# battery: volt
+# dissolved oxygen: mgl (mg/l), percent (% Sat)
+# turbidity: ntu
+# ph (dimensionless): dl 
+#These are the header of parameters = [,,°C,mS/cm,mg/l,  ,m,   ,%Sat,V,]
+units = ['degC', 'mScm', 'mgl','dl','mH2O', 'ppt', 'percent', 'volt']
+
+# Now we need to provide a list of known data values to test against.
+# For each data record that needs to be tested, the first value should
+# be the datetime in the "MM/DD/YYYY hh:mm:ss" format, followed by a
+# comma delimited list of parameter values in column order as
+# above. If there are parameter values that are not available for some
+# reason (e.g. a sensor goes out), enter the value as "nan". This list
+# should include AT LEAST the first three records of data, a set of
+# three records from some random location in the file and the last
+# three records of data
+test_data = """[ #Do not edit this line
+['08/08/2006 11:15:00',30.66,8.392,4.81,7.33,1.17,4.6,67.9,11.6],
+['08/08/2006 11:30:00',30.68,8.38,4.86,7.33,1.19,4.6,68.6,11.6],
+['08/08/2006 11:45:00',30.76,8.41,5.16,7.37,1.19,4.6,73.0,11.6],
+['08/14/2006 03:15:00',31.03,8.13,3.83,7.14,0.97,4.5,54.5,9.7],
+['08/14/2006 03:30:00',31.01,8.14,3.76,7.14,0.98,4.5,53.5,9.7],
+['08/14/2006 03:45:00',30.83,8.07,3.80,7.16,0.97,4.4,53.8,9.7],
+['08/26/2006 01:15:00',29.12,5.84,0.68,7.33,0.87,3.1,9.2,4.9],
+['08/26/2006 01:30:00',29.21,5.85,0.81,7.36,0.89,3.1,11.1,4.9],
+['08/26/2006 01:45:00',29.14,6.15,0.86,7.34,0.88,3.3,11.8,4.8],
+]   #Do not edit this line
+""" #Do not edit this line

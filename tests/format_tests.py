@@ -24,8 +24,7 @@ def test_files():
 
         sonde_file_path = list(glob_files)[0]
 
-        if not 'hydrotech' in test_file_path:
-            yield check_file, test_file_path, sonde_file_path
+        yield check_file, test_file_path, sonde_file_path
 
 
 def check_file(test_file_path, sonde_file_path):
