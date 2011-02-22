@@ -3,7 +3,7 @@
     ~~~~~~~~~~~
 
     This module implements the main Sonde object.
-    
+
 """
 from __future__ import absolute_import
 
@@ -67,20 +67,20 @@ def Sonde(data_file, file_format=None , *args, **kwargs):
       - `macroctd` : a Macroctd csv file
       - `hydrotech` : a Hydrotech csv file
       - `solinst` : a solinst lev file
-      
+
     """
 
     if not file_format:
         file_format = autodetect(data_file)
-    
+
     if file_format.lower() == 'ysi':
         from sonde.formats.ysi import YSIDataset
         return YSIDataset(data_file, *args, **kwargs)
-    
+
     if file_format.lower() == 'hydrolab':
         from sonde.formats.hydrolab import HydrolabDataset
         return HydrolabDataset(data_file, *args, **kwargs)
-    
+
     if file_format.lower() == 'greenspan':
         from sonde.formats.greenspan import GreenspanDataset
         return GreenspanDataset(data_file, *args, **kwargs)
@@ -118,7 +118,7 @@ def autodetect(data_file):
 
     fid = StringIO()
     file_ext = data_file.split('.')[-1].lower()
-        
+
     if file_ext=='xls':
         xls2csv(data_file, fid)
     else:
@@ -146,11 +146,11 @@ def autodetect(data_file):
 
     #read second line
     line2 = fid.readline()
-    
+
     if line2.lower().find('log file name')!=-1: #binary junk in first line
         return 'hydrotech'
 
-    #check for ysi 
+    #check for ysi
     if line1[0]=='A':
         return 'ysi' #binary
 
@@ -168,7 +168,7 @@ def autodetect(data_file):
     else:
         return False
 
-    
+
 
 def xls2csv(data_file, csv_file):
     """
@@ -183,9 +183,9 @@ def xls2csv(data_file, csv_file):
 
     else:
         bc = csv_file
-        
+
     bcw = csv.writer(bc,csv.excel)
-        
+
     for row in range(sh.nrows):
         this_row = []
         for col in range(sh.ncols):
@@ -193,9 +193,9 @@ def xls2csv(data_file, csv_file):
             if isinstance(val, unicode):
                 val = val.encode('utf8')
             this_row.append(val)
-                
+
         bcw.writerow(this_row)
-    
+
 
 class BaseSondeDataset(object):
     """
@@ -219,7 +219,7 @@ class BaseSondeDataset(object):
 
         #TODO ADD COMMENTS FIELD
 
-    
+
     def get_standard_unit(self, param_code):
         """
         Return the standard unit for given parameter `param_code`
@@ -239,7 +239,7 @@ class BaseSondeDataset(object):
             param_description = master_parameter_list[param_code][0]
 
         self.parameters[param_code] = (param_description, param_unit)
-                                       
+
         if param_code in self.data:
             self.rescale_parameter(param_code)
 
@@ -268,7 +268,7 @@ class BaseSondeDataset(object):
         std_symbol = std_unit.dimensionality.keys()[0].symbol
         current_symbol = current_unit.dimensionality.keys()[0].symbol
 
-        #if current_unit != std_unit:        
+        #if current_unit != std_unit:
         if current_symbol != std_symbol:
             self.data[param_code] = self.data[param_code].rescale(std_unit)
 
@@ -318,7 +318,7 @@ class BaseSondeDataset(object):
         else:
             raise NotImplementedError, "conversion from %s to %s not supported" % (from_symbol, to_symbol)
 
-            
+
     def _calculate_salinity(self):
         """
         Calculate salinity if salinity parameter is missing but
@@ -339,22 +339,22 @@ class BaseSondeDataset(object):
                 cond = self.data['CON02'].rescale(sq.mScm).magnitude
             else:
                 return
-            
+
             # absolute pressure in dbar
             #if 'WSE01' in params:
             #    P = self.data['WSE01'].rescale(pq.m).magnitude * 1.0197 + 10.1325
             #elif 'WSE02' in params:
-            #    P = self.data['WSE02'].rescale(pq.m).magnitude * 1.0197 
+            #    P = self.data['WSE02'].rescale(pq.m).magnitude * 1.0197
             #else:
             #    P = 10.1325
 
             if 'WSE01' in params:
                 P = self.data['WSE01'].rescale(sq.dbar).magnitude + (pq.atm).rescale(sq.dbar).magnitude
             elif 'WSE02' in params:
-                P = self.data['WSE02'].rescale(sq.dbar).magnitude 
+                P = self.data['WSE02'].rescale(sq.dbar).magnitude
             else:
                 P = (pq.atm).rescale(dbar).magnitude
-            
+
             R = cond / 42.914
             sal = seawater.csiro.salt(R,T,P)
 
