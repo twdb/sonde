@@ -2,8 +2,8 @@
     sonde.formats.hydrolab
     ~~~~~~~~~~~~~~~~~
 
-    This module implements the Hydrolab format 
-    
+    This module implements the Hydrolab format
+
 """
 from __future__ import absolute_import
 
@@ -35,7 +35,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
         self.default_tzinfo = tzinfo
         super(HydrolabDataset, self).__init__()
 
-    
+
     def _read_data(self):
         """
         Read the Hydrolab txt data file
@@ -53,7 +53,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
                      'Turb' : 'TUR01',
                      'Redox': 'NotImplemented',
                      }
-        
+
         unit_map = {'deg C' : pq.degC,
                     'deg F' : pq.degF,
                     'deg K' : pq.degK,
@@ -75,7 +75,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
         # determine parameters provided and in what units
         self.parameters = dict()
         self.data = dict()
-        
+
         for parameter in hydrolab_data.parameters:
             try:
                 pcode = param_map[(parameter.name).strip()]
@@ -104,7 +104,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
 class HydrolabReader:
     """
     A reader object that opens and reads a Hydrolab txt file.
-    
+
     `data_file` should be either a file path string or a file-like
     object. It accepts one optional parameter, `tzinfo` is a
     datetime.tzinfo object that represents the timezone of the
@@ -137,7 +137,7 @@ class HydrolabReader:
         setup_date = fid.readline().split(':')[-1].strip()
         setup_time = fid.readline().split(':')[-1].strip()
         start_date = fid.readline().split(':')[-1].strip()
-        start_time = fid.readline().split(':')[-1].strip() 
+        start_time = fid.readline().split(':')[-1].strip()
         stop_date = fid.readline().split(':')[-1].strip()
         stop_time = fid.readline().split(':')[-1].strip()
         interval = fid.readline().split(':')[-1].strip()
@@ -145,14 +145,14 @@ class HydrolabReader:
 
         # convert to datetime. this assumes that date and time formats
         # are always MMDDYY & HHMMSS which is true for the sample of
-        # files inspected 
+        # files inspected
         fmt = '%m%d%y%H%M%S'
         self.setup_time = datetime.datetime.strptime(setup_date + setup_time, fmt)
         self.start_time = datetime.datetime.strptime(start_date + start_time, fmt)
         self.stop_time = datetime.datetime.strptime(stop_date + stop_time, fmt)
-        self.logging_interval = int(interval[0:2])*3600 + int(interval[2:4])*60 + int(interval[4:6]) 
+        self.logging_interval = int(interval[0:2])*3600 + int(interval[2:4])*60 + int(interval[4:6])
         self.header_lines = []
-        
+
         #read variables and units.
         re_time = re.compile(' *Time')
         buf = fid.readline()
@@ -169,9 +169,9 @@ class HydrolabReader:
                         name = param + ' ' + unit
                     else:
                         name = param
-                        
+
                     self.parameters.append(Parameter(name, unit))
-              
+
                 break
             else:
                 self.header_lines.append(buf)
@@ -183,14 +183,14 @@ class HydrolabReader:
         data_str = ''
         re_date = re.compile(' *Date')
         re_data = re.compile('^[0-9]') # only process lines starting with a number
-        
+
         # re_data = re.compile('((?!Date)(?![0-9]))', re.M) matches only junk lines
         # might be more efficient to work out how to use the above to strip out all
         # junk lines in one go.
         for buf in fid.readlines():
             if re_date.match(buf):
                 log_date = buf.split(':')[-1].strip()
-                
+
             if re_data.match(buf):
                 try:
                     time_field, data_line = buf.split(None, 1)
@@ -198,7 +198,7 @@ class HydrolabReader:
                     data_str = data_str + data_line
                 except:
                     continue
-            
+
         self.dates = np.array(log_time)
         data_str = re.sub('#', 'N', data_str)
         data_str = re.sub('&', '', data_str)
@@ -209,7 +209,7 @@ class HydrolabReader:
             #no data in file
             print 'No Data Found In File'
             raise
-    
+
         for ii in range(self.num_params):
             self.parameters[ii].data = data[:,ii]
 
@@ -219,7 +219,7 @@ class Parameter:
     name, unit and data
     """
     def __init__(self, param_name, param_unit):
-        
+
         self.name = param_name
         self.unit = param_unit
         self.data = []

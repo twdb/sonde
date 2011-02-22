@@ -6,7 +6,7 @@
     There are two main hydrotech formats also
     the files may be in ASCII or Excel (xls) format
     The module attempts to autodetect the correct format
-    
+
 """
 from __future__ import absolute_import
 
@@ -34,7 +34,7 @@ class HydrotechDataset(sonde.BaseSondeDataset):
         self.data_file = data_file
         self.default_tzinfo = tzinfo
         super(HydrotechDataset, self).__init__()
-    
+
     def _read_data(self):
         """
         Read the hydrotech data file
@@ -45,7 +45,7 @@ class HydrotechDataset(sonde.BaseSondeDataset):
                      'Dep25' : 'WSE01',
                      'IBatt' : 'BAT01',
                      }
-        
+
         unit_map = {'\xf8C' : pq.degC,
                     'mS/cm' : sq.mScm,
                     'uS/cm' : sq.uScm,
@@ -60,7 +60,7 @@ class HydrotechDataset(sonde.BaseSondeDataset):
         # determine parameters provided and in what units
         self.parameters = dict()
         self.data = dict()
-        
+
         for parameter in hydrotech_data.parameters:
             try:
                 pcode = param_map[(parameter.name).strip()]
@@ -86,13 +86,13 @@ class HydrotechDataset(sonde.BaseSondeDataset):
             'sensor_warmup_time' : hydrotech_data.sensor_warmup_time,
             'circltr_warmup_time' : hydrotech_data.circltr_warmup_time,
             }
-                        
+
         self.dates = hydrotech_data.dates
 
 class HydrotechReader:
     """
     A reader object that opens and reads a Hydrolab txt file.
-    
+
     `data_file` should be either a file path string or a file-like
     object. It accepts one optional parameter, `tzinfo` is a
     datetime.tzinfo object that represents the timezone of the
@@ -109,7 +109,7 @@ class HydrotechReader:
         """
         Cleans input file by replacing # with 'NaN' and adding
         a # to the beginning of comment lines.
-        Returns a StringIO object 
+        Returns a StringIO object
         """
         fid = open(data_file)
         file_string = fid.read()
@@ -120,7 +120,7 @@ class HydrotechReader:
         #prepend # to non data lines
         file_string = re.sub(re.compile('^(\D)',re.MULTILINE), '#\\1' , file_string)
         #remove junk binary characters
-        
+
         return StringIO(file_string)
 
     def read_hydrotech(self, data_file):
@@ -134,7 +134,7 @@ class HydrotechReader:
             fid = data_file
 
 
-        fid.seek(0)        
+        fid.seek(0)
         fmt = '%m%d%y%H%M%S'
         strp = '#,\r\n'
 
@@ -161,14 +161,14 @@ class HydrotechReader:
         self.sensor_warmup_time = int(sensor_warmup[0:2])*3600 + int(sensor_warmup[2:4])*60 + int(sensor_warmup[4:6])
         self.circltr_warmup_time = int(circltr_warmup[0:2])*3600 + int(circltr_warmup[2:4])*60 + int(circltr_warmup[4:6])
 
-        buf = fid.readline().strip(strp)        
+        buf = fid.readline().strip(strp)
         while buf[0:4]!='Date':
             buf = fid.readline().strip(strp)
 
         fields = buf.split(',')
         params = fields[2:]
         units = fid.readline().strip(strp).split(',')[2:]
-        
+
         #read data
         fid.seek(0)
 
@@ -180,38 +180,38 @@ class HydrotechReader:
             if field!='':
                 cols.append(ncol)
                 field_names.append(field)
-                
+
             ncol += 1
 
-            
+
         data = np.genfromtxt(fid, delimiter=',', dtype=None, names=field_names, usecols = cols,  missing_values='NaN', filling_values=np.nan)
 
         if len(data['Date'][0].split('/')[-1])==2:
             fmt = '%m/%d/%y%H:%M:%S'
         else:
             fmt = '%m/%d/%Y%H:%M:%S'
-            
+
         self.dates = np.array(
             [datetime.datetime.strptime(d + t, fmt)
              for d,t in zip(data['Date'],data['Time'])]
             )
-        
+
         for param,unit in zip(params,units):
             if param!='':
-                self.num_params += 1 
+                self.num_params += 1
                 self.parameters.append(Parameter(param, unit))
 
         for ii in range(self.num_params):
             param = self.parameters[ii].name
             self.parameters[ii].data = data[param]
-           
+
 class Parameter:
     """
     Class that implements the a structure to return a parameters
     name, unit and data
     """
     def __init__(self, param_name, param_unit):
-        
+
         self.name = param_name
         self.unit = param_unit
         self.data = []

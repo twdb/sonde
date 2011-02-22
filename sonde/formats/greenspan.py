@@ -6,7 +6,7 @@
     There are two main greenspan formats also
     the files may be in ASCII or Excel (xls) format
     The module attempts to autodetect the correct format
-    
+
 """
 from __future__ import absolute_import
 
@@ -38,7 +38,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
         self.default_tzinfo = tzinfo
         super(GreenspanDataset, self).__init__()
 
-    
+
     def _read_data(self):
         """
         Read the greenspan data file
@@ -47,7 +47,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                      'EC' : 'CON02', #Double Check?
                      'EC Raw' : 'CON02',
                      'EC Norm' : 'CON01',
-                     
+
                      #'SpCond' : 'CON01???',
                      'Salinity' : 'SAL01',
                      #'DO % Sat' : 'DOX02',
@@ -59,7 +59,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                      'TDS' : 'TDS01',
                      #'Redox': 'NotImplemented',
                      }
-        
+
         unit_map = {'deg_C' : pq.degC,
                     'Celcius' : pq.degC,
                     'deg_F' : pq.degF,
@@ -81,7 +81,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
         # determine parameters provided and in what units
         self.parameters = dict()
         self.data = dict()
-        
+
         for parameter in greenspan_data.parameters:
             try:
                 pcode = param_map[(parameter.name).strip()]
@@ -108,18 +108,18 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                 'top_of_case' : greenspan_data.top_of_case,
                 'raingage' : greenspan_data.raingage,
                 }
-            
+
         elif self.file_format == 'block':
             self.format_parameters = {
                 'header_lines' : greenspan_data.header_lines
                 }
-            
+
         self.dates = greenspan_data.dates
 
 class GreenspanReader:
     """
     A reader object that opens and reads a Hydrolab txt file.
-    
+
     `data_file` should be either a file path string or a file-like
     object. It accepts one optional parameter, `tzinfo` is a
     datetime.tzinfo object that represents the timezone of the
@@ -132,15 +132,15 @@ class GreenspanReader:
         self.parameters = []
         file_buf = StringIO()
         file_ext = data_file.split('.')[-1].lower()
-        
+
         if file_ext =='xls':
             self.xls2csv(data_file, file_buf)
         else:
             file_buf.write(open(data_file).read())
-            
+
         if not self.file_format:
             self.file_format = self.detect_file_format(file_buf)
-            
+
         self.read_greenspan(file_buf)
 
     def xls2csv(self, data_file, csv_file):
@@ -156,9 +156,9 @@ class GreenspanReader:
 
         else:
             bc = csv_file
-        
+
         bcw = csv.writer(bc,csv.excel)
-        
+
         for row in range(sh.nrows):
             this_row = []
             for col in range(sh.ncols):
@@ -166,9 +166,9 @@ class GreenspanReader:
                 if isinstance(val, unicode):
                     val = val.encode('utf8')
                 this_row.append(val)
-                
+
             bcw.writerow(this_row)
-        
+
 
     def detect_file_format(self, data_file):
         """
@@ -228,9 +228,9 @@ class GreenspanReader:
         """
         Read header information
         """
-        
+
         fid.seek(0)
-        
+
         if (self.file_format == '2.4.1') or (self.file_format == '2.3.1'):
 
             self.converter_name = fid.readline().split(',')[1]
@@ -250,9 +250,9 @@ class GreenspanReader:
             params = fields[3:]
             units = fid.readline().split(',')[3:]
 
-            #clean param & unit names 
+            #clean param & unit names
             for param,unit in zip(params,units):
-                self.num_params += 1 
+                self.num_params += 1
                 self.parameters.append(Parameter(param.strip('()_'), unit.strip('()_')))
 
             #read data
@@ -278,28 +278,28 @@ class GreenspanReader:
             buf = fid.readline()
             while buf:
                 self.header_lines.append(buf)
-                
+
                 if buf[0] == 'T':
                     break
 
                 if buf[0:3] == '# C':
                     self.num_params += 1
-                    unit, param = buf.split()[2:] 
+                    unit, param = buf.split()[2:]
                     self.parameters.append(Parameter(param.strip('()_'), unit.strip('()_')))
-                    
+
                 buf = fid.readline()
 
-            fmt = 'T%Y%m%d%H%M%S'            
+            fmt = 'T%Y%m%d%H%M%S'
             dates = []
             data = []
             row = None
             while buf:
                 if buf[0] == 'T':
                     #if not row:
-                    data.append(row) 
+                    data.append(row)
                     dates.append(datetime.datetime.strptime(buf.strip('\r\n'), fmt))
                     row = np.zeros(self.num_params)
-                    row[:] = np.nan 
+                    row[:] = np.nan
 
                 elif buf[0]  == 'D':
                     col = int(buf[1]) - 1
@@ -312,13 +312,13 @@ class GreenspanReader:
 
                 ### TODO WORK OUT HOW TO APPEND data.append(row) correctly
             #append last record to data
-            data.append(row) 
-            #remove blank first record and convert to np.array 
+            data.append(row)
+            #remove blank first record and convert to np.array
             data = np.array(data[1:])
             self.dates = np.array(dates)
             for ii in range(self.num_params):
                 self.parameters[ii].data = data[:,ii]
-           
+
         else:
             print 'Unknown Format Type'
             raise
@@ -329,7 +329,7 @@ class Parameter:
     name, unit and data
     """
     def __init__(self, param_name, param_unit):
-        
+
         self.name = param_name
         self.unit = param_unit
         self.data = []

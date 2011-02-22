@@ -4,7 +4,7 @@
 
     This module implements the Macroctd Manta format.
     The files may be in csv or Excel (xls) format
-    
+
 """
 from __future__ import absolute_import
 
@@ -29,7 +29,7 @@ class MacroctdDataset(sonde.BaseSondeDataset):
         self.default_tzinfo = tzinfo
         super(MacroctdDataset, self).__init__()
 
-    
+
     def _read_data(self):
         """
         Read the macroctd data file
@@ -39,7 +39,7 @@ class MacroctdDataset(sonde.BaseSondeDataset):
                      'Pressure' : 'WSE01',
                      'Battery' : 'BAT01',
                      }
-        
+
         unit_map = {'degC' : pq.degC,
                     'mS/cm' : sq.mScm,
                     'psi' : pq.psi,
@@ -51,7 +51,7 @@ class MacroctdDataset(sonde.BaseSondeDataset):
         # determine parameters provided and in what units
         self.parameters = dict()
         self.data = dict()
-        
+
         for parameter in macroctd_data.parameters:
             try:
                 pcode = param_map[(parameter.name).strip()]
@@ -71,13 +71,13 @@ class MacroctdDataset(sonde.BaseSondeDataset):
             'header_lines' : macroctd_data.header_lines,
             'serial_number' : macroctd_data.serial_number,
             }
-            
+
         self.dates = macroctd_data.dates
 
 class MacroctdReader:
     """
     A reader object that opens and reads a Hydrolab txt file.
-    
+
     `data_file` should be either a file path string or a file-like
     object. It accepts one optional parameter, `tzinfo` is a
     datetime.tzinfo object that represents the timezone of the
@@ -102,18 +102,18 @@ class MacroctdReader:
         buf = fid.readline()
         self.header_lines.append(buf)
         self.serial_number = buf.split(',')[3]
-        
+
         while buf:
             if buf[0:9]=='@AVERAGES':
                 break
-            
+
             self.header_lines.append(buf)
             buf = fid.readline()
 
         fields = ['Date', 'Time', 'Battery', 'Temperature', 'EC', 'Pressure']
         params = fields[2:]
         units = ['volts', 'degC', 'mS/cm', 'psi']
-        
+
         data = np.genfromtxt(fid, delimiter=',', dtype=None, names=fields)
 
         self.dates = np.array(
@@ -122,13 +122,13 @@ class MacroctdReader:
             )
 
         #atm pressure correction for macroctd
-        data['Pressure'] -= 14.7 
-        #assign param & unit names 
+        data['Pressure'] -= 14.7
+        #assign param & unit names
         for param,unit in zip(params,units):
-            self.num_params += 1    
+            self.num_params += 1
             self.parameters.append(Parameter(param.strip(), unit.strip()))
 
-                
+
         for ii in range(self.num_params):
             param = self.parameters[ii].name
             self.parameters[ii].data = data[param]
@@ -140,7 +140,7 @@ class Parameter:
     name, unit and data
     """
     def __init__(self, param_name, param_unit):
-        
+
         self.name = param_name
         self.unit = param_unit
         self.data = []

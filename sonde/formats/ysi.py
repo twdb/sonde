@@ -2,8 +2,8 @@
     sonde.formats.ysi
     ~~~~~~~~~~~~~~~~~
 
-    This module implements the YSI format 
-    
+    This module implements the YSI format
+
 """
 from __future__ import absolute_import
 
@@ -39,7 +39,7 @@ class YSIDataset(sonde.BaseSondeDataset):
         self.default_tzinfo = tzinfo
         super(YSIDataset, self).__init__()
 
-    
+
     def _read_data(self):
         """
         Read the YSI binary data file
@@ -95,7 +95,7 @@ class YSIDataset(sonde.BaseSondeDataset):
             ysi_data = YSIReaderTxt(self.data_file, self.default_tzinfo, self.param_file)
             self.format_parameters = {
                 }
-            
+
         # determine parameters provided and in what units
         self.parameters = dict()
         self.data = dict()
@@ -136,7 +136,7 @@ class ChannelRec:
 class YSIReaderTxt:
     """
     A reader object that opens and reads a YSI txt/cdf file.
-    
+
     `data_file` should be either a file path string or a file-like
     object. It one optional parameters, `tzinfo` is a datetime.tzinfo
     object that represents the timezone of the timestamps in the
@@ -170,17 +170,17 @@ class YSIReaderTxt:
                 if buf.split(',')[0].strip(' "').lower()=='date':
                     param_fields = buf.split(',')
                     param_units = fid.readline().strip('\r\n').split(',')
-                    
+
                 if len(buf.split(',')[0].strip(' "').split('/'))==3: #i.e if date in first column
                     break
             else:
                 if buf.split()[0].strip(' "').lower()=='date':
                     param_fields = buf.split()
                     units_fields = fid.readline().strip('\r\n').split()
-                    
+
                 if len(buf.split()[0].strip(' "').split('/'))==3:
                     break
-            
+
             buf = fid.readline().strip('\r\n') #i.e if date in first column
 
         #clean up names & units
@@ -207,14 +207,14 @@ class YSIReaderTxt:
             [datetime.datetime.strptime(d + t, fmt)
              for d,t in zip(data['Date'],data['Time'])]
             )
-        
-        #assign param & unit names 
+
+        #assign param & unit names
         for param,unit in zip(params,units):
-            self.num_params += 1    
+            self.num_params += 1
             self.parameters.append(Parameter(param.strip(), unit.strip()))
-                
+
         for ii in range(self.num_params):
-            param = re.sub('[?.:]', '', self.parameters[ii].name).replace(' ','_') 
+            param = re.sub('[?.:]', '', self.parameters[ii].name).replace(' ','_')
             self.parameters[ii].data = data[param]
 
 class Parameter:
@@ -223,16 +223,16 @@ class Parameter:
     name, unit and data
     """
     def __init__(self, param_name, param_unit):
-        
+
         self.name = param_name
         self.unit = param_unit
         self.data = []
 
-        
+
 class YSIReaderBin:
     """
     A reader object that opens and reads a YSI binary file.
-    
+
     `data_file` should be either a file path string or a file-like
     object. It accepts two optional parameters, `param_file` is a
     ysi_param.def definition file and `tzinfo` is a datetime.tzinfo
@@ -251,10 +251,10 @@ class YSIReaderBin:
                                       tzinfo=tzinfo)
 
         ysi_epoch_in_seconds = time.mktime(ysi_epoch.timetuple())
-                                                    
+
         for param in self.parameters:
             param.data = (np.array(param.data)).round(decimals=param.ndecimals)
-            
+
         self.dates = np.array([datetime.datetime.fromtimestamp(t + ysi_epoch_in_seconds, tzinfo)
                                for t in self.julian_time])
 
@@ -276,7 +276,7 @@ class YSIReaderBin:
 
         elif type(param_file) == file:
             file_string = param_file.read()
-    
+
         file_string = re.sub("\n\s*\n*", "\n", file_string) #remove blank lines
         file_string = re.sub(";.*\n*", "", file_string)     #remove comment lines
         file_string = re.sub("\t", "", file_string)         #remove tabs
@@ -290,7 +290,7 @@ class YSIReaderBin:
                           ('shortname', '|S9'),
                           ('num_dec_places', '<i8')])
         self.ysi_param_def = np.genfromtxt(StringIO(file_string), delimiter=',', usecols=(0,1,3,5,7) , skip_header=3, dtype=dtype)
-        
+
 
     def read_ysi(self, ysi_file):
         """
@@ -301,7 +301,7 @@ class YSIReaderBin:
 
         else:
             fid = ysi_file
-            
+
         record_type = []
         self.num_params=0
 
