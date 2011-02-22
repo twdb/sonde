@@ -11,20 +11,14 @@ from sonde import Sonde
 from sonde import quantities as sq
 
 def test_files():
-    test_match_paths = [i.rstrip('_test.txt') for i in glob.glob('./*_test_files/*_test.txt')]
+    test_file_paths = [i for i in glob.glob('./*_test_files/*_test.txt')]
 
-    for test_match_path in test_match_paths:
-        test_file_path = test_match_path + '_test.txt'
+    for test_file_path in test_file_paths:
+        tested_file_extension = test_file_path.split('_')[-2]
+        tested_file_path = '.'.join([test_file_path.rsplit('_' + tested_file_extension, 1)[0],
+                                     tested_file_extension])
 
-        glob_files = set(glob.glob(test_match_path + '*'))
-        glob_files -= set([test_file_path])
-
-        if len(glob_files) > 1:
-            glob_files -= set(glob.glob(test_match_path + '*.csv'))
-
-        sonde_file_path = list(glob_files)[0]
-
-        yield check_file, test_file_path, sonde_file_path
+        yield check_file, test_file_path, tested_file_path
 
 
 def check_file(test_file_path, sonde_file_path):

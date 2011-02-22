@@ -1,27 +1,29 @@
 [header]
 # format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka
-format = 'greenspan'
+format = 'solinst'
 
 
 [format_parameters]
 # log file name: if present in file else leave blank
-log_file_name = 'El Jardin_18 Oct 06'
+log_file_name = 
 
 # timezone: if present in file else leave blank
 tz = 
 
 # site name: if present in file else leave blank
-site_name = 'El Jardin'
+site_name = 'JDM1'
 
 # instrument serial number, if present in file else leave blank
-serial_number = '19549'
+serial_number ='.N00-60652  312.'
+
+
 
 # datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
 # file header then use first and last line in data
 # datetime provided in first line of data
-setup_time = '07/18/2006 16:00:00'
-start_time = '07/18/2006 16:00:00'
-stop_time = '10/18/2006 14:00:00'
+setup_time = '12/18/2005 08:00:00'
+start_time = '12/18/2005 08:00:00'
+stop_time = '01/30/2006 16:30:00'
 
 
 [data]
@@ -39,8 +41,8 @@ stop_time = '10/18/2006 14:00:00'
 # 'TUR01' : Turbidity
 # 'WSE01' : Water Surface Elevation (No Atm Pressure Correction)
 # 'WSE02' : Water Surface Elevation (Atm Pressure Corrected)
-# These are the header of parameters = [Batt, DO,Temp, EC, pH]
-parameters = ['BAT01','DOX01','TEM01','CON01','PHL01']
+# These are the header of parameters = [Level","","Temp","","Cond","]
+parameters = ['WSE01','TEM01', 'CON01']
 
 
 # units (comma delimited, in column order)
@@ -52,8 +54,8 @@ parameters = ['BAT01','DOX01','TEM01','CON01','PHL01']
 # dissolved oxygen: mgl (mg/l), percent (% Sat)
 # turbidity: ntu
 # ph (dimensionless): dl 
-#These are the header of parameters = [volt, feet, deg c, uS/cm]
-units = ['volt', 'mgl', 'degC','uScm', 'dl']
+#These are the header of parameters = [Volts, temp (c), cond ]
+units = ['mH2O', 'degC', 'mScm']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
@@ -65,14 +67,16 @@ units = ['volt', 'mgl', 'degC','uScm', 'dl']
 # three records from some random location in the file and the last
 # three records of data
 test_data = """[ #Do not edit this line
-['07/18/2006 16:00:00','nan',7.84,33.07,1023,8.22],
-['07/18/2006 17:00:00', 'nan',8.01,33.05,1025.8,8.23],
-['07/18/2006 18:00:00', 'nan',7.86,32.94,1026.1,8.22],
-['08/02/2006 00:00:00',10,2.41,30.74,799.9,8.14],
-['08/02/2006 01:00:00', 'nan',2.34,30.69,799.5,8.12],
-['08/02/2006 02:00:00', 'nan',2.26,30.64,785.8,8.1],
-['10/18/2006 12:00:00', 'nan',-1.34,29.82,1050.1,7.59],
-['10/18/2006 13:00:00', 'nan',-1.34,29.93,1066.2,7.6],
-['10/18/2006 14:00:00', 'nan',-0.67,29.97,1148.3,7.51],
+['2010/08/05 10:10:40',0.2732,38.318],
+['12/18/2005 08:00:00', 1.987, 8.31, 21.94],
+['12/18/2005 08:15:00', 1.989, 8.48, 22.05],
+['12/18/2005 08:30:00', 1.977, 8.65, 22.07],
+['12/18/2005 08:45:00', 1.966, 8.71, 22.19],
+['01/09/2006 05:15:00', 1.733, 15.38, 17.12],
+['01/09/2006 05:30:00', 1.715, 15.37, 17.18],
+['01/09/2006 05:45:00', 1.692, 15.31, 17.26],
+['1/30/2006 16:00:00', 1.915, 18.76, 20.60],
+['1/30/2006 16:15:00', 1.923, 18.86, 20.66],
+['1/30/2006 16:30:00', 1.956, 18.98, 20.66],
 ]   #Do not edit this line
 """ #Do not edit this line

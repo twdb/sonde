@@ -1,6 +1,6 @@
 [header]
 # format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka
-format = 'macroctd'
+format = 'solinst'
 
 
 [format_parameters]
@@ -11,17 +11,18 @@ log_file_name =
 tz = 
 
 # site name: if present in file else leave blank
-site_name = 'Klake006 aug'
+site_name = 'SO#69853'
 
 # instrument serial number, if present in file else leave blank
-serial_number = 
+serial_number ='.. 0-1034598 2..'
+
 
 # datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
 # file header then use first and last line in data
 # datetime provided in first line of data
-setup_time = '01/13/2009 16:13:31'
-start_time = '01/14/2009 07:00:00'
-stop_time = '01/14/2010 07:00:00'
+setup_time = '05/08/2010 10:10:40'
+start_time = '05/08/2010 10:10:40'
+stop_time = '10/08/2010 12:20:40'
 
 
 [data]
@@ -40,7 +41,7 @@ stop_time = '01/14/2010 07:00:00'
 # 'WSE01' : Water Surface Elevation (No Atm Pressure Correction)
 # 'WSE02' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = [Temp","","SpCond","","Sal","","IBatt"]
-parameters = ['TEM01', 'CON01', 'SAL01','BAT01']
+parameters = ['WSE01','TEM01']
 
 
 # units (comma delimited, in column order)
@@ -52,8 +53,8 @@ parameters = ['TEM01', 'CON01', 'SAL01','BAT01']
 # dissolved oxygen: mgl (mg/l), percent (% Sat)
 # turbidity: ntu
 # ph (dimensionless): dl 
-#These are the header of parameters = [øC","","mS/cm","","ppt","","Volts]
-units = ['degC', 'mScm', 'ppt', 'volt']
+#These are the header of parameters = [Volts, temp (c), cond ]
+units = ['ftH2O', 'degC']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
@@ -65,14 +66,14 @@ units = ['degC', 'mScm', 'ppt', 'volt']
 # three records from some random location in the file and the last
 # three records of data
 test_data = """[ #Do not edit this line
-['01/14/09 07:00:00', 12.88, .887, .46, 6.2],
-['01/14/09 08:00:00', 12.65, .888, .46, 6.1],
-['01/14/09 09:00:00', 12.39, .887, .46, 6.1],
-['01/21/09 05:00:00', 13.12, 42.9, 27.68, 5.6],
-['01/21/09 06:00:00', 13.04, 42.9, 27.66, 5.6],
-['01/21/09 07:00:00', 12.84, 42.8, 27.59, 5.6],
-['02/12/09 06:00:00', 18.37, .0218, 0, 5.3],
-['02/12/09 07:00:00', 18.22, .0207, 0, 5.3],
-['02/12/09 08:00:00', 20.33, .0012, -0, 5.3],
+['2010/08/05 10:10:40',0.2732,38.318],
+['2010/08/05 10:15:40',0.2882,40.115],
+['2010/08/05 10:20:40',0.2897,39.155],
+['2010/08/06 16:35:40', -0.1606, 22.702],
+['2010/08/06 16:40:40', -0.1647, 22.510],
+['2010/08/06 16:45:40', -0.1616, 22.383],
+['2010/08/10 12:10:40', -0.2050, 30.102],
+['2010/08/10 12:15:40', -0.2055, 30.047],
+['2010/08/10 12:20:40', -0.2048, 29.994],
 ]   #Do not edit this line
 """ #Do not edit this line
