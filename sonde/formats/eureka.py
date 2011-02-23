@@ -113,6 +113,9 @@ class EurekaReader:
 
         self.read_eureka(file_buf)
 
+        if tzinfo:
+            self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
+
 
     def xls2csv(self, data_file, csv_file):
         """
