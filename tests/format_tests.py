@@ -9,6 +9,8 @@ import quantities as pq
 
 from sonde import Sonde
 from sonde import quantities as sq
+from sonde.timezones import cst, cdt
+
 
 def test_files():
     test_file_paths = [i for i in glob.glob('./*_test_files/*_test.txt')]
@@ -22,10 +24,21 @@ def test_files():
 
 
 def check_file(test_file_path, sonde_file_path):
+    global tz
+    tz = None
     test_file = ConfigObj(test_file_path, unrepr=True)
 
     file_format = test_file['header']['format']
-    sonde = Sonde(sonde_file_path, file_format=file_format)
+
+
+    # force cst, as the python naive datetime automatically converts
+    # to cst which tends to screw things up
+    if 'tz' in test_file['format_parameters'] and test_file['format_parameters']['tz'].lower() == 'cdt':
+        tz = cdt
+    else:
+        tz = cst
+
+    sonde = Sonde(sonde_file_path, file_format=file_format, tzinfo=tz)
 
     check_format_parameters(test_file['format_parameters'], sonde)
 
@@ -37,9 +50,8 @@ def check_file(test_file_path, sonde_file_path):
 
 
 def check_values_match(test_data, parameters, units, sonde):
-    date_format = "%m/%d/%Y %H:%M:%S"
+    date = _convert_to_aware_datetime(test_data[0])
 
-    date = datetime.strptime(test_data[0], date_format)
     assert date in sonde.dates, "date not found in sonde: %s" % (date)
 
     for parameter, unit, test_value in zip(parameters, units, test_data[1:]):
@@ -60,20 +72,48 @@ def check_values_match(test_data, parameters, units, sonde):
         assert_almost_equal(test_datum, sonde_datum)
 
 
+
 def check_format_parameters(format_parameters, sonde):
     for parameter_name, test_value in format_parameters.items():
         if test_value == '':
             continue
 
-        test_value = str(test_value)
-
         assert parameter_name in sonde.format_parameters, "format parameter '%s' not found in sonde.format_parameters" % parameter_name
-
 
         sonde_parameter = sonde.format_parameters[parameter_name]
 
         if re.match('\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}', test_value):
-            test_value = datetime.strptime(test_value, "%m/%d/%Y %H:%M:%S")
-
+            test_value = _convert_to_aware_datetime(test_value)
 
         assert test_value == sonde_parameter, "format parameter '%s' doesn't match: %s != %s" % (parameter_name, test_value, sonde_parameter)
+
+
+
+
+def _tz_offset_string(tzinfo):
+    """
+    Return a tzoffset string in the form +HHMM or -HHMM as required
+    for parsing the '%z' directive of the the datetime strptime()
+    method's format for parsing datetime strings
+    """
+    offset = tzinfo.utcoffset(tzinfo)
+
+    hours = offset.days * 24 + offset.seconds/3600
+    minutes = (offset.seconds % 3600) / 60
+
+    return "%+03d%02d" % (hours, minutes)
+
+
+
+def _convert_to_aware_datetime(datetime_string):
+    """
+    Convert to a datetime string to a datetime object, taking tz into
+    account if it is set
+    """
+    date_format = "%m/%d/%Y %H:%M:%S"
+    dt = datetime.strptime(datetime_string, date_format)
+
+    if tz:
+        dt = dt.replace(tzinfo=tz)
+
+    return dt
