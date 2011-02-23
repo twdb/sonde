@@ -103,7 +103,7 @@ class HydrotechReader:
         self.num_params = 0
         self.parameters = []
         file_buf = self.clean_file(data_file)
-        self.read_hydrotech(file_buf)
+        self.read_hydrotech(file_buf, tzinfo)
 
     def clean_file(self, data_file):
         """
@@ -123,7 +123,7 @@ class HydrotechReader:
 
         return StringIO(file_string)
 
-    def read_hydrotech(self, data_file):
+    def read_hydrotech(self, data_file, tzinfo=None):
         """
         Open and read a Hydrotech file.
         """
@@ -195,6 +195,12 @@ class HydrotechReader:
             [datetime.datetime.strptime(d + t, fmt)
              for d,t in zip(data['Date'],data['Time'])]
             )
+
+        if tzinfo:
+            self.setup_time = self.setup_time.replace(tzinfo=tzinfo)
+            self.start_time = self.start_time.replace(tzinfo=tzinfo)
+            self.stop_time = self.stop_time.replace(tzinfo=tzinfo)
+            self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
         for param,unit in zip(params,units):
             if param!='':

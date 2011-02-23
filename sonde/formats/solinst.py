@@ -95,6 +95,8 @@ class SolinstReader:
         self.num_params = 0
         self.parameters = []
         self.read_solinst(data_file)
+        if tzinfo:
+            self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
     def read_solinst(self, data_file):
         """
@@ -126,7 +128,7 @@ class SolinstReader:
             fields = buf.split('=', 1)
 
             if fields[0].strip()=='Instrument type':
-                self.model = fields[1].strip() 
+                self.model = fields[1].strip()
 
             if fields[0].strip()=='Serial number':
                 self.serial_number = fields[1].strip('. ').split()[0].split('-')[-1]

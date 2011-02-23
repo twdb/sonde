@@ -148,6 +148,8 @@ class YSIReaderTxt:
         self.num_params = 0
         self.parameters = []
         self.read_ysi(data_file)
+        if tzinfo:
+            self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
     def read_ysi(self, data_file):
         """
@@ -283,6 +285,9 @@ class YSIReaderBin:
 
         self.dates = np.array([datetime.datetime.fromtimestamp(t + ysi_epoch_in_seconds, tzinfo)
                                for t in self.julian_time])
+
+        if tzinfo:
+            self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
         self.julian_time = np.array(self.julian_time)
         self.begin_log_time = datetime.datetime.fromtimestamp(self.begin_log_time + ysi_epoch_in_seconds)

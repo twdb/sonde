@@ -101,6 +101,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
 
         self.dates = hydrolab_data.dates
 
+
 class HydrolabReader:
     """
     A reader object that opens and reads a Hydrolab txt file.
@@ -115,6 +116,13 @@ class HydrolabReader:
         self.num_params = 0
         self.parameters = []
         self.read_hydrolab(data_file)
+
+        if tzinfo:
+            self.setup_time = self.setup_time.replace(tzinfo=tzinfo)
+            self.start_time = self.start_time.replace(tzinfo=tzinfo)
+            self.stop_time = self.stop_time.replace(tzinfo=tzinfo)
+            self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
+
 
     def read_hydrolab(self, hydrolab_file):
         """
