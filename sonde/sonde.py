@@ -12,6 +12,7 @@ from exceptions import NotImplementedError
 import re
 
 import numpy as np
+import os
 import quantities as pq
 import pytz
 import seawater.csiro
@@ -20,7 +21,7 @@ import csv
 from StringIO import StringIO
 
 from sonde import quantities as sq
-from sonde.timezones import cst
+from sonde.timezones import cst,cdt
 
 
 #XXX: put this into a proper config file
@@ -196,6 +197,45 @@ def xls2csv(data_file, csv_file):
 
         bcw.writerow(this_row)
 
+def merge(file_list, tz_list=None):
+    """
+    Merges all files in file_list
+    tz_list specifies timezone of each file. 
+    If tz_list == None then cst is assumed i.e UTC-6
+    """
+    if tz_list is None:
+        tz_list = [cdt for fn in file_list]
+
+    data = dict()
+    data['dates'] = np.empty(0,dtype=datetime.datetime)
+    data['filenames'] = np.empty(0,dtype='|S100')
+    for param,unit in master_parameter_list.items():
+        data[param] = np.empty(0, dtype='<f8')*unit[-1]
+
+    for file_name, tz in zip(file_list, tz_list):
+        print 'processing: ', file_name
+        dataset = Sonde(file_name, tzinfo=tz)
+        data['dates'] = np.hstack((data['dates'],dataset.dates))
+        fnames = np.zeros(dataset.dates.size, dtype='|S100')
+        fnames[:] = os.path.split(file_name)[-1]
+        data['filenames'] = np.hstack((data['filenames'],fnames))
+        no_data = np.zeros(dataset.dates.size)
+        no_data[:] = np.nan
+        for param in master_parameter_list.keys():
+            if param in dataset.data.keys():
+                tmp_data = dataset.data[param]
+            else:
+                tmp_data = no_data
+
+            data[param] = np.hstack((data[param],tmp_data))
+
+    for param,unit in master_parameter_list.items():
+        if np.all(np.isnan(data[param])):
+            del data[param]
+        else:
+            data[param] = data[param]*unit[-1]
+
+    return data
 
 class BaseSondeDataset(object):
     """
