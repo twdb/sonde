@@ -43,6 +43,7 @@ setup(
     ],
     tests_require=[
         'nose>=0.11.4',
+        'configobj>=4.7.2',
     ],
     test_suite='nose.collector',
 )
