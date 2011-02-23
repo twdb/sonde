@@ -52,9 +52,9 @@ parameters = ['TEM01', 'CON01', 'DOX01','PHL01','WSE01','SAL01','DOX02','BAT01']
 # battery: volt
 # dissolved oxygen: mgl (mg/l), percent (% Sat)
 # turbidity: ntu
-# ph (dimensionless): dl 
+# ph (dimensionless): dimensionless 
 #These are the header of parameters = [',,°C,mS/cm,mg/l,  ,m,   ,%Sat,V']
-units = ['degC', 'mScm', 'mgl','dl', 'mH2O', 'ppt', 'percent', 'volt']
+units = ['degC', 'mScm', 'mgl','dimensionless', 'mH2O', 'ppt', 'percent', 'volt']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
