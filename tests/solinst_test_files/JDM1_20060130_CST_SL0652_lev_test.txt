@@ -14,7 +14,7 @@ tz =
 site_name = 'JDM1'
 
 # instrument serial number, if present in file else leave blank
-serial_number ='.N00-60652  312.'
+serial_number ='60652'
 
 
 
@@ -67,7 +67,6 @@ units = ['mH2O', 'degC', 'mScm']
 # three records from some random location in the file and the last
 # three records of data
 test_data = """[ #Do not edit this line
-['2010/08/05 10:10:40',0.2732,38.318],
 ['12/18/2005 08:00:00', 1.987, 8.31, 21.94],
 ['12/18/2005 08:15:00', 1.989, 8.48, 22.05],
 ['12/18/2005 08:30:00', 1.977, 8.65, 22.07],

@@ -35,7 +35,7 @@ class MacroctdDataset(sonde.BaseSondeDataset):
         Read the macroctd data file
         """
         param_map = {'Temperature' : 'TEM01',
-                     'EC' : 'CON01',
+                     'EC' : 'CON02',
                      'Pressure' : 'WSE01',
                      'Battery' : 'BAT01',
                      }
@@ -70,6 +70,7 @@ class MacroctdDataset(sonde.BaseSondeDataset):
         self.format_parameters = {
             'header_lines' : macroctd_data.header_lines,
             'serial_number' : macroctd_data.serial_number,
+            'site_name' : macroctd_data.site_name, 
             }
 
         self.dates = macroctd_data.dates
@@ -106,6 +107,9 @@ class MacroctdReader:
         while buf:
             if buf[0:9]=='@AVERAGES':
                 break
+
+            if buf[0:11]=='@DEPLOYMENT':
+                self.site_name = buf.split(None,1)[-1].strip('"\r\n')
 
             self.header_lines.append(buf)
             buf = fid.readline()

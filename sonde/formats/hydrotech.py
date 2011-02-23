@@ -50,7 +50,7 @@ class HydrotechDataset(sonde.BaseSondeDataset):
                     'mS/cm' : sq.mScm,
                     'uS/cm' : sq.uScm,
                     'mg/l' : sq.mgl,
-                    'meters' : sq.mH20,
+                    'meters' : sq.mH2O,
                     'Volts' : pq.volt,
                     'ppt' : sq.psu,
                     }

@@ -70,8 +70,9 @@ class YSIDataset(sonde.BaseSondeDataset):
                     '%' : pq.percent,
                     'mg/L' : sq.mgl,
                     'pH' : pq.dimensionless,
-                    'meters' : sq.mH20,
-                    'feet' : sq.ftH20,
+                    'meters' : sq.mH2O,
+                    'm' : sq.mH2O,
+                    'feet' : sq.ftH2O,
                     'volts' : pq.volt,
                     'V' : pq.volt,
                     'ppt' : sq.psu,
@@ -81,10 +82,11 @@ class YSIDataset(sonde.BaseSondeDataset):
             ysi_data = YSIReaderBin(self.data_file, self.default_tzinfo, self.param_file)
             self.format_parameters = {
                 'site_name': ysi_data.site_name,
+                'log_file_name': ysi_data.log_file_name,
                 'instr_type': ysi_data.instr_type,
                 'system_sig': ysi_data.system_sig,
                 'prog_ver': ysi_data.prog_ver,
-                'serial_num': ysi_data.serial_num,
+                'serial_number': ysi_data.serial_number,
                 'pad1': ysi_data.pad1,
                 'logging_interval': ysi_data.logging_interval,
                 'begin_log_time': ysi_data.begin_log_time,
@@ -167,26 +169,25 @@ class YSIReaderTxt:
 
         while buf:
             if dlm==',':
-                if buf.split(',')[0].strip(' "').lower()=='date':
+                if buf.split(',')[0].strip(' "').lower()=='date' or buf.split(',')[0].strip(' "').lower()=='datetime':
                     param_fields = buf.split(',')
                     param_units = fid.readline().strip('\r\n').split(',')
 
                 if len(buf.split(',')[0].strip(' "').split('/'))==3: #i.e if date in first column
+                    line1 = buf.split(',')
                     break
             else:
-                if buf.split()[0].strip(' "').lower()=='date':
+                if buf.split()[0].strip(' "').lower()=='date' or buf.split()[0].strip(' "').lower()=='datetime':
                     param_fields = buf.split()
                     units_fields = fid.readline().strip('\r\n').split()
 
                 if len(buf.split()[0].strip(' "').split('/'))==3:
+                    line1 = buf.split()
                     break
 
             buf = fid.readline().strip('\r\n') #i.e if date in first column
 
         #clean up names & units
-        fmt = re.sub('([mMdD])', '%\\1', param_units[0].lower()).replace('y','%Y').strip(' "')
-        fmt += '%H:%M:%S'
-
         fields = []
         params = []
         units = []
@@ -194,19 +195,45 @@ class YSIReaderTxt:
             fields.append(param.strip(' "'))
             units.append(unit.strip(' "'))
 
-        params = fields[2:]
-        units = units[2:]
+        #work out date format
+        if fields[0].lower()=='datetime':
+            datestr, timestr = line1[0].split()
+            start = 1
+        else:
+            datestr = line1[0]
+            timestr = line1[1]
+            start = 2
 
-        fid.seek(-1,1) #move back to above first line of data
+        if max([len(d) for d in datestr.split('/')])==4:
+            y = '%Y'
+        else:
+            y = '%y'
+
+        fmt = re.sub('([mMdD])', '%\\1', param_units[0].lower()).replace('y',y).strip(' "')
+
+        if len(timestr.split(':')) == 3:
+            fmt += ' %H:%M:%S'
+        else:
+            fmt += ' %H:%M'
+
+        params = fields[start:]
+        units = units[start:]
+        fid.seek(-len(buf)-2,1) #move back to above first line of data
         if dlm==',':
             data = np.genfromtxt(fid, dtype=None, names=fields, delimiter=',')
         else:
             data = np.genfromtxt(fid, dtype=None, names=fields)
 
-        self.dates = np.array(
-            [datetime.datetime.strptime(d + t, fmt)
-             for d,t in zip(data['Date'],data['Time'])]
-            )
+        if fields[0].lower()=='datetime':
+            self.dates = np.array(
+                [datetime.datetime.strptime(d.strip('"'), fmt)
+                 for d in data['DateTime']]
+                )
+        else:
+            self.dates = np.array(
+                [datetime.datetime.strptime(d.strip('"') + ' ' + t.strip('"'), fmt)
+                 for d,t in zip(data['Date'],data['Time'])]
+                )
 
         #assign param & unit names
         for param,unit in zip(params,units):
@@ -214,7 +241,7 @@ class YSIReaderTxt:
             self.parameters.append(Parameter(param.strip(), unit.strip()))
 
         for ii in range(self.num_params):
-            param = re.sub('[?.:]', '', self.parameters[ii].name).replace(' ','_')
+            param = re.sub('[?.:%]', '', self.parameters[ii].name).replace(' ','_')
             self.parameters[ii].data = data[param]
 
 class Parameter:
@@ -316,6 +343,9 @@ class YSIReaderBin:
                                  self.logging_interval, self.begin_log_time, \
                                  self.first_sample_time, self.pad2 \
                                  = struct.unpack(fmt, fid.read(fmt_size))
+
+                self.site_name = self.site_name.strip('\x00')
+                self.log_file_name = self.site_name
 
             elif record_type == 'B':
                 self.num_params = self.num_params + 1

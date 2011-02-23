@@ -39,13 +39,16 @@ class SolinstDataset(sonde.BaseSondeDataset):
         Read the solinst data file
         """
         param_map = {'TEMPERATURE' : 'TEM01',
+                     'Temperature' : 'TEM01',
                      '1: Conductivity' : 'CON01',
                      'LEVEL' : 'WSE01',
+                     'Level' : 'WSE01',
                      'pressure?' : 'ATM01',
                      }
 
         unit_map = {'Deg C' : pq.degC,
-                    'm' : sq.mH20,
+                    'm' : sq.mH2O,
+                    'ft': sq.ftH2O,
                     'mS/cm' : sq.mScm,
                     }
 
@@ -80,7 +83,7 @@ class SolinstDataset(sonde.BaseSondeDataset):
 
 class SolinstReader:
     """
-    A reader object that opens and reads a Solinst csv/xls file.
+    A reader object that opens and reads a Solinst lev file.
 
     `data_file` should be either a file path string or a file-like
     object. It accepts one optional parameter, `tzinfo` is a
@@ -107,17 +110,26 @@ class SolinstReader:
         buf = fid.readline().strip(' \r\n')
         params = []
         units = []
+        start_reading = False
         while buf:
             if buf=='[Instrument info from data header]':
+                start_reading = True
+
+            if not start_reading:
+                buf = fid.readline().strip(' \r\n')
+                continue
+
+            if buf=='[Data]':
+                self.num_rows = int(fid.readline().strip(' \r\n'))
                 break
 
-            fields = buf.split('=')
+            fields = buf.split('=', 1)
 
             if fields[0].strip()=='Instrument type':
-                self.model = fields[1].strip() + fields[2].strip()
+                self.model = fields[1].strip() 
 
             if fields[0].strip()=='Serial number':
-                self.serial_number = fields[1].split()[0].split('-')[-1]
+                self.serial_number = fields[1].strip('. ').split()[0].split('-')[-1]
 
             if fields[0].strip()=='Instrument number':
                 self.project_id = fields[1].strip()
@@ -127,26 +139,31 @@ class SolinstReader:
 
             if fields[0].strip()=='Identification':
                 params.append(fields[1])
-
-            if fields[0].strip()=='Reference':
-                #assumes unit field is seperate by at least two spaces. single
-                #space is considered part of unit name
-                units.append(re.sub('\s{1,} ', ',', fields[1]).split(',')[-1])
+                buf = fid.readline().strip(' \r\n')
+                fields = buf.split('=', 1)
+                if fields[0].strip()=='Unit':
+                    units.append(fields[1].strip())
+                elif fields[0].strip()=='Reference':
+                    #assumes unit field is seperate by at least two spaces. single
+                    #space is considered part of unit name
+                    units.append(re.sub('\s{1,} ', ',', fields[1]).split(',')[-1])
 
             buf = fid.readline().strip(' \r\n')
 
         #skip over rest of header
-        while buf:
-            if buf=='[Data]':
-                self.num_rows = int(fid.readline().strip(' \r\n'))
-                break
-
-            buf = fid.readline().strip(' \r\n')
-
+        #while buf:
+        #    if buf=='[Data]':
+        #        self.num_rows = int(fid.readline().strip(' \r\n'))
+        #        break
+        #
+        #    buf = fid.readline().strip(' \r\n')
 
         fields = ['Date','Time'] + params
 
-        data = np.genfromtxt(fid, dtype=None, names=fields, skip_footer=1)
+        #below command is skipping last line of data
+        #data = np.genfromtxt(fid, dtype=None, names=fields, skip_footer=1)
+        buf = fid.read()
+        data = np.genfromtxt(StringIO(buf.split('END')[0]), dtype=None, names=fields)
 
         self.dates = np.array(
             [datetime.datetime.strptime(d + t, '%Y/%m/%d%H:%M:%S.0')

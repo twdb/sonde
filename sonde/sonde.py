@@ -14,7 +14,7 @@ import re
 import numpy as np
 import quantities as pq
 import pytz
-import seawater
+import seawater.csiro
 import xlrd
 import csv
 from StringIO import StringIO
@@ -45,8 +45,8 @@ master_parameter_list = {
     'TEM01' : ('Water Temperature', pq.degC),
     'TEM02' : ('Air Temperature', pq.degC),
     'TUR01' : ('Turbidity', sq.ntu),
-    'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', sq.mH20),
-    'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', sq.mH20),
+    'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', sq.mH2O),
+    'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', sq.mH2O),
     }
 
 
@@ -138,7 +138,7 @@ def autodetect(data_file):
     if line1.lower().find('minisonde4a')!=-1:
         return 'hydrotech'
 
-    if line1.lower().find('data file for datadogger.')!=-1:
+    if line1.lower().find('data file for datalogger.')!=-1:
         return 'solinst'
 
     if line1.lower().find('log file name')!=-1:
@@ -161,7 +161,7 @@ def autodetect(data_file):
         return 'ysi' #cdf file
 
     #eureka try and detect degree symbol
-    print line2
+    #print line2
     if line2.find('\xb0')!=-1:
         return 'eureka'
 
@@ -208,14 +208,28 @@ class BaseSondeDataset(object):
     parameters = {}
 
     def __init__(self):
+        self.format_parameters = {}
         self._read_data()
         self.rescale_all()
 
         if 'CON01' in self.data or 'CON02' in self.data:
             self._calculate_salinity()
 
+        #if 'site_name' in self.format_parameters.keys():
+        #    site_name = self.format_parameters['site_name']
+        #    @todo tz check
+
         if default_timezone and self.dates[0].tzinfo != None:
             self.convert_timezones(default_timezone)
+
+        if 'setup_time' not in self.format_parameters.keys() :
+            self.format_parameters['setup_time'] = self.dates[0]
+
+        if 'start_time' not in self.format_parameters.keys() :
+            self.format_parameters['start_time'] = self.dates[0]
+
+        if 'stop_time' not in self.format_parameters.keys() :
+            self.format_parameters['stop_time'] = self.dates[-1]
 
         #TODO ADD COMMENTS FIELD
 

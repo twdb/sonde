@@ -54,7 +54,7 @@ parameters = ['TEM01','CON01','WSE01','DOX02','BAT01','CON02','DOX01','SAL01']
 # turbidity: ntu
 # ph (dimensionless): dl 
 #These are the header of parameters = ["M/D/Y","h:m:s","C","mS/cm","m","%","V","mS/cm","mg/L","ppt" ]
-units = ['degC', 'mScm', 'mH2O', 'percent', 'volts', 'mScm', 'mgl', 'ppt']
+units = ['degC', 'mScm', 'mH2O', 'percent', 'volt', 'mScm', 'mgl', 'ppt']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should

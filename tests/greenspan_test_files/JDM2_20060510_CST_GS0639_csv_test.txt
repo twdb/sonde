@@ -11,7 +11,7 @@ log_file_name =
 tz = 
 
 # site name: if present in file else leave blank
-site_name = 'sanbernard site c'
+site_name =
 
 # instrument serial number, if present in file else leave blank
 serial_number ='00000000' 

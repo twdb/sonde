@@ -14,15 +14,15 @@ tz =
 site_name = 'SO#69853'
 
 # instrument serial number, if present in file else leave blank
-serial_number ='.. 0-1034598 2..'
+serial_number ='1034598'
 
 
 # datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
 # file header then use first and last line in data
 # datetime provided in first line of data
-setup_time = '05/08/2010 10:10:40'
-start_time = '05/08/2010 10:10:40'
-stop_time = '10/08/2010 12:20:40'
+setup_time = '08/05/2010 10:10:40'
+start_time = '08/05/2010 10:10:40'
+stop_time = '08/10/2010 12:20:40'
 
 
 [data]
@@ -66,14 +66,14 @@ units = ['ftH2O', 'degC']
 # three records from some random location in the file and the last
 # three records of data
 test_data = """[ #Do not edit this line
-['2010/08/05 10:10:40',0.2732,38.318],
-['2010/08/05 10:15:40',0.2882,40.115],
-['2010/08/05 10:20:40',0.2897,39.155],
-['2010/08/06 16:35:40', -0.1606, 22.702],
-['2010/08/06 16:40:40', -0.1647, 22.510],
-['2010/08/06 16:45:40', -0.1616, 22.383],
-['2010/08/10 12:10:40', -0.2050, 30.102],
-['2010/08/10 12:15:40', -0.2055, 30.047],
-['2010/08/10 12:20:40', -0.2048, 29.994],
+['08/05/2010 10:10:40',0.2732,38.318],
+['08/05/2010 10:15:40',0.2882,40.115],
+['08/05/2010 10:20:40',0.2897,39.155],
+['08/06/2010 16:35:40', -0.1606, 22.702],
+['08/06/2010 16:40:40', -0.1647, 22.510],
+['08/06/2010 16:45:40', -0.1616, 22.383],
+['08/10/2010 12:10:40', -0.2050, 30.102],
+['08/10/2010 12:15:40', -0.2055, 30.047],
+['08/10/2010 12:20:40', -0.2048, 29.994],
 ]   #Do not edit this line
 """ #Do not edit this line

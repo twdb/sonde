@@ -68,9 +68,9 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                     'uS/cm' : sq.uScm,
                     'mg/l' : sq.mgl,
                     'pH' : pq.dimensionless,
-                    'm' : sq.mH20,
-                    'Metres' : sq.mH20,
-                    'ft' : sq.ftH20,
+                    'm' : sq.mH2O,
+                    'Metres' : sq.mH2O,
+                    'ft' : sq.ftH2O,
                     'volts' : pq.volt,
                     'volt' : pq.volt,
                     'psu' : sq.psu,
@@ -131,9 +131,9 @@ class GreenspanReader:
         self.num_params = 0
         self.parameters = []
         file_buf = StringIO()
-        file_ext = data_file.split('.')[-1].lower()
+        self.file_ext = data_file.split('.')[-1].lower()
 
-        if file_ext =='xls':
+        if self.file_ext =='xls':
             self.xls2csv(data_file, file_buf)
         else:
             file_buf.write(open(data_file).read())
@@ -236,7 +236,7 @@ class GreenspanReader:
             self.converter_name = fid.readline().split(',')[1]
             self.source_file_name = fid.readline().split(',')[2]
             self.target_file_name = fid.readline().split(',')[2]
-            self.site_name = fid.readline().split(',')[1]
+            self.site_name = fid.readline().split(',')[-1]
             self.site_information = fid.readline().split(',')[1]
             self.serial_number = fid.readline().split(',')[1]
             self.firmware_version = fid.readline().split(',')[1]
@@ -257,9 +257,21 @@ class GreenspanReader:
 
             #read data
             fid.seek(0)
-            self.dates = np.genfromtxt(fid, delimiter=',', skiprows=15, usecols=(1), dtype=datetime.datetime)
+            datestr = np.genfromtxt(fid, delimiter=',', skip_header=15, usecols=(1), dtype='|S')
+            if self.file_ext=='xls': #xlrd reads in dates as floats
+                self.dates = np.array(
+                    [(datetime.datetime(*xlrd.xldate_as_tuple(dt,0)))
+                     for dt in datestr]
+                    )
+            else:
+                self.dates = np.array(
+                    [datetime.datetime.strptime(dt, '%d/%m/%Y %H:%M:%S')
+                     for dt in datestr]
+                    )
+
+            #self.dates = np.array([datetime.datetime.strptime(dt, '%d/%m/%Y %H:%M:%S') for dt in datestr])
             fid.seek(0)
-            self.data = np.genfromtxt(fid, delimiter=',', skiprows=15, usecols=cols, dtype=float)
+            self.data = np.genfromtxt(fid, delimiter=',', skip_header=15, usecols=cols, dtype=float)
 
             for ii in range(self.num_params):
                 self.parameters[ii].data = data[:,ii]
@@ -282,6 +294,13 @@ class GreenspanReader:
                 if buf[0] == 'T':
                     break
 
+                if buf[0:4] == 'C0 B':
+                    self.num_params += 1
+                    param = 'Batt'
+                    unit = 'volts'
+                    self.parameters.append(Parameter(param.strip('()_'), unit.strip('()_')))
+
+
                 if buf[0:3] == '# C':
                     self.num_params += 1
                     unit, param = buf.split()[2:]
@@ -293,17 +312,20 @@ class GreenspanReader:
             dates = []
             data = []
             row = None
+            prev_dt = None
             while buf:
                 if buf[0] == 'T':
-                    #if not row:
-                    data.append(row)
-                    dates.append(datetime.datetime.strptime(buf.strip('\r\n'), fmt))
-                    row = np.zeros(self.num_params)
-                    row[:] = np.nan
+                    dt = datetime.datetime.strptime(buf.strip('\r\n'), fmt)
+                    if dt != prev_dt:
+                        prev_dt = dt
+                        data.append(row)
+                        dates.append(datetime.datetime.strptime(buf.strip('\r\n'), fmt))
+                        row = np.zeros(self.num_params)
+                        row[:] = np.nan
 
                 elif buf[0]  == 'D':
-                    col = int(buf[1]) - 1
-                    row[col] = float(buf.split()[-1])
+                    col = int(buf[1])
+                    row[col] = float(buf.split()[1])
 
                 else:
                     self.header_lines.append(buf)

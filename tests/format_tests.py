@@ -65,6 +65,8 @@ def check_format_parameters(format_parameters, sonde):
         if test_value == '':
             continue
 
+        test_value = str(test_value)
+
         assert parameter_name in sonde.format_parameters, "format parameter '%s' not found in sonde.format_parameters" % parameter_name
 
 

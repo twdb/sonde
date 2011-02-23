@@ -58,7 +58,7 @@ class EurekaDataset(sonde.BaseSondeDataset):
                     '%Sat' : pq.percent,
                     'mg/l' : sq.mgl,
                     '' : pq.dimensionless,
-                    'm' : sq.mH20,
+                    'm' : sq.mH2O,
                     'V' : pq.volt,
                     'psu' : sq.psu,
                     }

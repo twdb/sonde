@@ -11,7 +11,7 @@ log_file_name =
 tz = 
 
 # site name: if present in file else leave blank
-site_name = 'Klake006 aug'
+site_name = 'KLake006 aug'
 
 # instrument serial number, if present in file else leave blank
 serial_number = 10647
@@ -19,9 +19,9 @@ serial_number = 10647
 # datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
 # file header then use first and last line in data
 # datetime provided in first line of data
-setup_time = '08/08/06 10:30:00'
-start_time = '08/08/06 10:30:00'
-stop_time = '09/20/06 09:00:00'
+setup_time = '08/08/2006 10:30:00'
+start_time = '08/08/2006 10:30:00'
+stop_time = '09/20/2006 09:00:00'
 
 
 [data]
@@ -65,14 +65,14 @@ units = ['volt', 'degC', 'mScm']
 # three records from some random location in the file and the last
 # three records of data
 test_data = """[ #Do not edit this line
-['08/08/06 10:30:00',11.9,30.8,17.505,15.54],
-['08/08/06 10:45:00',11.9,30.9,17.883,15.54],
-['08/08/06 11:00:00',11.9,30.9,18.315,15.54],
-['08/20/06 09:30:00',11.9,32.3,25.223,15.39],
-['08/20/06 09:45:00',11.9,32.4,25.277,15.41],
-['08/20/06 10:00:00',11.9,32.5,25.493,15.42],
-['09/20/06 08:30:00',11.6,20.8,0.468,14.49],
-['09/20/06 08:45:00',11.6,17.9,-0.684,14.37],
-['09/20/06 09:00:00',11.6,23.4,-0.774,14.43],
+['08/08/2006 10:30:00',11.9,30.8,17.505,15.54],
+['08/08/2006 10:45:00',11.9,30.9,17.883,15.54],
+['08/08/2006 11:00:00',11.9,30.9,18.315,15.54],
+['08/20/2006 09:30:00',11.9,32.3,25.223,15.39],
+['08/20/2006 09:45:00',11.9,32.4,25.277,15.41],
+['08/20/2006 10:00:00',11.9,32.5,25.493,15.42],
+['09/20/2006 08:30:00',11.6,20.8,0.468,14.49],
+['09/20/2006 08:45:00',11.6,17.9,-0.684,14.37],
+['09/20/2006 09:00:00',11.6,23.4,-0.774,14.43],
 ]   #Do not edit this line
 """ #Do not edit this line
