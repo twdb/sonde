@@ -43,15 +43,15 @@ stop_time = '12/29/2003 17:00:00'
 parameters = ['TEM01', 'CON01', 'SAL01', 'DOX01', 'WSE01', 'BAT01']
 
 # units (comma delimited, in column order)
-# depth: ftH20 (feet), mH20 (meters), psi
+# depth: ftH2O (feet), mH2O (meters), psi
 # conductivity: uScm (uS/cm), mScm (mS/cm)
 # salinity: ppt, psu
 # temperature: degC, degF
 # battery: volt
 # dissolved oxygen: mgl (mg/l), percent (% Sat)
 # turbidity: ntu
-# ph (dimensionless): dl 
-units = ['degC', 'mScm', 'ppt', 'mgl', 'ftH20', 'volt']
+# ph (dimensionless): dl
+units = ['degC', 'mScm', 'ppt', 'mgl', 'ftH2O', 'volt']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
