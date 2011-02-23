@@ -116,7 +116,6 @@ class YSIDataset(sonde.BaseSondeDataset):
         self.dates = ysi_data.dates
 
 
-
 class ChannelRec:
     """
     Class that implements the channel record data structure used by
@@ -345,6 +344,7 @@ class YSIReaderBin:
                                  = struct.unpack(fmt, fid.read(fmt_size))
 
                 self.site_name = self.site_name.strip('\x00')
+                self.serial_number = self.serial_number.strip('\x00')
                 self.log_file_name = self.site_name
 
             elif record_type == 'B':
