@@ -14,7 +14,7 @@ tz =
 site_name = 'KLake006 aug'
 
 # instrument serial number, if present in file else leave blank
-serial_number = 10647
+serial_number = '10647'
 
 # datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
 # file header then use first and last line in data
