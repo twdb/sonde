@@ -97,7 +97,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                 print 'Greenspan Unit Name:', parameter.unit
                 raise
 
-        if (self.file_format == '2.4.1') or (self.file_format == '2.3.1'):
+        if (greenspan_data.file_format == '2.4.1') or (greenspan_data.file_format == '2.3.1'):
             self.format_parameters = {
                 'converter_name' : greenspan_data.converter_name,
                 'source_file_name' : greenspan_data.source_file_name,
@@ -110,7 +110,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                 'raingage' : greenspan_data.raingage,
                 }
 
-        elif self.file_format == 'block':
+        elif greenspan_data.file_format == 'block':
             self.format_parameters = {
                 'header_lines' : greenspan_data.header_lines
                 }
@@ -237,16 +237,16 @@ class GreenspanReader:
         fid.seek(0)
 
         if (self.file_format == '2.4.1') or (self.file_format == '2.3.1'):
-
-            self.converter_name = fid.readline().split(',')[1]
-            self.source_file_name = fid.readline().split(',')[2]
-            self.target_file_name = fid.readline().split(',')[2]
-            self.site_name = fid.readline().split(',')[-1]
-            self.site_information = fid.readline().split(',')[1]
-            self.serial_number = fid.readline().split(',')[1]
-            self.firmware_version = fid.readline().split(',')[1]
-            self.top_of_case = fid.readline().split(',')[1]
-            self.raingage = fid.readline().split(',')[1]
+            self.converter_name = fid.readline().split(',')[1].rstrip('\r\n')
+            self.source_file_name = fid.readline().split(',')[2].rstrip('\r\n')
+            self.target_file_name = fid.readline().split(',')[2].rstrip('\r\n')
+            fid.readline() # skip junk
+            self.site_name = fid.readline().split(',')[-1].rstrip(' \r\n')
+            self.site_information = fid.readline().split(',')[1].rstrip(' \r\n')
+            self.serial_number = fid.readline().split(',')[1].rstrip('\x00\r\n')
+            self.firmware_version = fid.readline().split(',')[1].rstrip('\r\n')
+            self.top_of_case = fid.readline().split(',')[1].rstrip('\r\n')
+            self.raingage = fid.readline().split(',')[1].strip(' \r\n')
             fid.readline()
             #column 0,1,2 = 'Data', 'dd/mm/yyyy hh:mm:ss', 'Type/Comment'
             #column [3:] = actual data
@@ -257,7 +257,6 @@ class GreenspanReader:
 
             #clean param & unit names
             for param,unit in zip(params,units):
-                self.num_params += 1
                 self.parameters.append(Parameter(param.strip('()_'), unit.strip('()_')))
 
             #read data
@@ -278,8 +277,8 @@ class GreenspanReader:
             fid.seek(0)
             self.data = np.genfromtxt(fid, delimiter=',', skip_header=15, usecols=cols, dtype=float)
 
-            for ii in range(self.num_params):
-                self.parameters[ii].data = data[:,ii]
+            for ii in range(len(self.parameters)):
+                self.parameters[ii].data = self.data[:,ii]
 
         elif self.file_format == 'block':
 
