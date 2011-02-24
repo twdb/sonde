@@ -19,9 +19,9 @@ serial_number = '17837'
 # datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
 # file header then use first and last line in data
 # datetime provided in first line of data
-setup_time = '2/22/2007 12:00:00'
-start_time = '2/22/2007 12:00:00'
-stop_time = '2/25/2007 13:00:00'
+setup_time = '02/22/2007 12:00:00'
+start_time = '02/22/2007 12:00:00'
+stop_time = '02/25/2007 13:00:00'
 
 
 [data]
