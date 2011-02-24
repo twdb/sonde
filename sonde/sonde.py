@@ -350,7 +350,7 @@ class BaseSondeDataset(object):
         write output in csv format
         """
 
-        version = '# pysonde csv format version: 1.0'
+        version = '# pysonde csv format version: 1.0\n'
         header = [version]
         #prepend parameter list and units with single #
         param_header = '# datetime, '
