@@ -83,12 +83,16 @@ class EurekaDataset(sonde.BaseSondeDataset):
                 print 'Eureka Unit Name:', parameter.unit
                 raise
 
-
         self.format_parameters = {
-            'header_lines' : eureka_data.header_lines
+            'header_lines' : eureka_data.header_lines,
             }
+        if hasattr(eureka_data, 'site_name'):
+            self.format_parameters['site_name'] = eureka_data.site_name
+        if hasattr(eureka_data, 'serial_number'):
+            self.format_parameters['serial_number'] = eureka_data.serial_number
 
         self.dates = eureka_data.dates
+
 
 class EurekaReader:
     """
@@ -171,6 +175,12 @@ class EurekaReader:
                 break
 
             self.header_lines.append(buf)
+
+            if 'Site Name' in buf:
+                self.site_name = buf.split(',')[1].strip()
+            if 'Serial Number' in buf:
+                self.serial_number = buf.split(',')[1].strip()
+
             buf = fid.readline()
 
         fields = buf.strip('\r\n').split(',')
@@ -192,11 +202,24 @@ class EurekaReader:
 
         #assign param & unit names
         for param,unit in zip(params,units):
-            if param.strip() != '' and param.strip() != 'Manta': #remove trailing blank column
+            # grab serial number from the second 'Manta' field if it
+            # exists
+            if param.strip() == 'Manta':
+                if 'Manta_1' in data.dtype.fields:
+                    self.serial_number = data['Manta_1'][0].strip()
+
+            elif param.strip() != '': #remove trailing blank column
                 if param=='SAL': #fix unitless Salinity column
                     unit = 'psu'
 
                 self.parameters.append(Parameter(param.strip(), unit.strip()))
+
+        # if the serial number just contains numbers the cell holding
+        # it might be formatted as a number, in which case it gets
+        # read in with a trailing '.0'; I'm not sure if this is a
+        # eureka thing or an xlrd thing
+        if hasattr(self, 'serial_number') and self.serial_number.rfind('.0') == len(self.serial_number) - 2:
+            self.serial_number = self.serial_number[:-2]
 
         for ii in range(len(self.parameters)):
             param = (self.parameters[ii].name).strip(' .').replace(' ', '_')
