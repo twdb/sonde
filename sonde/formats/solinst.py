@@ -29,6 +29,7 @@ class SolinstDataset(sonde.BaseSondeDataset):
     object that represents the timezone of the timestamps in the file.
     """
     def __init__(self, data_file, tzinfo=None):
+        self.manufacturer = 'solinst'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
         super(SolinstDataset, self).__init__()
@@ -47,6 +48,7 @@ class SolinstDataset(sonde.BaseSondeDataset):
                      }
 
         unit_map = {'Deg C' : pq.degC,
+                    'DEG C' : pq.degC,
                     'm' : sq.mH2O,
                     'ft': sq.ftH2O,
                     'mS/cm' : sq.mScm,

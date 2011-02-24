@@ -31,6 +31,7 @@ class HydrotechDataset(sonde.BaseSondeDataset):
     object that represents the timezone of the timestamps in the binary file.
     """
     def __init__(self, data_file, tzinfo=None):
+        self.manufacturer = 'hydrotech'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
         super(HydrotechDataset, self).__init__()

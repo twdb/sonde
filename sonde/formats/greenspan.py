@@ -33,6 +33,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
     of the timestamps in the binary file.
     """
     def __init__(self, data_file, tzinfo=None, file_format=None):
+        self.manufacturer = 'greenspan'
         self.data_file = data_file
         self.file_format = file_format
         self.default_tzinfo = tzinfo
