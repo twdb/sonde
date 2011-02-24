@@ -192,16 +192,13 @@ class EurekaReader:
 
         #assign param & unit names
         for param,unit in zip(params,units):
-            if param!='': #remove trailing blank column
+            if param.strip() != '' and param.strip() != 'Manta': #remove trailing blank column
                 if param=='SAL': #fix unitless Salinity column
                     unit = 'psu'
 
-
-                self.num_params += 1
                 self.parameters.append(Parameter(param.strip(), unit.strip()))
 
-
-        for ii in range(self.num_params):
+        for ii in range(len(self.parameters)):
             param = (self.parameters[ii].name).strip(' .').replace(' ', '_')
             self.parameters[ii].data = data[param]
 
