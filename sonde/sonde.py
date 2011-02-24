@@ -102,6 +102,10 @@ def Sonde(data_file, file_format=None , *args, **kwargs):
         from sonde.formats.solinst import SolinstDataset
         return SolinstDataset(data_file, *args, **kwargs)
 
+    if file_format.lower() == 'generic':
+        from sonde.formats.generic import GenericDataset
+        return GenericDataset(data_file, *args, **kwargs)
+
     if file_format == False:
         print "File Format Autodetection Failed"
         raise
@@ -144,6 +148,9 @@ def autodetect(data_file):
 
     if line1.lower().find('log file name')!=-1:
         return 'hydrolab'
+
+    if line1.lower().find('pysonde csv format')!=-1:
+        return 'generic'
 
     #read second line
     line2 = fid.readline()
@@ -200,25 +207,45 @@ def xls2csv(data_file, csv_file):
 def merge(file_list, tz_list=None):
     """
     Merges all files in file_list
-    tz_list specifies timezone of each file. 
+    tz_list specifies timezone of each file.
+    options cst=utc-6, cdt=utc-5, auto=determine based on dataset.setup_time
     If tz_list == None then cst is assumed i.e UTC-6
+       tz_list == auto then cst/cdt is determined from dataset.setup_date
+    returns a Sonde object
     """
-    if tz_list is None:
-        tz_list = [cdt for fn in file_list]
+    from sonde.formats.merge import MergeDataset
 
+    if tz_list is None:
+        tz_list = [cst for fn in file_list]
+    elif tz_list=='auto':
+        tz_list = ['auto' for fn in file_list]
+
+    metadata = dict()
     data = dict()
-    data['dates'] = np.empty(0,dtype=datetime.datetime)
-    data['filenames'] = np.empty(0,dtype='|S100')
+    
+    metadata['dates'] = np.empty(0,dtype=datetime.datetime)
+    metadata['data_file_name'] = np.empty(0,dtype='|S100')
+    metadata['instrument_serial_number'] = np.empty(0,dtype='|S15')
+    metadata['instrument_manufacturer'] = np.empty(0,dtype='|S15')
+
     for param,unit in master_parameter_list.items():
         data[param] = np.empty(0, dtype='<f8')*unit[-1]
 
     for file_name, tz in zip(file_list, tz_list):
         print 'processing: ', file_name
         dataset = Sonde(file_name, tzinfo=tz)
-        data['dates'] = np.hstack((data['dates'],dataset.dates))
-        fnames = np.zeros(dataset.dates.size, dtype='|S100')
-        fnames[:] = os.path.split(file_name)[-1]
-        data['filenames'] = np.hstack((data['filenames'],fnames))
+        fn_list = np.zeros(dataset.dates.size, dtype='|S100')
+        sn_list = np.zeros(dataset.dates.size, dtype='|S15')
+        m_list = np.zeros(dataset.dates.size, dtype='|S15')
+
+        fn_list[:] = os.path.split(file_name)[-1]
+        sn_list[:] = dataset.format_parameters['serial_number']
+        m_list[:] = dataset.manufacturer
+
+        metadata['dates'] = np.hstack((metadata['dates'],dataset.dates))
+        metadata['data_file_name'] = np.hstack((metadata['data_file_name'],fn_list))
+        metadata['instrument_serial_number'] = np.hstack((metadata['instrument_serial_number'],sn_list))
+        metadata['instrument_manufacturer'] = np.hstack((metadata['instrument_manufacturer'],m_list))
         no_data = np.zeros(dataset.dates.size)
         no_data[:] = np.nan
         for param in master_parameter_list.keys():
@@ -235,7 +262,11 @@ def merge(file_list, tz_list=None):
         else:
             data[param] = data[param]*unit[-1]
 
-    return data
+    dataset = MergeDataset(metadata,data)
+
+    return dataset
+
+
 
 class BaseSondeDataset(object):
     """
@@ -271,7 +302,110 @@ class BaseSondeDataset(object):
         if 'stop_time' not in self.format_parameters.keys() :
             self.format_parameters['stop_time'] = self.dates[-1]
 
+        if 'serial_number' not in self.format_parameters.keys() :
+            self.format_parameters['serial_number'] = ''
+
         #TODO ADD COMMENTS FIELD
+
+    def write(self, file_name, format='netcdf4', fill_value='-999.99',
+              metadata={}, disclaimer='', float_fmt='%5.2f'):
+        """
+        fill_value must be a float
+        """
+        data = self.data.copy()
+        #convert to column format
+        if isinstance(self.data_file,str):
+            fn_list = np.zeros(self.dates.size, dtype='|S100')
+            fn_list[:] = self.data_file
+        else:
+            fn_list = self.data_file
+
+        if isinstance(self.format_parameters['serial_number'],str):
+            sn_list = np.zeros(self.dates.size, dtype='|S100')
+            sn_list[:] = self.format_parameters['serial_number']
+        else:
+            sn_list = self.format_parameters['serial_number']
+
+        if isinstance(self.manufacturer,str):
+            m_list = np.zeros(self.dates.size, dtype='|S100')
+            m_list[:] = self.manufacturer
+        else:
+            m_list = self.manufacturer
+
+        metadata['original_data_file_name'] = fn_list
+        metadata['instrument_serial_number'] = sn_list
+        metadata['instrument_manufacturer'] = m_list
+        metadata['fill_value'] = fill_value
+
+        if format.lower()=='netcdf4':
+            self._write_netcdf4(file_name, metadata, self.dates, data, disclaimer)
+        elif format.lower()=='csv':
+            self._write_csv(file_name, metadata, self.dates, data, disclaimer, float_fmt)
+        else:
+            print 'Unknown output format: ',format
+            raise
+
+    def _write_csv(self, file_name, metadata, dates, data, disclaimer, float_fmt):
+        """
+        write output in csv format
+        """
+
+        version = '# pysonde csv format version: 1.0'
+        header = [version]
+        #prepend parameter list and units with single #
+        param_header = '# datetime, '
+        unit_header = '# yyyy/mm/dd HH:MM:SS, '
+        dtype_fmts = ['|S19']
+        fmt = '%s, '
+        for param in np.sort(data.keys()):
+            param_header += param + ', '
+            unit_header += data[param].dimensionality.keys()[0].symbol + ', '
+            data[param][np.isnan(data[param])] = metadata['fill_value']
+            dtype_fmts.append('f8')
+            fmt += float_fmt + ', '
+
+        #prepend disclaimer and metadata with ##
+        for line in disclaimer.splitlines():
+            header.append('# disclaimer: ' + line + '\n')
+
+        for key,val in metadata.items():
+            if not isinstance(val, np.ndarray):
+                header.append('# ' + str(key) + ' : ' + str(val) + '\n')
+            else:
+                param_header += key + ', '
+                unit_header += 'n/a, '
+                dtype_fmts.append(val.dtype)
+                fmt += '%s, '
+
+        #remove trailing commas
+        param_header = param_header[:-2] +'\n'
+        unit_header = unit_header[:-2] + '\n'
+        fmt = fmt[:-2]
+
+        header.append('# timezone: ' + str(self.default_tzinfo) + '\n')
+        header.append(param_header)
+        header.append(unit_header)
+
+        dtype = np.dtype({'names': param_header.replace(' ','').strip('#\n').split(','),
+                  'formats': dtype_fmts})
+
+        write_data = np.zeros(dates.size, dtype=dtype)
+        write_data['datetime'] = np.array(
+            [datetime.datetime.strftime(dt, '%Y/%m/%d %H:%M:%S') for dt in dates]
+            )
+
+        for key,val in metadata.items():
+            if isinstance(val, np.ndarray):
+                write_data[key] = val
+
+        for param in data.keys():
+            write_data[param] = data[param]
+
+        #start writing file
+        fid = open(file_name, 'w')
+        fid.writelines(header)
+        np.savetxt(fid, write_data, fmt=fmt)
+        fid.close()
 
 
     def get_standard_unit(self, param_code):
