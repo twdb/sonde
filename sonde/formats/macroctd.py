@@ -71,14 +71,14 @@ class MacroctdDataset(sonde.BaseSondeDataset):
         self.format_parameters = {
             'header_lines' : macroctd_data.header_lines,
             'serial_number' : macroctd_data.serial_number,
-            'site_name' : macroctd_data.site_name, 
+            'site_name' : macroctd_data.site_name,
             }
 
         self.dates = macroctd_data.dates
 
 class MacroctdReader:
     """
-    A reader object that opens and reads a Hydrolab txt file.
+    A reader object that opens and reads a Macroctd txt file.
 
     `data_file` should be either a file path string or a file-like
     object. It accepts one optional parameter, `tzinfo` is a
@@ -90,6 +90,10 @@ class MacroctdReader:
         self.num_params = 0
         self.parameters = []
         self.read_macroctd(data_file)
+
+        if tzinfo:
+            self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
+
 
     def read_macroctd(self, data_file):
         """
@@ -132,7 +136,6 @@ class MacroctdReader:
         for param,unit in zip(params,units):
             self.num_params += 1
             self.parameters.append(Parameter(param.strip(), unit.strip()))
-
 
         for ii in range(self.num_params):
             param = self.parameters[ii].name
