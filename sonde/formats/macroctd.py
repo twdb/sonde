@@ -25,7 +25,7 @@ class MacroctdDataset(sonde.BaseSondeDataset):
     object that represents the timezone of the timestamps in the file.
     """
     def __init__(self, data_file, tzinfo=None):
-        self.manufacturer = 'macroctd'
+        self.file_format = 'macroctd'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
         super(MacroctdDataset, self).__init__()

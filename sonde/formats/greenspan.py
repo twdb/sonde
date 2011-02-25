@@ -32,10 +32,10 @@ class GreenspanDataset(sonde.BaseSondeDataset):
     `tzinfo` is a datetime.tzinfo object that represents the timezone
     of the timestamps in the binary file.
     """
-    def __init__(self, data_file, tzinfo=None, file_format=None):
-        self.manufacturer = 'greenspan'
+    def __init__(self, data_file, tzinfo=None, format_version=None):
+        self.file_format = 'greenspan'
         self.data_file = data_file
-        self.file_format = file_format
+        self.format_version = format_version
         self.default_tzinfo = tzinfo
         super(GreenspanDataset, self).__init__()
 
@@ -48,7 +48,6 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                      'EC' : 'CON02', #Double Check?
                      'EC Raw' : 'CON02',
                      'EC Norm' : 'CON01',
-
                      #'SpCond' : 'CON01???',
                      'Salinity' : 'SAL01',
                      #'DO % Sat' : 'DOX02',
@@ -97,7 +96,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                 print 'Greenspan Unit Name:', parameter.unit
                 raise
 
-        if (greenspan_data.file_format == '2.4.1') or (greenspan_data.file_format == '2.3.1'):
+        if (greenspan_data.format_version == '2.4.1') or (greenspan_data.format_version == '2.3.1'):
             self.format_parameters = {
                 'converter_name' : greenspan_data.converter_name,
                 'source_file_name' : greenspan_data.source_file_name,
@@ -110,7 +109,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                 'raingage' : greenspan_data.raingage,
                 }
 
-        elif greenspan_data.file_format == 'block':
+        elif greenspan_data.format_version == 'block':
             self.format_parameters = {
                 'header_lines' : greenspan_data.header_lines
                 }
@@ -126,9 +125,9 @@ class GreenspanReader:
     datetime.tzinfo object that represents the timezone of the
     timestamps in the txt file.
     """
-    def __init__(self, data_file, tzinfo=None, file_format=None):
+    def __init__(self, data_file, tzinfo=None, format_version=None):
         self.default_tzinfo = tzinfo
-        self.file_format = file_format
+        self.format_version = format_version
         self.num_params = 0
         self.parameters = []
         file_buf = StringIO()
@@ -139,8 +138,8 @@ class GreenspanReader:
         else:
             file_buf.write(open(data_file).read())
 
-        if not self.file_format:
-            self.file_format = self.detect_file_format(file_buf)
+        if not self.format_version:
+            self.format_version = self.detect_format_version(file_buf)
 
         self.read_greenspan(file_buf)
 
@@ -175,7 +174,7 @@ class GreenspanReader:
             bcw.writerow(this_row)
 
 
-    def detect_file_format(self, data_file):
+    def detect_format_version(self, data_file):
         """
         Reads first several lines of file and tries to autodetect
         greenspan file format
@@ -236,7 +235,7 @@ class GreenspanReader:
 
         fid.seek(0)
 
-        if (self.file_format == '2.4.1') or (self.file_format == '2.3.1'):
+        if (self.format_version == '2.4.1') or (self.format_version == '2.3.1'):
             self.converter_name = fid.readline().split(',')[1].rstrip('\r\n')
             self.source_file_name = fid.readline().split(',')[2].rstrip('\r\n')
             self.target_file_name = fid.readline().split(',')[2].rstrip('\r\n')
@@ -250,6 +249,7 @@ class GreenspanReader:
             fid.readline()
             #column 0,1,2 = 'Data', 'dd/mm/yyyy hh:mm:ss', 'Type/Comment'
             #column [3:] = actual data
+            fid.readline()
             fields = fid.readline().split(',')
             cols = range(len(fields))[3:]
             params = fields[3:]
@@ -280,7 +280,7 @@ class GreenspanReader:
             for ii in range(len(self.parameters)):
                 self.parameters[ii].data = self.data[:,ii]
 
-        elif self.file_format == 'block':
+        elif self.format_version == 'block':
 
             self.header_lines = []
             self.header_lines.append(fid.readline())
