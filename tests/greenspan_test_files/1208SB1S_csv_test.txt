@@ -40,7 +40,7 @@ stop_time = '02/02/2009 15:00:00'
 # 'water_depth_non_vented' : Water Surface Elevation (No Atm Pressure Correction)
 # 'water_depth_vented' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = [Battery,Temperature,Pressure,EC Raw,EC Norm, ,Salinity]
-parameters = ['instrument_battery_voltage','water_temperature','water_depth_non_vented','water_electrical_conductivity','water_specific_conductance','TDS01','seawater_salinity']
+parameters = ['instrument_battery_voltage','water_temperature','water_depth_non_vented','water_electrical_conductivity','water_specific_conductance','water_total_dissolved_salts','seawater_salinity']
 
 
 # units (comma delimited, in column order)
