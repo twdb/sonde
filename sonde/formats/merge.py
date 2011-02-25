@@ -30,8 +30,9 @@ class MergeDataset(sonde.BaseSondeDataset):
     data is a dict containing all the data with param names and units.
     """
     def __init__(self, metadata, paramdata):
-        self.manufacturer = metadata['instrument_manufacturer']
-        self.data_file = metadata['data_file_name']
+        idx = self._indices_duplicate_data(metadata['dates'], paramdata)
+        self.manufacturer = metadata['instrument_manufacturer'][idx]
+        self.data_file = metadata['data_file_name'][idx]
         self.default_tzinfo = sonde.default_timezone
 
         # determine parameters provided and in what units
@@ -40,12 +41,32 @@ class MergeDataset(sonde.BaseSondeDataset):
 
         for param in paramdata.keys():
             self.parameters[param] = param
-            self.data[param] = paramdata[param]
+            self.data[param] = paramdata[param][idx]
 
         self.format_parameters = {
-            'serial_number' : metadata['instrument_serial_number']
+            'serial_number' : metadata['instrument_serial_number'][idx]
             }
 
-        self.dates = metadata['dates']
+        self.dates = metadata['dates'][idx]
         #I don't think the following line is needed
         #super(MergeDataset, self).__init__()
+
+    def _indices_duplicate_data(self, dates, data):
+        """
+        return data index required to remove duplicate data
+        """
+        #convert to single structured array
+        dtypes = [datetime.datetime]
+        names = ['datetime']
+        for param in data.keys():
+            dtypes.append('f8')
+            names.append(param)
+
+        tmp_data = np.zeros(dates.size, dtype=np.dtype({'names':names,
+                                                  'formats':dtypes}))
+        tmp_data['datetime'] = dates
+        for param in data.keys():
+            tmp_data[param] = data[param]
+
+        u, idx = np.unique(tmp_data, return_index=True)
+        return idx

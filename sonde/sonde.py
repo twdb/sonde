@@ -232,38 +232,43 @@ def merge(file_list, tz_list=None):
         data[param] = np.empty(0, dtype='<f8')*unit[-1]
 
     for file_name, tz in zip(file_list, tz_list):
-        print 'processing: ', file_name
-        dataset = Sonde(file_name, tzinfo=tz)
-        fn_list = np.zeros(dataset.dates.size, dtype='|S100')
-        sn_list = np.zeros(dataset.dates.size, dtype='|S15')
-        m_list = np.zeros(dataset.dates.size, dtype='|S15')
+        try:
+            
+            dataset = Sonde(file_name, tzinfo=tz)
+            fn_list = np.zeros(dataset.dates.size, dtype='|S100')
+            sn_list = np.zeros(dataset.dates.size, dtype='|S15')
+            m_list = np.zeros(dataset.dates.size, dtype='|S15')
 
-        fn_list[:] = os.path.split(file_name)[-1]
-        sn_list[:] = dataset.format_parameters['serial_number']
-        m_list[:] = dataset.manufacturer
+            fn_list[:] = os.path.split(file_name)[-1]
+            sn_list[:] = dataset.format_parameters['serial_number']
+            m_list[:] = dataset.manufacturer
 
-        metadata['dates'] = np.hstack((metadata['dates'],dataset.dates))
-        metadata['data_file_name'] = np.hstack((metadata['data_file_name'],fn_list))
-        metadata['instrument_serial_number'] = np.hstack((metadata['instrument_serial_number'],sn_list))
-        metadata['instrument_manufacturer'] = np.hstack((metadata['instrument_manufacturer'],m_list))
-        no_data = np.zeros(dataset.dates.size)
-        no_data[:] = np.nan
-        for param in master_parameter_list.keys():
-            if param in dataset.data.keys():
-                tmp_data = dataset.data[param]
-            else:
-                tmp_data = no_data
+            metadata['dates'] = np.hstack((metadata['dates'],dataset.dates))
+            metadata['data_file_name'] = np.hstack((metadata['data_file_name'],fn_list))
+            metadata['instrument_serial_number'] = np.hstack((metadata['instrument_serial_number'],sn_list))
+            metadata['instrument_manufacturer'] = np.hstack((metadata['instrument_manufacturer'],m_list))
+            no_data = np.zeros(dataset.dates.size)
+            no_data[:] = np.nan
+            for param in master_parameter_list.keys():
+                if param in dataset.data.keys():
+                    tmp_data = dataset.data[param]
+                else:
+                    tmp_data = no_data
 
-            data[param] = np.hstack((data[param],tmp_data))
+                    data[param] = np.hstack((data[param],tmp_data))
 
-    for param,unit in master_parameter_list.items():
-        if np.all(np.isnan(data[param])):
-            del data[param]
-        else:
-            data[param] = data[param]*unit[-1]
+            for param,unit in master_parameter_list.items():
+                if np.all(np.isnan(data[param])):
+                    del data[param]
+                else:
+                    data[param] = data[param]*unit[-1]
 
-    dataset = MergeDataset(metadata,data)
+            print 'merged: ', file_name
 
+        except:
+            print 'merged failed: ', file_name
+
+        dataset = MergeDataset(metadata,data)
     return dataset
 
 
@@ -350,7 +355,7 @@ class BaseSondeDataset(object):
         write output in csv format
         """
 
-        version = '# pysonde csv format version: 1.0\n'
+        version = '# file_format: pysonde csv format version 1.0\n'
         header = [version]
         #prepend parameter list and units with single #
         param_header = '# datetime, '
@@ -370,7 +375,7 @@ class BaseSondeDataset(object):
 
         for key,val in metadata.items():
             if not isinstance(val, np.ndarray):
-                header.append('# ' + str(key) + ' : ' + str(val) + '\n')
+                header.append('# ' + str(key) + ': ' + str(val) + '\n')
             else:
                 param_header += key + ', '
                 unit_header += 'n/a, '

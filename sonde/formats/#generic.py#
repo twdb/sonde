@@ -21,7 +21,7 @@
       (units must be from supported_units_list)
     comma seperated data
 
-    special columns:
+    special columns or header items:
         original_data_file_name, instrument_manufacturer, instrument_serial_number
         if these exist they will overide self.manufacturer,
         self.data_file and self_serial_number
@@ -50,6 +50,7 @@ class GenericDataset(sonde.BaseSondeDataset):
     """
     def __init__(self, data_file):
         self.manufacturer = 'generic'
+        self.file_format = 'generic'
         self.data_file = data_file
         self.format_parameters={}
         fid = open(data_file)
@@ -63,16 +64,30 @@ class GenericDataset(sonde.BaseSondeDataset):
             key,val = buf.split(':')
             self.format_parameters[key.strip()]=val.strip()
 
-        self.default_tzinfo = self.format_parameters['timezone'] #fix this
+        utc_offset = int(format_parameters['timezone'].lower().strip('utc'))
+        self.default_tzinfo = sonde.UTCStaticOffset(utc_offset)
 
-        data = np.genfromtxt(fid, dtype=None, names=params)
-        self.parameters[pcode] = sonde.master_parameter_list[pcode]
-        self.data[param_map[parameter.name]] = parameter.data * punit
+        data = np.genfromtxt(fid, dtype=None, names=params, delimiter=',')
+        self.dates = np.array(
+            [datetime.datetime.strptime(dt, '%Y/%m/%d %H:%M:%S')
+             for dt in data['datetime']]
+            )
 
+        self.dates = [i.replace(tzinfo=self.default_tzinfo) for i in self.dates]
 
+        for param,unit in zip(params,units):
+            if unit!='n/a':
+                if param.lower() in sonde.master_param_list:
+                    self.parameters[param] = param
+                else:
+                    print 'Unknown Parameter: ', param
+                    raise
 
+                #look for unit currently 
+                self.data[unit] = parameter.data * punit
 
-        super(SolinstDataset, self).__init__()
+        #assign values from header
+        super(GenericDataset, self).__init__()
 
 
     def _read_data(self):
