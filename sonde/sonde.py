@@ -45,6 +45,7 @@ master_parameter_list = {
     'SAL01' : ('Salinity', sq.psu),
     'TEM01' : ('Water Temperature', pq.degC),
     'TEM02' : ('Air Temperature', pq.degC),
+    'TDS01' : ('Total Dissolved Salts', sq.mgl),
     'TUR01' : ('Turbidity', sq.ntu),
     'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', sq.mH2O),
     'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', sq.mH2O),
