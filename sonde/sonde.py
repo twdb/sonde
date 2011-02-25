@@ -222,7 +222,7 @@ def merge(file_list, tz_list=None):
 
     metadata = dict()
     data = dict()
-    
+
     metadata['dates'] = np.empty(0,dtype=datetime.datetime)
     metadata['data_file_name'] = np.empty(0,dtype='|S100')
     metadata['instrument_serial_number'] = np.empty(0,dtype='|S15')
@@ -233,43 +233,41 @@ def merge(file_list, tz_list=None):
 
     for file_name, tz in zip(file_list, tz_list):
         try:
-            
             dataset = Sonde(file_name, tzinfo=tz)
-            fn_list = np.zeros(dataset.dates.size, dtype='|S100')
-            sn_list = np.zeros(dataset.dates.size, dtype='|S15')
-            m_list = np.zeros(dataset.dates.size, dtype='|S15')
-
-            fn_list[:] = os.path.split(file_name)[-1]
-            sn_list[:] = dataset.format_parameters['serial_number']
-            m_list[:] = dataset.manufacturer
-
-            metadata['dates'] = np.hstack((metadata['dates'],dataset.dates))
-            metadata['data_file_name'] = np.hstack((metadata['data_file_name'],fn_list))
-            metadata['instrument_serial_number'] = np.hstack((metadata['instrument_serial_number'],sn_list))
-            metadata['instrument_manufacturer'] = np.hstack((metadata['instrument_manufacturer'],m_list))
-            no_data = np.zeros(dataset.dates.size)
-            no_data[:] = np.nan
-            for param in master_parameter_list.keys():
-                if param in dataset.data.keys():
-                    tmp_data = dataset.data[param]
-                else:
-                    tmp_data = no_data
-
-                    data[param] = np.hstack((data[param],tmp_data))
-
-            for param,unit in master_parameter_list.items():
-                if np.all(np.isnan(data[param])):
-                    del data[param]
-                else:
-                    data[param] = data[param]*unit[-1]
-
-            print 'merged: ', file_name
-
         except:
             print 'merged failed: ', file_name
+            continue
 
-        dataset = MergeDataset(metadata,data)
-    return dataset
+        fn_list = np.zeros(dataset.dates.size, dtype='|S100')
+        sn_list = np.zeros(dataset.dates.size, dtype='|S15')
+        m_list = np.zeros(dataset.dates.size, dtype='|S15')
+
+        fn_list[:] = os.path.split(file_name)[-1]
+        sn_list[:] = dataset.format_parameters['serial_number']
+        m_list[:] = dataset.manufacturer
+
+        metadata['dates'] = np.hstack((metadata['dates'],dataset.dates))
+        metadata['data_file_name'] = np.hstack((metadata['data_file_name'],fn_list))
+        metadata['instrument_serial_number'] = np.hstack((metadata['instrument_serial_number'],sn_list))
+        metadata['instrument_manufacturer'] = np.hstack((metadata['instrument_manufacturer'],m_list))
+        no_data = np.zeros(dataset.dates.size)
+        no_data[:] = np.nan
+        for param in master_parameter_list.keys():
+            if param in dataset.data.keys():
+                tmp_data = dataset.data[param]
+            else:
+                tmp_data = no_data
+
+            data[param] = np.hstack((data[param],tmp_data))
+        print 'merged: ', file_name
+
+    for param,unit in master_parameter_list.items():
+        if np.all(np.isnan(data[param])):
+            del data[param]
+        else:
+            data[param] = data[param]*unit[-1]
+
+    return MergeDataset(metadata,data)
 
 
 
