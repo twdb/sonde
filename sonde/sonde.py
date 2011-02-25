@@ -306,10 +306,10 @@ class BaseSondeDataset(object):
             self.stop_time = self.dates[-1]
 
         if 'serial_number' not in self.__dict__.keys():
-            self.'serial_number' = ''
+            self.serial_number = ''
 
         if 'site_name' not in self.__dict__.keys():
-            self.'site_name' = ''
+            self.site_name = ''
 
         #TODO ADD COMMENTS FIELD
 
