@@ -37,7 +37,7 @@ class BaseViewer(HasTraits):
     def init_data(self):
         file_name = '/home/dpothina/work/apps/pysonde/tests/ysi_test_files/BAYT_20070323_CDT_YS1772AA_000.dat'
         sonde = Sonde(file_name)
-        sal_ds = np.array([1,2,3,4,5,6,7,8])#sonde.data['SAL01']
+        sal_ds = np.array([1,2,3,4,5,6,7,8])#sonde.data['seawater_salinity']
         time_ds = sal_ds**2#[time.mktime(date.utctimetuple()) for date in sonde.dates]
         #time_ds = ArrayDataSource(dt)
         #sal_ds = ArrayDataSource(salinity, sort_order="none")

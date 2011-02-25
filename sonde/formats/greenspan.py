@@ -44,19 +44,19 @@ class GreenspanDataset(sonde.BaseSondeDataset):
         """
         Read the greenspan data file
         """
-        param_map = {'Temperature' : 'TEM01',
-                     'EC' : 'CON02', #Double Check?
-                     'EC Raw' : 'CON02',
-                     'EC Norm' : 'CON01',
-                     #'SpCond' : 'CON01???',
-                     'Salinity' : 'SAL01',
-                     #'DO % Sat' : 'DOX02',
-                     'DO' : 'DOX01',
-                     'pH' : 'PHL01',
-                     'Pressure' : 'WSE01',
-                     #'Level' : 'WSE01',
-                     'Batt' : 'BAT01',
-                     'Battery' : 'BAT01',
+        param_map = {'Temperature' : 'water_temperature',
+                     'EC' : 'water_electrical_conductivity', #Double Check?
+                     'EC Raw' : 'water_electrical_conductivity',
+                     'EC Norm' : 'water_specific_conductance',
+                     #'SpCond' : 'water_specific_conductance???',
+                     'Salinity' : 'seawater_salinity',
+                     #'DO % Sat' : 'water_dissolved_oxygen_percent_saturation',
+                     'DO' : 'water_dissolved_oxygen_concentration',
+                     'pH' : 'water_ph',
+                     'Pressure' : 'water_depth_non_vented',
+                     #'Level' : 'water_depth_non_vented',
+                     'Batt' : 'instrument_battery_voltage',
+                     'Battery' : 'instrument_battery_voltage',
                      'TDS' : 'TDS01',
                      #'Redox': 'NotImplemented',
                      }

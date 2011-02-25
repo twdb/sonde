@@ -40,11 +40,11 @@ class HydrotechDataset(sonde.BaseSondeDataset):
         """
         Read the hydrotech data file
         """
-        param_map = {'Temp' : 'TEM01',
-                     'SpCond' : 'CON01',
-                     'Sal' : 'SAL01',
-                     'Dep25' : 'WSE01',
-                     'IBatt' : 'BAT01',
+        param_map = {'Temp' : 'water_temperature',
+                     'SpCond' : 'water_specific_conductance',
+                     'Sal' : 'seawater_salinity',
+                     'Dep25' : 'water_depth_non_vented',
+                     'IBatt' : 'instrument_battery_voltage',
                      }
 
         unit_map = {'\xf8C' : pq.degC,

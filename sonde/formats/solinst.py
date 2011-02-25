@@ -39,12 +39,12 @@ class SolinstDataset(sonde.BaseSondeDataset):
         """
         Read the solinst data file
         """
-        param_map = {'TEMPERATURE' : 'TEM01',
-                     'Temperature' : 'TEM01',
-                     '1: Conductivity' : 'CON01',
-                     'LEVEL' : 'WSE01',
-                     'Level' : 'WSE01',
-                     'pressure?' : 'ATM01',
+        param_map = {'TEMPERATURE' : 'water_temperature',
+                     'Temperature' : 'water_temperature',
+                     '1: Conductivity' : 'water_specific_conductance',
+                     'LEVEL' : 'water_depth_non_vented',
+                     'Level' : 'water_depth_non_vented',
+                     'pressure?' : 'air_pressure',
                      }
 
         unit_map = {'Deg C' : pq.degC,

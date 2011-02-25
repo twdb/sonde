@@ -13,7 +13,7 @@
       # fill_value = -999.99
     the last two comment/header lines should be the following
     parameter header prepended by single #:
-      # datetime, ATM01, CON01, etc
+      # datetime, air_pressure, water_specific_conductance, etc
       (datetime must be first field and in format yyyy/mm/dd HH:MM:SS)
       (parameter names must be from master_param_list
     unit header prepended by single #:

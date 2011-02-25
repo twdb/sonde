@@ -39,15 +39,15 @@ class EurekaDataset(sonde.BaseSondeDataset):
         """
         Read the eureka data file
         """
-        param_map = {'Temp.' : 'TEM01',
-                     'SC' : 'CON01',
-                     'SAL' : 'SAL01',
-                     'DO Sat' : 'DOX02',
-                     'DO SAT' : 'DOX02',
-                     'DO' : 'DOX01',
-                     'pH' : 'PHL01',
-                     'Depth' : 'WSE01',
-                     'Bat.' : 'BAT01',
+        param_map = {'Temp.' : 'water_temperature',
+                     'SC' : 'water_specific_conductance',
+                     'SAL' : 'seawater_salinity',
+                     'DO Sat' : 'water_dissolved_oxygen_percent_saturation',
+                     'DO SAT' : 'water_dissolved_oxygen_percent_saturation',
+                     'DO' : 'water_dissolved_oxygen_concentration',
+                     'pH' : 'water_ph',
+                     'Depth' : 'water_depth_non_vented',
+                     'Bat.' : 'instrument_battery_voltage',
                      }
 
         unit_map = {'\xb0C' : pq.degC,

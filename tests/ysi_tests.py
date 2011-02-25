@@ -117,16 +117,16 @@ class YSICompareWithCSVTestBase():
             assert date_pair[0] == date_pair[1], "%r != %r" % (str(date_pair[0]), str(date_pair[1]))
 
     def test_ysi_temps_match_csv(self):
-        compare_quantity_and_csv_str(self.ysi_dataset.data['TEM01'], self.ysi_csv.temps)
+        compare_quantity_and_csv_str(self.ysi_dataset.data['water_temperature'], self.ysi_csv.temps)
 
 #    def test_ysi_spconds_match_csv(self):
-#        compare_quantity_and_csv_str(self.ysi_dataset.data['CON01'], self.ysi_csv.spconds)
+#        compare_quantity_and_csv_str(self.ysi_dataset.data['water_specific_conductance'], self.ysi_csv.spconds)
 
     def test_ysi_depths_match_csv(self):
-        compare_quantity_and_csv_str(self.ysi_dataset.data['WSE01'], self.ysi_csv.depths)
+        compare_quantity_and_csv_str(self.ysi_dataset.data['water_depth_non_vented'], self.ysi_csv.depths)
 
     def test_ysi_odos_match_csv(self):
-        compare_quantity_and_csv_str(self.ysi_dataset.data['DOX02'], self.ysi_csv.odos)
+        compare_quantity_and_csv_str(self.ysi_dataset.data['water_dissolved_oxygen_percent_saturation'], self.ysi_csv.odos)
 
 
 #-------------------------------------------------------------------

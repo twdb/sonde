@@ -5,7 +5,7 @@ format = 'greenspan'
 
 [format_parameters]
 # log file name: if present in file else leave blank
-log_file_name = 'El Jardin_18 Oct 06'
+log_file_name = 
 
 # timezone: if present in file else leave blank
 tz = 
@@ -14,7 +14,7 @@ tz =
 site_name = 'GS 025399 SB1S'
 
 # instrument serial number, if present in file else leave blank
-serial_number ='________' 
+serial_number =
 
 # datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
 # file header then use first and last line in data
@@ -26,21 +26,21 @@ stop_time = '02/02/2009 15:00:00'
 
 [data]
 # parameters provided (comma delimited, in column order)
-# 'ATM01' : Atmospheric Pressure
-# 'BAT01' : Battery Voltage
-# 'CON01' : Specific Conductance(Normalized @25degC)
-# 'CON02' : Conductivity(Not Normalized)
-# 'DOX01' : Dissolved Oxygen Concentration
-# 'DOX02' : Dissolved Oxygen Saturation Concentration
-# 'PHL01' : pH Level
-# 'SAL01' : Salinity
-# 'TEM01' : Water Temperature
-# 'TEM02' : Air Temperature
-# 'TUR01' : Turbidity
-# 'WSE01' : Water Surface Elevation (No Atm Pressure Correction)
-# 'WSE02' : Water Surface Elevation (Atm Pressure Corrected)
+# 'air_pressure' : Atmospheric Pressure
+# 'instrument_battery_voltage' : Battery Voltage
+# 'water_specific_conductance' : Specific Conductance(Normalized @25degC)
+# 'water_electrical_conductivity' : Conductivity(Not Normalized)
+# 'water_dissolved_oxygen_concentration' : Dissolved Oxygen Concentration
+# 'water_dissolved_oxygen_percent_saturation' : Dissolved Oxygen Saturation Concentration
+# 'water_ph' : pH Level
+# 'seawater_salinity' : Salinity
+# 'water_temperature' : Water Temperature
+# 'air_temperature' : Air Temperature
+# 'water_turbidity' : Turbidity
+# 'water_depth_non_vented' : Water Surface Elevation (No Atm Pressure Correction)
+# 'water_depth_vented' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = [Battery,Temperature,Pressure,EC Raw,EC Norm, ,Salinity]
-parameters = ['BAT01','TEM01','WSE01','CON01','CON02','SAL01']
+parameters = ['instrument_battery_voltage','water_temperature','water_depth_non_vented','water_electrical_conductivity','water_specific_conductance','TDS01','seawater_salinity']
 
 
 # units (comma delimited, in column order)
@@ -53,7 +53,7 @@ parameters = ['BAT01','TEM01','WSE01','CON01','CON02','SAL01']
 # turbidity: ntu
 # ph (dimensionless): dl 
 #These are the header of parameters = [Volts,Celsius,Metres,uS/cm,uS/cm,mg/l,psu]
-units = ['volt', 'degC', 'mH2O','uScm','uScm','psu']
+units = ['volt', 'degC', 'mH2O','uScm','uScm','mgl','psu']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
@@ -65,16 +65,16 @@ units = ['volt', 'degC', 'mH2O','uScm','uScm','psu']
 # three records from some random location in the file and the last
 # three records of data
 test_data = """[ #Do not edit this line
-['10/27/2008 12:15:00',, 9.5, 18.71, .271,-195,-220,-147,-1E+10],
-['10/27/2008 12:30:00',, 9.5, 18.92, .259,-195,-219,-146,-1E+10],
-['10/27/2008 12:45:00',, 9.5, 19.16, .248,-199,-222,-148,-1E+10],
-['10/27/2008 13:00:00',, 9.5, 19.43, .236,-198,-221,-147,-1E+10],
-['11/11/2008 05:00:00',, 9.6, 21.27, .869, 31765, 34031, 22688, 21.46],
-['11/11/2008 05:15:00',, 9.6, 21.27, .869, 31769, 34036, 22691, 21.46],
-['11/11/2008 05:30:00',, 9.6, 21.27, .867, 31769, 34037, 22691, 21.46],
-['02/02/2009 14:15:00',, 9.1, 16.44,-.261, 371, 439, 293, .21],
-['02/02/2009 14:30:00',, 9.2, 16.18,-.326,-179,-214,-142,-1E+10],
-['02/02/2009 14:45:00',, 9.4, 26.23,-.82,-211,-206,-137,-1E+10],
-['02/02/2009 15:00:00',, 9.5, 31.85,-.939,-206,-183,-122,-1E+10],
+['10/27/2008 12:15:00', 9.5, 18.71, .271,-195,-220,-147,-1E+10],
+['10/27/2008 12:30:00', 9.5, 18.92, .259,-195,-219,-146,-1E+10],
+['10/27/2008 12:45:00', 9.5, 19.16, .248,-199,-222,-148,-1E+10],
+['10/27/2008 13:00:00', 9.5, 19.43, .236,-198,-221,-147,-1E+10],
+['11/11/2008 05:00:00', 9.6, 21.27, .869, 31765, 34031, 22688, 21.46],
+['11/11/2008 05:15:00', 9.6, 21.27, .869, 31769, 34036, 22691, 21.46],
+['11/11/2008 05:30:00', 9.6, 21.27, .867, 31769, 34037, 22691, 21.46],
+['02/02/2009 14:15:00', 9.1, 16.44,-.261, 371, 439, 293, .21],
+['02/02/2009 14:30:00', 9.2, 16.18,-.326,-179,-214,-142,-1E+10],
+['02/02/2009 14:45:00', 9.4, 26.23,-.82,-211,-206,-137,-1E+10],
+['02/02/2009 15:00:00', 9.5, 31.85,-.939,-206,-183,-122,-1E+10],
 ]   #Do not edit this line
 """ #Do not edit this line

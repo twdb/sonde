@@ -41,17 +41,17 @@ class HydrolabDataset(sonde.BaseSondeDataset):
         """
         Read the Hydrolab txt data file
         """
-        param_map = {'Temp' : 'TEM01',
-                     'Conductivity' : 'CON02',
-                     'SpCond' : 'CON01',
-                     'Salin' : 'SAL01',
-                     'DO % Sat' : 'DOX02',
-                     'DO mg/l' : 'DOX01',
-                     'pH' : 'PHL01',
-                     'Depth' : 'WSE01',
-                     'Level' : 'WSE01',
-                     'Batt' : 'BAT01',
-                     'Turb' : 'TUR01',
+        param_map = {'Temp' : 'water_temperature',
+                     'Conductivity' : 'water_electrical_conductivity',
+                     'SpCond' : 'water_specific_conductance',
+                     'Salin' : 'seawater_salinity',
+                     'DO % Sat' : 'water_dissolved_oxygen_percent_saturation',
+                     'DO mg/l' : 'water_dissolved_oxygen_concentration',
+                     'pH' : 'water_ph',
+                     'Depth' : 'water_depth_non_vented',
+                     'Level' : 'water_depth_non_vented',
+                     'Batt' : 'instrument_battery_voltage',
+                     'Turb' : 'water_turbidity',
                      'Redox': 'NotImplemented',
                      }
 

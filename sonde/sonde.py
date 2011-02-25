@@ -40,8 +40,8 @@ default_timezone = cst
 master_parameter_list = {
     'air_pressure' : ('Atmospheric Pressure', pq.pascal),
     'instrument_battery_voltage' : ('Battery Voltage', pq.volt),
-    'seawater_specific_conductance' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
-    'seawater_electrical_conductivity' : ('Electrical Conductivity(Not Normalized)', sq.mScm),
+    'water_specific_conductance' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
+    'water_electrical_conductivity' : ('Electrical Conductivity(Not Normalized)', sq.mScm),
     'water_dissolved_oxygen_concentration' : ('Dissolved Oxygen Concentration', sq.mgl),
     'water_dissolved_oxygen_percent_saturation' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
     'water_ph' : ('pH Level', pq.dimensionless),
@@ -295,7 +295,7 @@ class BaseSondeDataset(object):
         self._read_data()
         self.rescale_all()
 
-        if 'CON01' in self.data or 'CON02' in self.data:
+        if 'water_specific_conductance' in self.data or 'water_electrical_conductivity' in self.data:
             self._calculate_salinity()
 
         #if 'site_name' in self.format_parameters.keys():
@@ -528,41 +528,41 @@ class BaseSondeDataset(object):
         conductivity is present.
         """
         params = self.parameters.keys()
-        if 'SAL01' in params:
+        if 'seawater_salinity' in params:
             return
         else:
-            if 'CON01' in params:
+            if 'water_specific_conductance' in params:
                 T = 25.0
-                cond = self.data['CON01'].rescale(sq.mScm).magnitude
-            elif 'CON02' in params:
-                current_unit = self.data['TEM01'].units
-                temp_celsius = self.data['TEM01'].rescale(pq.degC)
+                cond = self.data['water_specific_conductance'].rescale(sq.mScm).magnitude
+            elif 'water_electrical_conductivity' in params:
+                current_unit = self.data['water_temperature'].units
+                temp_celsius = self.data['water_temperature'].rescale(pq.degC)
                 temp_celsius += self._temperature_offset(current_unit, pq.degC)
                 T = temp_celsius.magnitude
-                cond = self.data['CON02'].rescale(sq.mScm).magnitude
+                cond = self.data['water_electrical_conductivity'].rescale(sq.mScm).magnitude
             else:
                 return
 
             # absolute pressure in dbar
-            #if 'WSE01' in params:
-            #    P = self.data['WSE01'].rescale(pq.m).magnitude * 1.0197 + 10.1325
-            #elif 'WSE02' in params:
-            #    P = self.data['WSE02'].rescale(pq.m).magnitude * 1.0197
+            #if 'water_depth_non_vented' in params:
+            #    P = self.data['water_depth_non_vented'].rescale(pq.m).magnitude * 1.0197 + 10.1325
+            #elif 'water_depth_vented' in params:
+            #    P = self.data['water_depth_vented'].rescale(pq.m).magnitude * 1.0197
             #else:
             #    P = 10.1325
 
-            if 'WSE01' in params:
-                P = self.data['WSE01'].rescale(sq.dbar).magnitude + (pq.atm).rescale(sq.dbar).magnitude
-            elif 'WSE02' in params:
-                P = self.data['WSE02'].rescale(sq.dbar).magnitude
+            if 'water_depth_non_vented' in params:
+                P = self.data['water_depth_non_vented'].rescale(sq.dbar).magnitude + (pq.atm).rescale(sq.dbar).magnitude
+            elif 'water_depth_vented' in params:
+                P = self.data['water_depth_vented'].rescale(sq.dbar).magnitude
             else:
                 P = (pq.atm).rescale(dbar).magnitude
 
             R = cond / 42.914
             sal = seawater.csiro.salt(R,T,P)
 
-            self.set_standard_unit('SAL01', sq.psu)
-            self.data['SAL01'] = sal * sq.psu
+            self.set_standard_unit('seawater_salinity', sq.psu)
+            self.data['seawater_salinity'] = sal * sq.psu
 
 
     def convert_timezones(self, to_tzinfo):

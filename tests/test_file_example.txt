@@ -25,20 +25,20 @@ stop_time = '12/29/2003 17:00:00'
 
 [data]
 # parameters provided (comma delimited, in column order)
-# ATM01 : Atmospheric Pressure
-# BAT01 : Battery Voltage
-# CON01 : Specific Conductance(Normalized @25degC)
-# CON02 : Conductivity(Not Normalized)
-# DOX01 : Dissolved Oxygen Concentration
-# DOX02 : Dissolved Oxygen Saturation Concentration
-# PHL01 : pH Level
-# SAL01 : Salinity
-# TEM01 : Water Temperature
-# TEM02 : Air Temperature
-# TUR01 : Turbidity
-# WSE01 : Water Surface Elevation (No Atm Pressure Correction)
-# WSE02 : Water Surface Elevation (Atm Pressure Corrected)
-parameters = ['TEM01', 'CON01', 'SAL01', 'DOX01', 'WSE01', 'BAT01']
+# air_pressure : Atmospheric Pressure
+# instrument_battery_voltage : Battery Voltage
+# water_specific_conductance : Specific Conductance(Normalized @25degC)
+# water_electrical_conductivity : Conductivity(Not Normalized)
+# water_dissolved_oxygen_concentration : Dissolved Oxygen Concentration
+# water_dissolved_oxygen_percent_saturation : Dissolved Oxygen Saturation Concentration
+# water_ph : pH Level
+# seawater_salinity : Salinity
+# water_temperature : Water Temperature
+# air_temperature : Air Temperature
+# water_turbidity : Turbidity
+# water_depth_non_vented : Water Surface Elevation (No Atm Pressure Correction)
+# water_depth_vented : Water Surface Elevation (Atm Pressure Corrected)
+parameters = ['water_temperature', 'water_specific_conductance', 'seawater_salinity', 'water_dissolved_oxygen_concentration', 'water_depth_non_vented', 'instrument_battery_voltage']
 
 # units (comma delimited, in column order)
 # depth: ftH20 (feet), mH20 (meters), psi
