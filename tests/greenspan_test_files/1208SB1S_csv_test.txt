@@ -14,7 +14,7 @@ tz =
 site_name = 'GS 025399 SB1S'
 
 # instrument serial number, if present in file else leave blank
-serial_number ='________' 
+serial_number =
 
 # datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
 # file header then use first and last line in data
@@ -40,7 +40,7 @@ stop_time = '02/02/2009 15:00:00'
 # 'WSE01' : Water Surface Elevation (No Atm Pressure Correction)
 # 'WSE02' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = [Battery,Temperature,Pressure,EC Raw,EC Norm, ,Salinity]
-parameters = ['BAT01','TEM01','WSE01','CON01','CON02','SAL01']
+parameters = ['BAT01','TEM01','WSE01','CON02','CON01','TDS01','SAL01']
 
 
 # units (comma delimited, in column order)
@@ -53,7 +53,7 @@ parameters = ['BAT01','TEM01','WSE01','CON01','CON02','SAL01']
 # turbidity: ntu
 # ph (dimensionless): dl 
 #These are the header of parameters = [Volts,Celsius,Metres,uS/cm,uS/cm,mg/l,psu]
-units = ['volt', 'degC', 'mH2O','uScm','uScm','psu']
+units = ['volt', 'degC', 'mH2O','uScm','uScm','mgl','psu']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should

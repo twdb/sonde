@@ -21,7 +21,7 @@ serial_number = 'M070600313'
 # file header then leave blank
 # datetime provided in first line of data
 setup_time = '08/06/2006 20:57:00'
-start_time = '08/06/2006 20:57:00'
+start_time = '08/08/2006 11:45:00'
 stop_time = '08/25/2006 16:45:00'
 
 
@@ -41,7 +41,7 @@ stop_time = '08/25/2006 16:45:00'
 # 'WSE01' : Water Surface Elevation (No Atm Pressure Correction)
 # 'WSE02' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = [Date,Time,Temp.,SC,DO,pH,Depth,SAL,DO SAT,Bat.,Manta,Manta,]
-parameters = ['TEM01', 'CON01', 'DOX01','PHL01','WSE01','DOX02','SAL01','BAT01']
+parameters = ['TEM01', 'CON01', 'DOX01','PHL01','WSE01','SAL01','DOX02', 'BAT01']
 
 
 # units (comma delimited, in column order)
@@ -54,7 +54,7 @@ parameters = ['TEM01', 'CON01', 'DOX01','PHL01','WSE01','DOX02','SAL01','BAT01']
 # turbidity: ntu
 # ph (dimensionless): dimensionless 
 #These are the header of parameters = [,,°C,mS/cm,mg/l,  ,m,   ,%Sat,V,Name,Serial #,]
-units = ['degC', 'mScm', 'mgl','dimensionless','mH2O', 'percent', 'ppt', 'volt']
+units = ['degC', 'mScm', 'mgl','dimensionless','mH2O', 'psu', 'percent', 'volt']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
