@@ -5,7 +5,7 @@ format = 'greenspan'
 
 [format_parameters]
 # log file name: if present in file else leave blank
-log_file_name = 'El Jardin_18 Oct 06'
+log_file_name = 
 
 # timezone: if present in file else leave blank
 tz = 
