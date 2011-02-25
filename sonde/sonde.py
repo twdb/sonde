@@ -296,17 +296,20 @@ class BaseSondeDataset(object):
         if default_timezone and self.dates[0].tzinfo != None:
             self.convert_timezones(default_timezone)
 
-        if 'setup_time' not in self.format_parameters.keys() :
-            self.format_parameters['setup_time'] = self.dates[0]
+        if 'setup_time' not in self.__dict__.keys():
+            self.setup_time = self.dates[0]
 
-        if 'start_time' not in self.format_parameters.keys() :
-            self.format_parameters['start_time'] = self.dates[0]
+        if 'start_time' not in self.__dict__.keys():
+            self.start_time = self.dates[0]
 
-        if 'stop_time' not in self.format_parameters.keys() :
-            self.format_parameters['stop_time'] = self.dates[-1]
+        if 'stop_time' not in self.__dict__.keys():
+            self.stop_time = self.dates[-1]
 
-        if 'serial_number' not in self.format_parameters.keys() :
-            self.format_parameters['serial_number'] = ''
+        if 'serial_number' not in self.__dict__.keys():
+            self.'serial_number' = ''
+
+        if 'site_name' not in self.__dict__.keys():
+            self.'site_name' = ''
 
         #TODO ADD COMMENTS FIELD
 
