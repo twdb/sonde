@@ -13,7 +13,7 @@ from sonde.timezones import cst, cdt
 
 
 def test_files():
-    test_file_paths = [i for i in glob.glob('./*_test_files/*_test.txt')]
+    test_file_paths = glob.glob('./*_test_files/*_test.txt')
 
     for test_file_path in test_file_paths:
         tested_file_extension = test_file_path.split('_')[-2]
