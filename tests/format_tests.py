@@ -69,8 +69,15 @@ def check_values_match(test_data, parameters, units, sonde):
             continue
 
         test_datum = (test_value * test_quantity).rescale(sonde_datum.units)
-        assert_almost_equal(test_datum, sonde_datum)
 
+        # if value in the test file is less precise than the actual
+        # data value, then just check the number of decimal places of
+        # the test value. Note: this means trailing zeros ignored
+        if len(str(test_value).split('.')) == 2:
+            places = len(str(test_value).split('.')[1])
+            assert_almost_equal(test_datum, sonde_datum, places)
+        else:
+            assert_almost_equal(test_datum, sonde_datum)
 
 
 def check_format_parameters(format_parameters, sonde):
@@ -82,12 +89,11 @@ def check_format_parameters(format_parameters, sonde):
 
         sonde_parameter = sonde.format_parameters[parameter_name]
 
+        # if we are testing a datetime value
         if re.match('\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}', test_value):
             test_value = _convert_to_aware_datetime(test_value)
 
         assert test_value == sonde_parameter, "format parameter '%s' doesn't match: %s != %s" % (parameter_name, test_value, sonde_parameter)
-
-
 
 
 def _tz_offset_string(tzinfo):
@@ -102,7 +108,6 @@ def _tz_offset_string(tzinfo):
     minutes = (offset.seconds % 3600) / 60
 
     return "%+03d%02d" % (hours, minutes)
-
 
 
 def _convert_to_aware_datetime(datetime_string):
