@@ -1,0 +1,84 @@
+[header]
+# format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka,solinst
+format = 'hydrolab'
+
+
+[format_parameters]
+# log file name: if present in file else leave blank
+log_file_name = 'sa_jan07'
+
+# timezone: if present in file else leave blank
+tz = 
+
+# site name: if present in file else leave blank
+site_name =
+
+# instrument serial number, if present in file else leave blank
+serial_number =
+
+
+
+# datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
+# file header then leave blank
+setup_time = '01/24/2007 15:40:37'
+start_time = '01/25/2007 01:30:00'
+stop_time = '03/07/2007 23:59:59'
+
+
+[data]
+# parameters provided (comma delimited, in column order)
+# ATM01 : Atmospheric Pressure
+# BAT01 : Battery Voltage
+# CON01 : Specific Conductance(Normalized @25degC)
+# CON02 : Conductivity(Not Normalized)
+# DOX01 : Dissolved Oxygen Concentration
+# DOX02 : Dissolved Oxygen Saturation Concentration
+# PHL01 : pH Level
+# SAL01 : Salinity
+# TEM01 : Water Temperature
+# TEM02 : Air Temperature
+# TUR01 : Turbidity
+# WSE01 : Water Surface Elevation (No Atm Pressure Correction)
+# WSE02 : Water Surface Elevation (Atm Pressure Corrected)
+#parameters in header = [Time    Temp  SpCond   Salin      DO      DO   Level    Batt]
+parameters = ['TEM01', 'CON01', 'SAL01', 'DOX02', 'DOX01','WSE01', 'BAT01']
+
+# units (comma delimited, in column order)
+# depth: ftH20 (feet), mH20 (meters), psi
+# conductivity: uScm (uS/cm), mScm (mS/cm)
+# salinity: ppt, psu
+# temperature: degC, degF
+# battery: volt
+# dissolved oxygen: mgl (mg/l), percent (% Sat)
+# turbidity: ntu
+# ph (dimensionless): dl 
+#units in header = [deg C   mS/cm     ppt   % Sat    mg/l    feet   volts]
+units = ['degC', 'mScm', 'ppt', 'percent', 'mgl', 'mH20', 'volt']
+
+# Now we need to provide a list of known data values to test against.
+# For each data record that needs to be tested, the first value should
+# be the datetime in the "MM/DD/YYYY hh:mm:ss" format, followed by a
+# comma delimited list of parameter values in column order as
+# above. If there are parameter values that are not available for some
+# reason (e.g. a sensor goes out), enter the value as "nan". This list
+# should include AT LEAST the first three records of data, a set of
+# three records from some random location in the file and the last
+# three records of data
+test_data = """[ #Do not edit this line
+Date (MMDDYY) : 012507
+Variable or Calibration changed at 012407 154233 => changes ignored!
+Variable or Calibration changed at 012407 154345 => changes ignored!
+013000   22.61   0.613     0.3    74.3    6.40     N/A    15.3&
+023000   22.74   0.614     0.3    73.3    6.31     N/A    15.3&
+033000   22.86   0.615     0.3    72.5    6.22     N/A    15.3&
+043000   22.97   0.616     0.3    71.5    6.12     N/A    15.3&
+053000   23.06   0.618     0.3    70.1    5.99     N/A    15.2&
+063000   23.15   0.619     0.3    68.6    5.86     N/A    15.3&
+073000   23.19   0.620     0.3    66.8    5.70     N/A    15.2&
+083000   23.11   0.622     0.3    70.0    5.98     N/A    15.3&
+093000   17.86   0.083     0.0    81.7    7.76     N/A    15.3&
+103000   15.12   0.066     0.0    81.1    8.16     N/A    15.3&
+113000    8.12   10.19     5.8   112.6   12.77     N/A    15.3&
+123000    8.45   10.10     5.7   115.7   13.02     N/A    15.3&
+]   #Do not edit this line
+""" #Do not edit this line
