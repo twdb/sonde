@@ -56,12 +56,14 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                      'Pressure' : 'WSE01',
                      #'Level' : 'WSE01',
                      'Batt' : 'BAT01',
+                     'Battery' : 'BAT01',
                      'TDS' : 'TDS01',
                      #'Redox': 'NotImplemented',
                      }
 
         unit_map = {'deg_C' : pq.degC,
                     'Celcius' : pq.degC,
+                    'Celsius' : pq.degC,
                     'deg_F' : pq.degF,
                     'deg_K' : pq.degK,
                     'mS/cm' : sq.mScm,
@@ -72,6 +74,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                     'Metres' : sq.mH2O,
                     'ft' : sq.ftH2O,
                     'volts' : pq.volt,
+                    'Volts' : pq.volt,
                     'volt' : pq.volt,
                     'psu' : sq.psu,
                     }
