@@ -48,6 +48,7 @@ master_parameter_list = {
     'seawater_salinity' : ('Salinity', sq.psu),
     'water_temperature' : ('Water Temperature', pq.degC),
     'air_temperature' : ('Air Temperature', pq.degC),
+    'water_total_dissolved_salts' : ('Total Dissolved Salts', sq.mgl),
     'water_turbidity' : ('Turbidity', sq.ntu),
     'water_depth_non_vented' : ('Depth is the vertical distance below the water surface.(No Atm Pressure Correction)', sq.mH2O),
     'water_depth_vented' : ('Depth is the vertical distance below the water surface.(w/ Atm Pressure Correction)', sq.mH2O),
@@ -55,7 +56,7 @@ master_parameter_list = {
     'eastward_water_velocity' : ('Eastward Water Velocity',sq.mps),
     'upward_water_velocity' : ('Upward Water Velocity',sq.mps),
     'water_x_velocity' : ('Water Velocity in x direction',sq.mps),
-    'water_y_velocity' : ('Water in y direction',sq.mps), 
+    'water_y_velocity' : ('Water in y direction',sq.mps),
     }
 
 
