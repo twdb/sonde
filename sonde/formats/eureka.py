@@ -74,6 +74,7 @@ class EurekaDataset(sonde.BaseSondeDataset):
             try:
                 pcode = param_map[(parameter.name).strip()]
                 punit = unit_map[(parameter.unit).strip()]
+
                 #ignore params that have no data
                 if not np.all(np.isnan(parameter.data)):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
@@ -87,10 +88,15 @@ class EurekaDataset(sonde.BaseSondeDataset):
         self.format_parameters = {
             'header_lines' : eureka_data.header_lines,
             }
+
         if hasattr(eureka_data, 'site_name'):
             self.format_parameters['site_name'] = eureka_data.site_name
         if hasattr(eureka_data, 'serial_number'):
             self.format_parameters['serial_number'] = eureka_data.serial_number
+        if hasattr(eureka_data, 'setup_time'):
+            self.format_parameters['setup_time'] = eureka_data.setup_time
+        if hasattr(eureka_data, 'stop_time'):
+            self.format_parameters['stop_time'] = eureka_data.stop_time
 
         self.dates = eureka_data.dates
 
@@ -118,7 +124,19 @@ class EurekaReader:
 
         self.read_eureka(file_buf)
 
+        # if the serial number just contains numbers the cell holding
+        # it might be formatted as a number, in which case it gets
+        # read in with a trailing '.0'; I'm not sure if this is a
+        # eureka thing or an xlrd thing
+        if hasattr(self, 'serial_number') and self.serial_number.rfind('.0') == len(self.serial_number) - 2:
+            self.serial_number = self.serial_number[:-2]
+
         if tzinfo:
+            if hasattr(self, 'setup_time'):
+                self.setup_time = self.setup_time.replace(tzinfo=tzinfo)
+            if hasattr(self, 'stop_time'):
+                self.stop_time = self.stop_time.replace(tzinfo=tzinfo)
+
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
 
@@ -181,8 +199,15 @@ class EurekaReader:
                 self.site_name = buf.split(',')[1].strip()
             if 'Serial Number' in buf:
                 self.serial_number = buf.split(',')[1].strip()
+            if 'Start time' in buf:
+                d,t = buf.strip().split()[3:5]
+                self.setup_time = datetime.datetime.strptime(d + t, '%m/%d/%Y%H:%M:%S')
+            if 'Stop time' in buf:
+                d,t = buf.strip().split()[3:5]
+                self.stop_time = datetime.datetime.strptime(d + t, '%m/%d/%Y%H:%M:%S')
 
             buf = fid.readline()
+
 
         fields = buf.strip('\r\n').split(',')
         params = fields[2:]
@@ -214,13 +239,6 @@ class EurekaReader:
                     unit = 'psu'
 
                 self.parameters.append(Parameter(param.strip(), unit.strip()))
-
-        # if the serial number just contains numbers the cell holding
-        # it might be formatted as a number, in which case it gets
-        # read in with a trailing '.0'; I'm not sure if this is a
-        # eureka thing or an xlrd thing
-        if hasattr(self, 'serial_number') and self.serial_number.rfind('.0') == len(self.serial_number) - 2:
-            self.serial_number = self.serial_number[:-2]
 
         for ii in range(len(self.parameters)):
             param = (self.parameters[ii].name).strip(' .').replace(' ', '_')
