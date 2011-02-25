@@ -104,13 +104,14 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                 'converter_name' : greenspan_data.converter_name,
                 'source_file_name' : greenspan_data.source_file_name,
                 'target_file_name' : greenspan_data.target_file_name,
-                'site_name' : greenspan_data.site_name,
                 'site_information' : greenspan_data.site_information,
-                'serial_number' : greenspan_data.serial_number,
                 'firmware_version' : greenspan_data.firmware_version,
                 'top_of_case' : greenspan_data.top_of_case,
                 'raingage' : greenspan_data.raingage,
                 }
+
+            self.serial_number = greenspan_data.serial_number
+            self.site_name = greenspan_data.site_name
 
         elif greenspan_data.format_version == 'block':
             self.format_parameters = {

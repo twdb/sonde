@@ -82,18 +82,19 @@ class YSIDataset(sonde.BaseSondeDataset):
         if self.data_file.split('.')[-1]=='dat':
             ysi_data = YSIReaderBin(self.data_file, self.default_tzinfo, self.param_file)
             self.format_parameters = {
-                'site_name': ysi_data.site_name,
                 'log_file_name': ysi_data.log_file_name,
                 'instr_type': ysi_data.instr_type,
                 'system_sig': ysi_data.system_sig,
                 'prog_ver': ysi_data.prog_ver,
-                'serial_number': ysi_data.serial_number,
                 'pad1': ysi_data.pad1,
                 'logging_interval': ysi_data.logging_interval,
                 'begin_log_time': ysi_data.begin_log_time,
                 'first_sample_time': ysi_data.first_sample_time,
                 'pad2' : ysi_data.pad2
                 }
+            self.site_name =ysi_data.site_name
+            self.serial_number =ysi_data.serial_number
+
         else:
             ysi_data = YSIReaderTxt(self.data_file, self.default_tzinfo, self.param_file)
             self.format_parameters = {

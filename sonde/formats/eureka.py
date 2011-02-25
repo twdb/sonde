@@ -90,13 +90,13 @@ class EurekaDataset(sonde.BaseSondeDataset):
             }
 
         if hasattr(eureka_data, 'site_name'):
-            self.format_parameters['site_name'] = eureka_data.site_name
+            self.site_name = eureka_data.site_name
         if hasattr(eureka_data, 'serial_number'):
-            self.format_parameters['serial_number'] = eureka_data.serial_number
+            self.serial_number = eureka_data.serial_number
         if hasattr(eureka_data, 'setup_time'):
-            self.format_parameters['setup_time'] = eureka_data.setup_time
+            self.setup_time = eureka_data.setup_time
         if hasattr(eureka_data, 'stop_time'):
-            self.format_parameters['stop_time'] = eureka_data.stop_time
+            self.stop_time = eureka_data.stop_time
 
         self.dates = eureka_data.dates
 

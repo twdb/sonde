@@ -85,9 +85,19 @@ def check_format_parameters(format_parameters, sonde):
         if test_value == '':
             continue
 
-        assert parameter_name in sonde.format_parameters, "format parameter '%s' not found in sonde.format_parameters" % parameter_name
+        # parameters on the sonde object itself; historically, these
+        # used to be in the format_parameters dict but now they are on
+        # the sonde object and it's not worth the effort to rearrange
+        # all the test files
+        sonde_parameters = ['serial_number', 'site_name', 'setup_time', 'start_time', 'stop_time']
 
-        sonde_parameter = sonde.format_parameters[parameter_name]
+        if parameter_name in sonde_parameters:
+            assert hasattr(sonde, parameter_name), "format parameter '%s' not found in sonde.format_parameters" % parameter_name
+            sonde_parameter = getattr(sonde, parameter_name)
+
+        else:
+            assert parameter_name in sonde.format_parameters, "format parameter '%s' not found in sonde.format_parameters" % parameter_name
+            sonde_parameter = sonde.format_parameters[parameter_name]
 
         # if we are testing a datetime value
         if re.match('\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}', test_value):

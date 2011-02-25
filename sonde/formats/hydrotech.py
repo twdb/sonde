@@ -78,15 +78,16 @@ class HydrotechDataset(sonde.BaseSondeDataset):
 
         self.format_parameters = {
             'model' : hydrotech_data.model,
-            'serial_number' : hydrotech_data.serial_number,
             'log_file_name' : hydrotech_data.log_file_name,
-            'setup_time' : hydrotech_data.setup_time,
-            'start_time' : hydrotech_data.start_time,
-            'stop_time' : hydrotech_data.stop_time,
             'logging_interval' : hydrotech_data.logging_interval,
             'sensor_warmup_time' : hydrotech_data.sensor_warmup_time,
             'circltr_warmup_time' : hydrotech_data.circltr_warmup_time,
             }
+
+        self.serial_number = hydrotech_data.serial_number
+        self.setup_time = hydrotech_data.setup_time
+        self.start_time = hydrotech_data.start_time
+        self.stop_time = hydrotech_data.stop_time
 
         self.dates = hydrotech_data.dates
 

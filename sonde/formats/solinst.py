@@ -74,13 +74,12 @@ class SolinstDataset(sonde.BaseSondeDataset):
                 print 'Solinst Unit Name:', parameter.unit
                 raise
 
-
         self.format_parameters = {
-            'serial_number' : solinst_data.serial_number,
             'project_id' : solinst_data.project_id,
-            'site_name' : solinst_data.site_name,
             }
 
+        self.site_name = solinst_data.site_name
+        self.serial_number = solinst_data.serial_number
         self.dates = solinst_data.dates
 
 class SolinstReader:

@@ -70,11 +70,12 @@ class MacroctdDataset(sonde.BaseSondeDataset):
 
         self.format_parameters = {
             'header_lines' : macroctd_data.header_lines,
-            'serial_number' : macroctd_data.serial_number,
-            'site_name' : macroctd_data.site_name,
             }
 
+        self.serial_number = macroctd_data.serial_number
+        self.site_name = macroctd_data.site_name
         self.dates = macroctd_data.dates
+
 
 class MacroctdReader:
     """

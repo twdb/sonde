@@ -93,12 +93,13 @@ class HydrolabDataset(sonde.BaseSondeDataset):
 
         self.format_parameters = {
             'log_file_name': hydrolab_data.log_file_name,
-            'setup_time': hydrolab_data.setup_time,
-            'start_time': hydrolab_data.start_time,
-            'stop_time': hydrolab_data.stop_time,
             'logging_interval': hydrolab_data.logging_interval,
             'header_lines': hydrolab_data.header_lines,
             }
+
+        self.setup_time = hydrolab_data.setup_time
+        self.start_time = hydrolab_data.start_time
+        self.stop_time = hydrolab_data.stop_time
 
         self.dates = hydrolab_data.dates
 

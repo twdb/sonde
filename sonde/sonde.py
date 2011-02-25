@@ -305,19 +305,19 @@ class BaseSondeDataset(object):
         if default_timezone and self.dates[0].tzinfo != None:
             self.convert_timezones(default_timezone)
 
-        if 'setup_time' not in self.__dict__.keys():
+        if not hasattr(self, 'setup_time'):
             self.setup_time = self.dates[0]
 
-        if 'start_time' not in self.__dict__.keys():
+        if not hasattr(self, 'start_time'):
             self.start_time = self.dates[0]
 
-        if 'stop_time' not in self.__dict__.keys():
+        if not hasattr(self, 'stop_time'):
             self.stop_time = self.dates[-1]
 
-        if 'serial_number' not in self.__dict__.keys():
+        if not hasattr(self, 'serial_number'):
             self.serial_number = ''
 
-        if 'site_name' not in self.__dict__.keys():
+        if not hasattr(self, 'site_name'):
             self.site_name = ''
 
         #TODO ADD COMMENTS FIELD
