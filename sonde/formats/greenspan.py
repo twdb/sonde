@@ -139,7 +139,7 @@ class GreenspanReader:
         if self.file_ext =='xls':
             self.xls2csv(data_file, file_buf)
         else:
-            file_buf.write(open(data_file).read())
+            file_buf.write(open(data_file, 'r').read())
 
         if not self.format_version:
             self.format_version = self.detect_format_version(file_buf)
@@ -248,15 +248,15 @@ class GreenspanReader:
             self.serial_number = fid.readline().split(',')[1].rstrip('\x00\r\n')
             self.firmware_version = fid.readline().split(',')[1].rstrip('\r\n')
             self.top_of_case = fid.readline().split(',')[1].rstrip('\r\n')
-            self.raingage = fid.readline().split(',')[1].strip(' \r\n')
+            self.raingage = fid.readline().split(',')[1].rstrip(' \r\n')
             fid.readline()
             #column 0,1,2 = 'Data', 'dd/mm/yyyy hh:mm:ss', 'Type/Comment'
             #column [3:] = actual data
             fid.readline()
-            fields = fid.readline().split(',')
+            fields = fid.readline().rstrip('\r\n').split(',')
             cols = range(len(fields))[3:]
             params = fields[3:]
-            units = fid.readline().split(',')[3:]
+            units = fid.readline().rstrip('\r\n').split(',')[3:]
 
             #clean param & unit names
             for param,unit in zip(params,units):
