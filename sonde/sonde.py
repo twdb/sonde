@@ -34,21 +34,28 @@ default_timezone = cst
 #: is exhaustive and will be fully populated whether or not data is or
 #: even available in a particular format. See the `parameters`
 #: attribute for parameters that are available for a particular file.
+#: where possible we follow netcdf CF standard for parameter name and unit
+#: (http://cf-pcmdi.llnl.gov/) in other cases we follow the general CF naming
+#: guidelines
 master_parameter_list = {
-    'ATM01' : ('Atmospheric Pressure', pq.pascal),
-    'BAT01' : ('Battery Voltage', pq.volt),
-    'CON01' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
-    'CON02' : ('Conductivity(Not Normalized)', sq.mScm),
-    'DOX01' : ('Dissolved Oxygen Concentration', sq.mgl),
-    'DOX02' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
-    'PHL01' : ('pH Level', pq.dimensionless),
-    'SAL01' : ('Salinity', sq.psu),
-    'TEM01' : ('Water Temperature', pq.degC),
-    'TEM02' : ('Air Temperature', pq.degC),
-    'TDS01' : ('Total Dissolved Salts', sq.mgl),
-    'TUR01' : ('Turbidity', sq.ntu),
-    'WSE01' : ('Water Surface Elevation (No Atm Pressure Correction)', sq.mH2O),
-    'WSE02' : ('Water Surface Elevation (Atm Pressure Corrected)', sq.mH2O),
+    'air_pressure' : ('Atmospheric Pressure', pq.pascal),
+    'instrument_battery_voltage' : ('Battery Voltage', pq.volt),
+    'seawater_specific_conductance' : ('Specific Conductance(Normalized @25degC)', sq.mScm),
+    'seawater_electrical_conductivity' : ('Electrical Conductivity(Not Normalized)', sq.mScm),
+    'water_dissolved_oxygen_concentration' : ('Dissolved Oxygen Concentration', sq.mgl),
+    'water_dissolved_oxygen_percent_saturation' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
+    'water_ph' : ('pH Level', pq.dimensionless),
+    'seawater_salinity' : ('Salinity', sq.psu),
+    'water_temperature' : ('Water Temperature', pq.degC),
+    'air_temperature' : ('Air Temperature', pq.degC),
+    'water_turbidity' : ('Turbidity', sq.ntu),
+    'water_depth_non_vented' : ('Depth is the vertical distance below the water surface.(No Atm Pressure Correction)', sq.mH2O),
+    'water_depth_vented' : ('Depth is the vertical distance below the water surface.(w/ Atm Pressure Correction)', sq.mH2O),
+    'northward_water_velocity' : ('Northward Water Velocity',sq.mps),
+    'eastward_water_velocity' : ('Eastward Water Velocity',sq.mps),
+    'upward_water_velocity' : ('Upward Water Velocity',sq.mps),
+    'water_x_velocity' : ('Water Velocity in x direction',sq.mps),
+    'water_y_velocity' : ('Water in y direction',sq.mps), 
     }
 
 
@@ -297,17 +304,20 @@ class BaseSondeDataset(object):
         if default_timezone and self.dates[0].tzinfo != None:
             self.convert_timezones(default_timezone)
 
-        if 'setup_time' not in self.format_parameters.keys() :
-            self.format_parameters['setup_time'] = self.dates[0]
+        if 'setup_time' not in self.__dict__.keys():
+            self.setup_time = self.dates[0]
 
-        if 'start_time' not in self.format_parameters.keys() :
-            self.format_parameters['start_time'] = self.dates[0]
+        if 'start_time' not in self.__dict__.keys():
+            self.start_time = self.dates[0]
 
-        if 'stop_time' not in self.format_parameters.keys() :
-            self.format_parameters['stop_time'] = self.dates[-1]
+        if 'stop_time' not in self.__dict__.keys():
+            self.stop_time = self.dates[-1]
 
-        if 'serial_number' not in self.format_parameters.keys() :
-            self.format_parameters['serial_number'] = ''
+        if 'serial_number' not in self.__dict__.keys():
+            self.serial_number = ''
+
+        if 'site_name' not in self.__dict__.keys():
+            self.site_name = ''
 
         #TODO ADD COMMENTS FIELD
 

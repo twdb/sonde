@@ -30,6 +30,8 @@ psu = pq.UnitQuantity('Salinity',
                       symbol='PSU')
 ppt = psu
 
+#unit of speed
+mps = pq.UnitQuantity('Speed', pq.m/pq.second, symbol='m/s')
 
 #: Unit of specific conductivity - microSiemens per centimeter
 uScm = pq.UnitQuantity('Specific Conductivity',
