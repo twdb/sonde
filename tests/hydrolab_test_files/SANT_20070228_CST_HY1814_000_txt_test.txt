@@ -1,0 +1,101 @@
+[header]
+# format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka,solinst
+format = 'hydrolab'
+
+
+[format_parameters]
+# log file name: if present in file else leave blank
+log_file_name = '15355_sa_feb07'
+
+# timezone: if present in file else leave blank
+tz = 
+
+# site name: if present in file else leave blank
+site_name =
+
+# instrument serial number, if present in file else leave blank
+serial_number =
+
+
+
+# datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
+# file header then leave blank
+setup_time = '02/28/2007 10:18:28'
+start_time = '02/28/2007 01:30:00'
+stop_time = '04/11/2007 23:59:59'
+
+
+[data]
+# parameters provided (comma delimited, in column order)
+# air_pressure : Atmospheric Pressure
+# instrument_battery_voltage : Battery Voltage
+# water_specific_conductance : Specific Conductance(Normalized @25degC)
+# water_electrical_conductivity : Conductivity(Not Normalized)
+# water_dissolved_oxygen_concentration : Dissolved Oxygen Concentration
+# water_dissolved_oxygen_percent_saturation : Dissolved Oxygen Saturation Concentration
+# water_ph : pH Level
+# seawater_salinity : Salinity
+# water_temperature : Water Temperature
+# air_temperature : Air Temperature
+# water_turbidity : Turbidity
+# water_depth_non_vented : Water Surface Elevation (No Atm Pressure Correction)
+# water_depth_vented : Water Surface Elevation (Atm Pressure Corrected)
+#parameters in header = [Temp  SpCond   Salin      DO      DO   Level    Batt]
+parameters = ['water_temperature', 'water_specific_conductance', 'seawater_salinity', 'water_dissolved_oxygen_percent_saturation', 'water_dissolved_oxygen_concentration','water_depth_non_vented', 'instrument_battery_voltage']
+
+# units (comma delimited, in column order)
+# depth: ftH20 (feet), mH20 (meters), psi
+# conductivity: uScm (uS/cm), mScm (mS/cm)
+# salinity: ppt, psu
+# temperature: degC, degF
+# battery: volt
+# dissolved oxygen: mgl (mg/l), percent (% Sat)
+# turbidity: ntu
+# ph (dimensionless): dl 
+#units in header = [deg C   mS/cm     ppt   % Sat    mg/l    feet   volts]
+units = ['degC', 'mScm', 'ppt', 'percent', 'mgl', 'ftH2O', 'volt']
+
+# Now we need to provide a list of known data values to test against.
+# For each data record that needs to be tested, the first value should
+# be the datetime in the "MM/DD/YYYY hh:mm:ss" format, followed by a
+# comma delimited list of parameter values in column order as
+# above. If there are parameter values that are not available for some
+# reason (e.g. a sensor goes out), enter the value as "nan". This list
+# should include AT LEAST the first three records of data, a set of
+# three records from some random location in the file and the last
+# three records of data
+test_data = """[ #Do not edit this line
+['02/28/2007 10:30:00', 22.73, 0.022, 0.0, 75.1, 6.51, -0.65, 13.2],
+['02/28/2007 11:30:00', 22.90, 0.020, 0.0, 86.3, 7.46, -0.72, 13.3],
+['02/28/2007 12:30:00', 26.13, 0.019, 0.0, 82.6, 6.73, -0.35, 13.2],
+['02/28/2007 13:30:00', 24.79, 0.015, 0.0, 75.4, 6.29, -0.87, 13.2],
+['02/28/2007 14:30:00', 23.49, 0.019, 0.0, 88.8, 7.59, -0.74, 13.2],
+['02/28/2007 15:30:00', 22.84, 0.019, 0.0, 80.0, 6.92, -0.70, 13.1],
+['03/10/2007 09:30:00', 20.37, 24.7, 14.9, 51.8, 4.28, 1.83, 12.9],
+['03/10/2007 10:30:00', 20.51, 24.7, 15.0, 53.3, 4.40, 1.88, 12.9],
+['03/10/2007 11:30:00', 20.66, 24.7, 15.0, 53.9, 4.43, 1.93, 12.9],
+['03/10/2007 12:30:00', 20.91, 24.7, 15.0, 55.7, 4.56, 1.79, 12.9],
+['03/13/2007 00:30:00', 20.54, 23.6, 14.2, 40.6, 3.36, 2.36, 12.8],
+['03/13/2007 01:30:00', 20.43, 25.1, 15.2, 31.2, 2.57, 2.36, 12.8],
+['03/13/2007 02:30:00', 20.55, 25.6, 15.6, 35.6, 2.92, 2.33, 12.8],
+['03/13/2007 03:30:00', 20.61, 25.1, 15.3, 33.2, 2.73, 2.32, 12.8],
+['03/13/2007 04:30:00', 20.56, 24.3, 14.7, 39.0, 3.22, 2.25, 12.8],
+['03/13/2007 05:30:00', 20.34, 23.3, 14.1, 43.6, 3.63, 2.25, 12.8],
+['03/13/2007 06:30:00', 20.17, 19.5, 11.6, 42.2, 3.57, 2.21, 12.8],
+['03/13/2007 07:30:00', 20.01, 19.4, 11.5, 47.7, 4.05, 2.15, 12.8],
+['03/13/2007 08:30:00', 20.53, 26.4, 16.1, 35.6, 2.91, 2.12, 12.8],
+['03/13/2007 09:30:00', 20.57, 27.2, 16.6, 32.0, 2.61, 2.13, 12.8],
+['03/13/2007 10:30:00', 20.44, 23.4, 14.1, 38.4, 3.19, 2.21, 12.8],
+['05/08/2007 14:31:42', 25.12, 0.025, 0.0, 60.2, 4.94, 0.55, 16.9],
+['05/08/2007 14:31:43', 25.12, 0.025, 0.0, 60.2, 4.94, 0.55, 16.9],
+['05/08/2007 14:31:44', 25.14, 0.025, 0.0, 60.2, 4.93, 0.55, 17.0],
+['05/08/2007 14:31:45', 25.14, 0.025, 0.0, 60.2, 4.93, 0.55, 17.1],
+['05/08/2007 14:31:46', 25.14, 0.025, 0.0, 60.2, 4.93, 0.55, 17.6],
+['05/08/2007 14:31:47', 25.14, 0.025, 0.0, 60.1, 4.93, 0.55, 17.6],
+['05/08/2007 14:31:48', 25.12, 0.025, 0.0, 60.1, 4.93, 0.55, 17.6],
+['05/08/2007 14:31:49', 25.12, 0.025, 0.0, 60.1, 4.93, 0.55, 17.1],
+['05/08/2007 14:31:50', 25.12, 0.025, 0.0, 60.1, 4.93, 0.55, 17.5],
+['05/08/2007 14:31:51', 25.12, 0.025, 0.0, 60.2, 4.94, 0.55, 17.6],
+['05/08/2007 14:31:52', 25.12, 0.025, 0.0, 60.2, 4.94, 0.55, 17.6],
+]   #Do not edit this line
+""" #Do not edit this line

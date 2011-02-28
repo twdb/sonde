@@ -1,4 +1,3 @@
-
 Log File Name : 15355_sa_feb07
 Setup Date (MMDDYY) : 022807
 Setup Time (HHMMSS) : 101828
