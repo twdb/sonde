@@ -169,15 +169,27 @@ class HydrolabReader:
         buf = fid.readline()
         while buf:
             if re_time.match(buf):
+                allparams = buf
                 params = buf.split()[1:]
                 buf = fid.readline()
                 # assumes fields are seperated by at least 2 spaces. single
                 # spaces are assumed to be part of unit names
-                units = re.sub('\s{1,} ', ',', buf).split(',')[1:]
+                # units = re.sub('\s{1,} ', ',', buf).split(',')[1:]
+                # the above assumption fails on some files. new logic below
+                # unit name ends at same column as param name ends.
+                lbuf = list(buf.strip('\r\n'))
+                loc = 0
+                for param in allparams.split():
+                    loc = allparams.find(param,loc) + len(param)
+                    try:
+                        lbuf[loc] = ','
+                    except:
+                        pass #last position
+                units = "".join(lbuf).split(',')[1:]
                 for param,unit in zip(params,units):
                     self.num_params += 1
                     if param=='DO':
-                        name = param + ' ' + unit
+                        name = param + ' ' + unit.strip()
                     else:
                         name = param
 
