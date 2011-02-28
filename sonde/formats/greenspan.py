@@ -34,6 +34,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
     """
     def __init__(self, data_file, tzinfo=None, format_version=None):
         self.file_format = 'greenspan'
+        self.manufacturer = 'greenspan'
         self.data_file = data_file
         self.format_version = format_version
         self.default_tzinfo = tzinfo

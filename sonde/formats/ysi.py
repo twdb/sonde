@@ -35,6 +35,7 @@ class YSIDataset(sonde.BaseSondeDataset):
     """
     def __init__(self, data_file, tzinfo=None, param_file=None):
         self.file_format = 'ysi'
+        self.manufacturer = 'ysi'
         self.data_file = data_file
         self.param_file = param_file
         self.default_tzinfo = tzinfo

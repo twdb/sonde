@@ -31,6 +31,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
     """
     def __init__(self, data_file, tzinfo=None, param_file=None):
         self.file_format = 'hydrolab'
+        self.manufacturer = 'hydrolab'
         self.data_file = data_file
         self.param_file = param_file
         self.default_tzinfo = tzinfo

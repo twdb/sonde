@@ -252,7 +252,7 @@ def merge(file_list, tz_list=None):
         m_list = np.zeros(dataset.dates.size, dtype='|S15')
 
         fn_list[:] = os.path.split(file_name)[-1]
-        sn_list[:] = dataset.format_parameters['serial_number']
+        sn_list[:] = dataset.serial_number
         m_list[:] = dataset.manufacturer
 
         metadata['dates'] = np.hstack((metadata['dates'],dataset.dates))

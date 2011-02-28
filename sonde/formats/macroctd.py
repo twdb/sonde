@@ -26,6 +26,7 @@ class MacroctdDataset(sonde.BaseSondeDataset):
     """
     def __init__(self, data_file, tzinfo=None):
         self.file_format = 'macroctd'
+        self.manufacturer = 'macroctd'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
         super(MacroctdDataset, self).__init__()
