@@ -21,13 +21,15 @@ import csv
 from StringIO import StringIO
 
 from sonde import quantities as sq
-from sonde.timezones import cst,cdt
+from sonde.timezones import cst,cdt,UTCStaticOffset
 
 
 #XXX: put this into a proper config file
 #: The default timezone to use when reading files
-default_timezone = cst
-
+#default_timezone = cst #i.e utc-6
+default_utc_static_offset = -6
+default_static_timezone = UTCStaticOffset(default_utc_static_offset)
+default_timezone = pytz.timezone('US/Central')
 
 #: A dict that contains all the parameters that could potentially be
 #: read from a data file, along with their standard units. This list
@@ -220,14 +222,17 @@ def merge(file_list, tz_list=None):
     options cst=utc-6, cdt=utc-5, auto=determine based on dataset.setup_time
     If tz_list == None then cst is assumed i.e UTC-6
        tz_list == auto then cst/cdt is determined from dataset.setup_date
+       tz_list == ['utc-6','utc-5', etc]
     returns a Sonde object
     """
     from sonde.formats.merge import MergeDataset
 
     if tz_list is None:
-        tz_list = [cst for fn in file_list]
+        tz_list = [default_static_timezone for fn in file_list]
     elif tz_list=='auto':
         tz_list = ['auto' for fn in file_list]
+    #else:
+    #    tz_list = [UTCStaticOffset(int(tz.lower().strip('utc'))) for tz in tz_list]
 
     metadata = dict()
     data = dict()
@@ -242,6 +247,12 @@ def merge(file_list, tz_list=None):
 
     for file_name, tz in zip(file_list, tz_list):
         try:
+            if tz=='auto':
+                tmp = Sonde(file_name)
+                utc_offset = default_utc_static_offset + int(default_timezone.dst(tmp.setup_time).seconds/3600)
+                tz = UTCStaticOffset(utc_offset)
+            else:
+                tz = UTCStaticOffset(int(tz.lower().strip('utc')))
             dataset = Sonde(file_name, tzinfo=tz)
         except:
             print 'merged failed: ', file_name
@@ -302,8 +313,8 @@ class BaseSondeDataset(object):
         #    site_name = self.format_parameters['site_name']
         #    @todo tz check
 
-        if default_timezone and self.dates[0].tzinfo != None:
-            self.convert_timezones(default_timezone)
+        if default_static_timezone and self.dates[0].tzinfo != None:
+            self.convert_timezones(default_static_timezone)
 
         if not hasattr(self, 'setup_time'):
             self.setup_time = self.dates[0]

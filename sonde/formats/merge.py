@@ -34,7 +34,7 @@ class MergeDataset(sonde.BaseSondeDataset):
         sort_idx = np.argsort(metadata['dates'][idx])
         self.manufacturer = metadata['instrument_manufacturer'][idx][sort_idx]
         self.data_file = metadata['data_file_name'][idx][sort_idx]
-        self.default_tzinfo = sonde.default_timezone
+        self.default_tzinfo = sonde.default_static_timezone
 
         # determine parameters provided and in what units
         self.parameters = dict()

@@ -247,6 +247,7 @@ class GreenspanReader:
             fid.readline() # skip junk
             self.site_name = fid.readline().split(',')[-1].rstrip(' \r\n')
             self.site_information = fid.readline().split(',')[1].rstrip(' \r\n')
+            self.instrument_type = fid.readline().split(',')[-1].rstrip(' \r\n')
             self.serial_number = fid.readline().split(',')[1].rstrip('\x00\r\n')
             self.firmware_version = fid.readline().split(',')[1].rstrip('\r\n')
             self.top_of_case = fid.readline().split(',')[1].rstrip('\r\n')
