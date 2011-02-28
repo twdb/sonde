@@ -347,7 +347,7 @@ class BaseSondeDataset(object):
         else:
             m_list = self.manufacturer
 
-        metadata['original_data_file_name'] = fn_list
+        metadata['original_data_file'] = fn_list
         metadata['instrument_serial_number'] = sn_list
         metadata['instrument_manufacturer'] = m_list
         metadata['fill_value'] = fill_value

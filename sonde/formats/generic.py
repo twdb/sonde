@@ -42,7 +42,7 @@ import quantities as pq
 
 from .. import sonde
 from .. import quantities as sq
-from ..timezones import cdt, cst
+from ..timezones import UTCStaticOffset
 
 class GenericDataset(sonde.BaseSondeDataset):
     """
@@ -67,20 +67,21 @@ class GenericDataset(sonde.BaseSondeDataset):
                     'ft': sq.ftH2O,
                     'fth2o' : sq.ftH2O,
                     'ms/cm' : sq.mScm,
-                    'psu' : sq.PSU,
+                    'psu' : sq.psu,
+                    'pa' : pq.Pa,
                     }
 
-        generic_data = GenericReader(self.data_file, self.default_tzinfo)
+        generic_data = GenericReader(self.data_file)
         self.parameters = dict()
         self.data = dict()
         metadata = dict()
 
         for parameter in generic_data.parameters:
             if parameter.unit!='n/a':
-                if parameter.name.lower() in sonde.master_param_list:
-                    pcode = param
+                if parameter.name.lower() in sonde.master_parameter_list:
+                    pcode = parameter.name.lower()
                 else:
-                    print 'Un-mapped Parameter: ', param
+                    print 'Un-mapped Parameter: ', parameter.name.lower()
                     raise
                 try:
                     punit = unit_map[(parameter.unit.lower()).strip()]
@@ -92,7 +93,7 @@ class GenericDataset(sonde.BaseSondeDataset):
                      print 'Unit Name:', parameter.unit
                      raise
             else:
-                metadata[parameter.name] = parameter.data
+                metadata[parameter.name.lower()] = parameter.data
 
         self.format_parameters = generic_data.format_parameters
 
@@ -101,12 +102,12 @@ class GenericDataset(sonde.BaseSondeDataset):
         kwds = ['instrument_manufacturer', 'original_data_file', 'instrument_serial_number']
         for name,kwd in zip(names,kwds):
             #check format_parameters
-            idx = [i for i in self.format_paramaters.keys() if i.lower() == kwd]
+            idx = [i for i in self.format_parameters.keys() if i.lower() == kwd]
             if idx!=[]:
-               eval('self.'+kwd+'=self.format_parameters[idx[0]]')
+               exec('self.'+name+'=self.format_parameters[idx[0]]')
             idx = [i for i in metadata.keys() if i.lower() == kwd]
             if idx!=[]:
-               eval('self.'+kwd+'=metadata[idx[0]]')
+               exec('self.'+name+' = metadata[idx[0]]')
 
         self.dates = generic_data.dates
 
@@ -122,6 +123,7 @@ class GenericReader:
     def __init__(self, data_file):
         self.num_params = 0
         self.parameters = []
+        self.format_parameters = {}
         self.read_generic(data_file)
         self.dates = [i.replace(tzinfo=self.default_tzinfo) for i in self.dates]
 
@@ -145,10 +147,10 @@ class GenericReader:
 
             key,val = buf.split(':')
             self.format_parameters[key.strip()]=val.strip()
+            buf = fid.readline().strip('# ')
 
-        utc_offset = int(format_parameters['timezone'].lower().strip('utc'))
-        self.default_tzinfo = sonde.UTCStaticOffset(utc_offset)
-
+        utc_offset = int(self.format_parameters['timezone'].lower().strip('utc'))
+        self.default_tzinfo = UTCStaticOffset(utc_offset)
         data = np.genfromtxt(fid, dtype=None, names=params, delimiter=',')
         self.dates = np.array(
             [datetime.datetime.strptime(dt, '%Y/%m/%d %H:%M:%S')
@@ -156,7 +158,7 @@ class GenericReader:
             )
 
         #assign param & unit names
-        for param,unit in zip(params,units):
+        for param,unit in zip(params[1:],units[1:]):
             self.num_params += 1
             self.parameters.append(Parameter(param.strip(), unit.strip()))
 
