@@ -206,6 +206,7 @@ class HydrolabReader:
         data_str = ''
         re_date = re.compile(' *Date')
         re_data = re.compile('^[0-9]') # only process lines starting with a number
+        re_clean_special_char = re.compile('[&@\*?]')
 
         # re_data = re.compile('((?!Date)(?![0-9]))', re.M) matches only junk lines
         # might be more efficient to work out how to use the above to strip out all
@@ -228,11 +229,10 @@ class HydrolabReader:
 
         self.dates = np.array(log_time)
         data_str = re.sub('#', 'N', data_str)
-        data_str = re.sub('&', '', data_str)
-        data_str = re.sub('@', '', data_str)
-        data_str = re.sub('\*', '', data_str)
+        data_str = re_clean_special_char.sub('', data_str)
+#        import pdb; pdb.set_trace()
         try:
-            data = np.genfromtxt(StringIO(data_str), dtype=float) 
+            data = np.genfromtxt(StringIO(data_str), dtype=float)
         except:
             #no data in file
             print 'No Data Found In File'
