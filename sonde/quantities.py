@@ -30,6 +30,9 @@ psu = pq.UnitQuantity('Salinity',
                       symbol='PSU')
 ppt = psu
 
+# nickname for dimensionless
+dl = pq.dimensionless
+
 #unit of speed
 mps = pq.UnitQuantity('Speed', pq.m/pq.second, symbol='m/s')
 

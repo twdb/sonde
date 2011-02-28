@@ -31,8 +31,9 @@ class MergeDataset(sonde.BaseSondeDataset):
     """
     def __init__(self, metadata, paramdata):
         idx = self._indices_duplicate_data(metadata['dates'], paramdata)
-        self.manufacturer = metadata['instrument_manufacturer'][idx]
-        self.data_file = metadata['data_file_name'][idx]
+        sort_idx = np.argsort(metadata['dates'][idx])
+        self.manufacturer = metadata['instrument_manufacturer'][idx][sort_idx]
+        self.data_file = metadata['data_file_name'][idx][sort_idx]
         self.default_tzinfo = sonde.default_timezone
 
         # determine parameters provided and in what units
@@ -41,13 +42,13 @@ class MergeDataset(sonde.BaseSondeDataset):
 
         for param in paramdata.keys():
             self.parameters[param] = param
-            self.data[param] = paramdata[param][idx]
+            self.data[param] = paramdata[param][idx][sort_idx]
 
         self.format_parameters = {
-            'serial_number' : metadata['instrument_serial_number'][idx]
+            'serial_number' : metadata['instrument_serial_number'][idx][sort_idx]
             }
 
-        self.dates = metadata['dates'][idx]
+        self.dates = metadata['dates'][idx][sort_idx]
         #I don't think the following line is needed
         #super(MergeDataset, self).__init__()
 

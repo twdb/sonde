@@ -205,6 +205,10 @@ class HydrolabReader:
                 try:
                     time_field, data_line = buf.split(None, 1)
                     log_time.append(datetime.datetime.strptime(log_date + time_field, fmt))
+                    #fix for incomplete lines
+                    if len(data_line.split()) < self.num_params:
+                        data_line = data_line.strip('\r\n')
+                        data_line += (self.num_params - len(data_line.split()))*' N ' + '\n'
                     data_str = data_str + data_line
                 except:
                     continue
@@ -212,13 +216,18 @@ class HydrolabReader:
         self.dates = np.array(log_time)
         data_str = re.sub('#', 'N', data_str)
         data_str = re.sub('&', '', data_str)
+        data_str = re.sub('@', '', data_str)
         data_str = re.sub('\*', '', data_str)
         try:
-            data = np.genfromtxt(StringIO(data_str), dtype=float)
+            data = np.genfromtxt(StringIO(data_str), dtype=float) 
         except:
             #no data in file
             print 'No Data Found In File'
             raise
+
+        #de_duplicate data since some hydrolabs have repeat values
+        self.dates, idx = np.unique(self.dates, return_index=True)
+        data = data[idx]
 
         for ii in range(self.num_params):
             self.parameters[ii].data = data[:,ii]

@@ -53,7 +53,7 @@ parameters = ['water_temperature', 'water_ph','water_specific_conductance', 'sea
 # turbidity: ntu
 # ph (dimensionless): dl 
 #units in header = [deg C   mS/cm     ppt   % Sat    mg/l    feet   volts]
-units = ['degC', 'dl', 'mScm', 'ppt', 'percent', 'mgl', 'mH20', 'volt']
+units = ['degC', 'dl', 'mScm', 'ppt', 'percent', 'mgl', 'mH2O', 'volt']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should

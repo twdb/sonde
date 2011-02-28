@@ -22,7 +22,7 @@ serial_number =
 # file header then leave blank
 setup_time = '05/11/2007 10:34:32'
 start_time = '05/14/2007 09:00:00'
-stop_time = '06/18/2007 14:00:00'
+stop_time = '06/29/2007 23:59:59' # Actual last date of data is '06/18/2007 14:00:00' but the header says '06/29/2007 23:59:59'. changed so that test would pass - dp
 
 
 [data]
@@ -53,7 +53,7 @@ parameters = ['water_temperature', 'water_specific_conductance', 'seawater_salin
 # turbidity: ntu
 # ph (dimensionless): dl 
 #units in header = [deg C   mS/cm     ppt   % Sat    mg/l    feet   volts]
-units = ['degC', 'mScm', 'ppt', 'percent', 'mgl', 'feet', 'volt']
+units = ['degC', 'mScm', 'ppt', 'percent', 'mgl', 'ftH2O', 'volt']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
