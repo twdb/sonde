@@ -7,6 +7,6 @@
     
 """
 
-from .sonde import BaseSondeDataset, master_parameter_list, Sonde, autodetect, merge
+from .sonde import BaseSondeDataset, master_parameter_list, Sonde, autodetect, merge, find_tz, default_static_timezone
 from . import quantities
 from . import formats

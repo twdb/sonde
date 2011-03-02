@@ -215,6 +215,13 @@ def xls2csv(data_file, csv_file):
 
         bcw.writerow(this_row)
 
+def find_tz(dt):
+    """
+    give a naive datetime.datetime object finds local timezone i.e includes dst effects
+    """
+    utc_offset = default_utc_static_offset + int(default_timezone.dst(dt).seconds/3600)
+    return UTCStaticOffset(utc_offset)
+
 def merge(file_list, tz_list=None):
     """
     Merges all files in file_list
@@ -249,9 +256,10 @@ def merge(file_list, tz_list=None):
         try:
             if tz=='auto':
                 tmp = Sonde(file_name)
-                utc_offset = default_utc_static_offset + int(default_timezone.dst(tmp.setup_time).seconds/3600)
-                tz = UTCStaticOffset(utc_offset)
-            else:
+                #utc_offset = default_utc_static_offset + int(default_timezone.dst(tmp.setup_time).seconds/3600)
+                #tz = UTCStaticOffset(utc_offset)
+                tz = find_tz(tmp.setup_time)
+            elif isinstance(tz,str):
                 tz = UTCStaticOffset(int(tz.lower().strip('utc')))
             dataset = Sonde(file_name, tzinfo=tz)
         except:
@@ -332,6 +340,24 @@ class BaseSondeDataset(object):
             self.site_name = ''
 
         #TODO ADD COMMENTS FIELD
+    def apply_mask(self, mask, parameters=None):
+        """
+        remove data and headers where mask=False
+        if parameters = None remove all data
+        else apply to list of parameters by setting
+        parameter values to np.nan based on mask
+        """
+        if parameters is None:
+            self.dates = self.dates[mask]
+            for key in self.data.keys():
+                self.data[key] = self.data[key][mask]
+
+            self.manufacturer = self.manufacturer[mask]
+            self.data_file = self.data_file[mask]
+            self.serial_number = self.serial_number[mask]
+        else:
+            for parameter in parameters:
+                self.data[parameter][~mask] = np.nan
 
     def write(self, file_name, format='netcdf4', fill_value='-999.99',
               metadata={}, disclaimer='', float_fmt='%5.2f'):
@@ -346,11 +372,11 @@ class BaseSondeDataset(object):
         else:
             fn_list = self.data_file
 
-        if isinstance(self.format_parameters['serial_number'],str):
+        if isinstance(self.serial_number,str):
             sn_list = np.zeros(self.dates.size, dtype='|S100')
-            sn_list[:] = self.format_parameters['serial_number']
+            sn_list[:] = self.serial_number
         else:
-            sn_list = self.format_parameters['serial_number']
+            sn_list = self.serial_number
 
         if isinstance(self.manufacturer,str):
             m_list = np.zeros(self.dates.size, dtype='|S100')
@@ -385,7 +411,10 @@ class BaseSondeDataset(object):
         fmt = '%s, '
         for param in np.sort(data.keys()):
             param_header += param + ', '
-            unit_header += data[param].dimensionality.keys()[0].symbol + ', '
+            try:
+                unit_header += data[param].dimensionality.keys()[0].symbol + ', '
+            except:
+                unit_header += 'nd'
             data[param][np.isnan(data[param])] = metadata['fill_value']
             dtype_fmts.append('f8')
             fmt += float_fmt + ', '
@@ -394,13 +423,21 @@ class BaseSondeDataset(object):
         for line in disclaimer.splitlines():
             header.append('# disclaimer: ' + line + '\n')
 
-        for key,val in metadata.items():
-            if not isinstance(val, np.ndarray):
-                header.append('# ' + str(key) + ': ' + str(val) + '\n')
+        #for key,val in metadata.items():
+        #    if not isinstance(val, np.ndarray):
+        #        header.append('# ' + str(key) + ': ' + str(val) + '\n')
+        #    else:
+        #        param_header += key + ', '
+        #        unit_header += 'n/a, '
+        #        dtype_fmts.append(val.dtype)
+        #        fmt += '%s, '
+        for key in np.sort(metadata.keys()):
+            if not isinstance(metadata[key], np.ndarray):
+                header.append('# ' + str(key) + ': ' + str(metadata[key]) + '\n')
             else:
                 param_header += key + ', '
                 unit_header += 'n/a, '
-                dtype_fmts.append(val.dtype)
+                dtype_fmts.append(metadata[key].dtype)
                 fmt += '%s, '
 
         #remove trailing commas

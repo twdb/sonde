@@ -33,6 +33,7 @@ class MergeDataset(sonde.BaseSondeDataset):
         idx = self._indices_duplicate_data(metadata['dates'], paramdata)
         sort_idx = np.argsort(metadata['dates'][idx])
         self.manufacturer = metadata['instrument_manufacturer'][idx][sort_idx]
+        self.serial_number = metadata['instrument_serial_number'][idx][sort_idx]
         self.data_file = metadata['data_file_name'][idx][sort_idx]
         self.default_tzinfo = sonde.default_static_timezone
 
@@ -44,9 +45,10 @@ class MergeDataset(sonde.BaseSondeDataset):
             self.parameters[param] = param
             self.data[param] = paramdata[param][idx][sort_idx]
 
-        self.format_parameters = {
-            'serial_number' : metadata['instrument_serial_number'][idx][sort_idx]
-            }
+        #self.format_parameters = {
+        #    'serial_number' : metadata['instrument_serial_number'][idx][sort_idx]
+        #    }
+
 
         self.dates = metadata['dates'][idx][sort_idx]
         #I don't think the following line is needed
