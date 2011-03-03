@@ -149,10 +149,14 @@ class HydrotechReader:
 
         if 'MiniSonde' in buf:
             self.model, self.serial_number = buf.split()
-            self.log_file_name = fid.readline().strip(strp).split(':')[-1].strip()
-
         else:
-            self.log_file_name = buf.strip(strp).split(':')[-1].strip()
+            self.model =''
+            self.serial_number = ''
+
+        self.log_file_name = fid.readline().strip(strp).split(':')[-1].strip()
+
+        #else:
+        #    self.log_file_name = buf.strip(strp).split(':')[-1].strip()
 
         d = fid.readline().strip(strp).split(':')[-1].strip()
         t = fid.readline().strip(strp).split(':')[-1].strip()
