@@ -69,6 +69,11 @@ class GenericDataset(sonde.BaseSondeDataset):
                     'ms/cm' : sq.mScm,
                     'psu' : sq.psu,
                     'pa' : pq.Pa,
+                    'v' : pq.volt,
+                    'mg/l' : sq.mgl,
+                    '%' : pq.percent,
+                    'nd': pq.dimensionless,
+                    'ntu': sq.ntu,
                     }
 
         generic_data = GenericReader(self.data_file)

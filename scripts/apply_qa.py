@@ -83,8 +83,12 @@ log_data = log_data[log_data['site_name']==site_name]
 log_dates = np.array([datetime.datetime.strptime(d+t,'%m/%d/%Y%H:%M:%S') for d,t
              in zip(log_data['date'],log_data['time'])])
 
-#spot check data is always in local tz
+#spot check data is always in local tz & convert to default static tz
 log_dates = np.array([i.replace(tzinfo=sonde.find_tz(i)) for i in log_dates])
+
+tmp_datetimes = np.array([(i.strftime('%m/%d/%Y %H:%M:%S').split()) for i in log_dates])
+log_data['date'] = tmp_datetimes[:,0]
+log_data['time'] = tmp_datetimes[:,1]
 
 #sort deployment data
 idx = np.argsort(log_dates)
@@ -122,9 +126,13 @@ else:
 
 #merge original data files
 tz_list = []
-for file_name in data_files:
+for file_name in data_file_names:
     if file_name in log_files:
-        tz_list.append(log_data['timezone'][log_data['renamed_file']==file_name])
+        tz = log_data['timezone'][log_data['renamed_filename']==file_name][0]
+        if tz.strip()=='':
+            print 'No timezone specified in deployment log, assuming auto:', file_name 
+            tz = 'auto'
+        tz_list.append(tz)
     else:
         tz_list.append('auto')
 
@@ -132,26 +140,27 @@ merged_data = sonde.merge(data_files, tz_list=tz_list)
 
 #clip data to deployment times
 raw_data = copy.copy(merged_data)
-for file_name,name in zip(data_files, data_file_names):
-    if name not in log_data['renamed_filename']:
-        print 'No data in log file, unable to clip file: ', name
+for file_name in np.unique(raw_data.data_file):
+    if file_name not in log_data['renamed_filename']:
+        print 'Filename not found in deployment log, unable to clip file: ', file_name
         continue
 
-    idx = np.where(name==log_data['renamed_filename'])[0]
+    idx = np.where(file_name==log_data['renamed_filename'])[0]
     deploy_start_time = log_dates[idx]
     try:
         deploy_stop_time = log_dates[idx+1] #assumes no gaps in deployment log
     except:
-        print 'no deploy stop time found for file: ', name
+        print 'no deploy stop time found for file: ', file_name
         deploy_stop_time = deploy_start_time + datetime.timedelta(365)
+    outside_mask = ~(raw_data.data_file == file_name)
 
     clip_mask = (raw_data.dates > deploy_start_time) * \
           (raw_data.dates < deploy_stop_time) * \
           (raw_data.data_file == file_name)
-    mask = clip_mask | (raw_data.data_file != file_name)
-    #remove data where mask = True
+
+    mask = clip_mask | outside_mask
     raw_data.apply_mask(mask)
-    print 'Successfully clipped file: ', name
+    print str(np.where(mask==False)[0].size) + ' entries clipped from file: ', file_name
 
 print 'writing raw data file'
 raw_header = header.copy()
@@ -195,17 +204,24 @@ for startdate, stopdate, qarule in zip(start_dates, stop_dates,qarules):
     #for filt in ['data_file','manufacturer','serial_number']:
     #    if qarule[filt] is not '':
     #        exec('mask *= clean_data.'+filt+'!=qarule[filt]')
-
     mask = mask | outside_mask
-    parameters = qarule['apply_to_parameters'].strip()
-    if parameters=='':
-        clean_data.apply_mask(mask)
+    if np.all(mask):
+        print 'No data altered for rule: ', qarule
     else:
-        clean_data.apply_mask(mask, parameters=parameters.split(','))
+        print str(np.where(mask==False)[0].size) + ' entries altered for rule: ', qarule
+        parameters = qarule['apply_to_parameters'].strip()
+        if parameters=='':
+            clean_data.apply_mask(mask)
+        else:
+            clean_data.apply_mask(mask, parameters=parameters.split(','))
 
 #write final file
+print 'writing clean data file'
 clean_header = header.copy()
 clean_header['qa_level']='data corrected according to rules in file ' + os.path.split(qa_rules_file)[-1]
 clean_data.write(clean_data_file, format='csv',disclaimer=disclaimer, metadata=clean_header)
 
 #create plots
+#read in data @todo fix copy.copy problems
+raw_data = sonde.Sonde(raw_data_file)
+clean_data = sonde.Sonde(clean_data_file)
