@@ -1,9 +1,8 @@
 """
-    sonde.formats.solinst
+    sonde.formats.merge
     ~~~~~~~~~~~~~~~~~
 
-    This module implements the Solinst format.
-    The files are in .lev format
+    This module implements the Merge format used by sonde.merge
 
 """
 from __future__ import absolute_import
