@@ -62,6 +62,12 @@ master_parameter_list = {
     }
 
 
+def open(data_file, file_format=None , *args, **kwargs):
+    """
+    Wrapper for Sonde(), just here to make a nicer API
+    """
+    return Sonde(data_file, file_format=None , *args, **kwargs)
+
 
 def Sonde(data_file, file_format=None , *args, **kwargs):
     """
