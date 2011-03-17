@@ -56,19 +56,19 @@ class SondeTestDataset(BaseSondeDataset):
             'water_electrical_conductivity': np.array([-0.   , -0.   ,  8.326,  0.782,  1.964,  0.174]) * sq.mScm,
             'water_dissolved_oxygen_percent_saturation': np.array([  95.8  ,  101.767,   82.465, 102.95 ,  102.094,  109.647]) * pq.percent,
             'water_temperature': np.array([ 23.45,  25.24,  21.34, 25.7 ,  26.  ,  20.38]) * pq.degC,
-            'water_depth_non_vented': np.array([ 1, 1, 1, 1, 1, 1]) * pq.m,
+            'water_depth_non_vented': np.array([ 1, 1, 1, 1, 1, 1]) * sq.mH2O,
             }
 
         self.parameters = {
             'water_temperature' : ('Water Temperature', pq.degC),
             'water_electrical_conductivity' : ('Conductivity(Not Normalized)', sq.mScm),
-            'water_depth_non_vented' : ('Water Surface Elevation (No Atm Pressure Correction)', pq.m),
+            'water_depth_non_vented' : ('Water Surface Elevation (No Atm Pressure Correction)', sq.mH2O),
             'instrument_battery_voltage' : ('Battery Voltage', pq.volt),
             'water_dissolved_oxygen_percent_saturation' : ('Dissolved Oxygen Saturation Concentration', pq.percent),
             }
 
 
-                 
+
 class BaseSondeDataset_Test():
     def setup(self):
         self.dataset = SondeTestDataset()
@@ -100,10 +100,10 @@ class BaseSondeDataset_Test():
 
 
     def test_set_and_get_standard_unit(self):
-        self.dataset.set_standard_unit('water_depth_non_vented', pq.ft)
+        self.dataset.set_standard_unit('water_depth_non_vented', pq.ftH2O)
 
         # make sure the standard unit has been set
-        assert pq.ft == self.dataset.get_standard_unit('water_depth_non_vented')
+        assert pq.ftH2O == self.dataset.get_standard_unit('water_depth_non_vented')
 
         # make sure unit conversion happened
         for value in self.dataset.data["water_depth_non_vented"]:
@@ -112,11 +112,11 @@ class BaseSondeDataset_Test():
 
 
     def test_rescale_parameter_elevation(self):
-        self.dataset.data['water_depth_non_vented'] = np.ones(6) * 3.280839895013123 * pq.ft
+        self.dataset.data['water_depth_non_vented'] = np.ones(6) * 3.280839895013123 * pq.ftH2O
         self.dataset.rescale_parameter('water_depth_non_vented')
 
         for value in self.dataset.data["water_depth_non_vented"]:
-            eq_(value.units, pq.m)
+            eq_(value.units, sq.mH2O)
             assert_almost_equal(value.magnitude,
                                 1)
 
