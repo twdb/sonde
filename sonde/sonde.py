@@ -138,23 +138,28 @@ def autodetect(data_file, filename=None):
     False if unable to determine format
 
     data_file can be either a filename string or a file-like object,
-    if it is a file-like object, you must also pass a file_name string
+    if it is a file-like object, you can pass a file_name string if
+    the file-like object doesn't have a name or filename attribute
+    containing the filename
     """
 
     if type(data_file) == str:
         fid = open(data_file, 'r')
-        file_ext = data_file.split('.')[-1].lower()
     else:
         fid = data_file
-        if filename:
-            file_ext = filename.split('.')[-1].lower()
-        elif hasattr(data_file, 'filename'):
-            file_ext = data_file.filename.split('.')[-1].lower()
 
-    if file_ext=='xls':
+    if not filename:
+        if type(data_file) == str:
+            filename = data_file
+        elif hasattr(data_file, 'name'):
+            filename = data_file.name
+        elif hasattr(data_file, 'filename'):
+            filename = data_file.filename
+
+    file_ext = filename.split('.')[-1].lower()
+
+    if file_ext and file_ext=='xls':
         xls2csv(data_file, fid)
-    elif type(data_file) == str:
-        fid.write(open(data_file).read())
 
     fid.seek(0)
 
@@ -163,46 +168,35 @@ def autodetect(data_file, filename=None):
 
     if line1.lower().find('greenspan')!=-1:
         return 'greenspan'
-
     if line1.lower().find('macrocdt')!=-1:
         return 'macroctd'
-
     if line1.lower().find('minisonde4a')!=-1:
         return 'hydrotech'
-
     if line1.lower().find('data file for datalogger.')!=-1:
         return 'solinst'
-
     if line1.lower().find('log file name')!=-1:
         return 'hydrolab'
-
     if line1.lower().find('pysonde csv format')!=-1:
         return 'generic'
 
     #read second line
     line2 = fid.readline()
-
     if line2.lower().find('log file name')!=-1: #binary junk in first line
         return 'hydrotech'
 
     #check for ysi
-    if line1[0]=='A':
+    if line1[0] == 'A':
         return 'ysi_binary' #binary
-
-    if line1.find('=')!=-1:
+    if line1.find('=') != -1:
         return 'ysi_text' #txt file
-
-    if file_ext=='cdf':
+    if file_ext and file_ext == 'cdf':
         return 'ysi_cdf' #cdf file
 
     #eureka try and detect degree symbol
-    #print line2
-    if line2.find('\xb0')!=-1:
+    if line2.find('\xb0') !=- 1:
         return 'eureka'
-
     else:
         return False
-
 
 
 def xls2csv(data_file, csv_file):
@@ -215,7 +209,6 @@ def xls2csv(data_file, csv_file):
 
     if type(csv_file) == str:
         bc = open(csv_file, 'w')
-
     else:
         bc = csv_file
 

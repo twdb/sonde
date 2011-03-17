@@ -33,8 +33,8 @@ class YSIDataset(sonde.BaseSondeDataset):
     object that represents the timezone of the timestamps in the
     binary file.
     """
-    def __init__(self, data_file, tzinfo=None, param_file=None):
-        self.file_format = 'ysi'
+    def __init__(self, data_file, tzinfo=None, param_file=None, format=None):
+        self.file_format = sonde.autodetect(data_file) or 'ysi'
         self.manufacturer = 'ysi'
         self.data_file = data_file
         self.param_file = param_file
@@ -80,7 +80,7 @@ class YSIDataset(sonde.BaseSondeDataset):
                     'ppt' : sq.psu,
                     }
 
-        if self.data_file.split('.')[-1]=='dat':
+        if self.file_format.split('_')[-1]=='binary':
             ysi_data = YSIReaderBin(self.data_file, self.default_tzinfo, self.param_file)
             self.format_parameters = {
                 'log_file_name': ysi_data.log_file_name,
@@ -93,8 +93,8 @@ class YSIDataset(sonde.BaseSondeDataset):
                 'first_sample_time': ysi_data.first_sample_time,
                 'pad2' : ysi_data.pad2
                 }
-            self.site_name =ysi_data.site_name
-            self.serial_number =ysi_data.serial_number
+            self.site_name = ysi_data.site_name
+            self.serial_number = ysi_data.serial_number
 
         else:
             ysi_data = YSIReaderTxt(self.data_file, self.default_tzinfo, self.param_file)
@@ -160,7 +160,6 @@ class YSIReaderTxt:
         """
         if type(data_file) == str:
             fid = open(data_file, 'r')
-
         else:
             fid = data_file
 
@@ -335,13 +334,14 @@ class YSIReaderBin:
 
         else:
             fid = ysi_file
+            fid.seek(0)
 
+        import pdb; pdb.set_trace()
         record_type = []
         self.num_params=0
 
         record_type = fid.read(1)
         while record_type:
-
             if record_type == 'A':
                 fmt = '<HLH16s32s6sLll36s'
                 fmt_size = struct.calcsize(fmt)
@@ -350,7 +350,6 @@ class YSIReaderBin:
                                  self.logging_interval, self.begin_log_time, \
                                  self.first_sample_time, self.pad2 \
                                  = struct.unpack(fmt, fid.read(fmt_size))
-
                 self.site_name = self.site_name.strip('\x00')
                 self.serial_number = self.serial_number.strip('\x00')
                 self.log_file_name = self.site_name
