@@ -91,7 +91,7 @@ def Sonde(data_file, file_format=None , *args, **kwargs):
     if not file_format:
         file_format = autodetect(data_file)
 
-    if file_format.lower() == 'ysi':
+    if 'ysi' in file_format.lower():
         from sonde.formats.ysi import YSIDataset
         return YSIDataset(data_file, *args, **kwargs)
 
@@ -131,19 +131,29 @@ def Sonde(data_file, file_format=None , *args, **kwargs):
         raise NotImplementedError, "file format '%s' is not supported" % \
                                    (file_format,)
 
-def autodetect(data_file):
+def autodetect(data_file, filename=None):
     """
     autodetect file_format based on file
     return file_format string if successful or
     False if unable to determine format
+
+    data_file can be either a filename string or a file-like object,
+    if it is a file-like object, you must also pass a file_name string
     """
 
-    fid = StringIO()
-    file_ext = data_file.split('.')[-1].lower()
+    if type(data_file) == str:
+        fid = open(data_file, 'r')
+        file_ext = data_file.split('.')[-1].lower()
+    else:
+        fid = data_file
+        if filename:
+            file_ext = filename.split('.')[-1].lower()
+        elif hasattr(data_file, 'filename'):
+            file_ext = data_file.filename.split('.')[-1].lower()
 
     if file_ext=='xls':
         xls2csv(data_file, fid)
-    else:
+    elif type(data_file) == str:
         fid.write(open(data_file).read())
 
     fid.seek(0)
@@ -177,13 +187,13 @@ def autodetect(data_file):
 
     #check for ysi
     if line1[0]=='A':
-        return 'ysi' #binary
+        return 'ysi_binary' #binary
 
     if line1.find('=')!=-1:
-        return 'ysi' #txt file
+        return 'ysi_text' #txt file
 
     if file_ext=='cdf':
-        return 'ysi' #cdf file
+        return 'ysi_cdf' #cdf file
 
     #eureka try and detect degree symbol
     #print line2
