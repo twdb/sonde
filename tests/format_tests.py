@@ -13,14 +13,19 @@ from sonde.timezones import cst, cdt
 
 
 def test_files():
-    test_file_paths = glob.glob('./*_test_files/*_test.txt')
+    test_format_paths = glob.glob('./*_test_files/')
 
-    for test_file_path in test_file_paths:
-        tested_file_extension = test_file_path.split('_')[-2]
-        tested_file_path = '.'.join([test_file_path.rsplit('_' + tested_file_extension, 1)[0],
-                                     tested_file_extension])
+    for test_format_path in test_format_paths:
+        test_file_paths = glob.glob(test_format_path + '/*_test.txt')
+        for i, test_file_path in enumerate(test_file_paths):
+            tested_file_extension = test_file_path.split('_')[-2]
+            tested_file_path = '.'.join([test_file_path.rsplit('_' + tested_file_extension, 1)[0],
+                                         tested_file_extension])
 
-        yield check_file, test_file_path, tested_file_path
+            yield check_file, test_file_path, tested_file_path
+
+            test_file_descriptor = open(test_file_path)
+            yield check_file, test_file_descriptor, tested_file_path
 
 
 def check_file(test_file_path, sonde_file_path):
