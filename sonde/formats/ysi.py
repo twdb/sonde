@@ -336,6 +336,7 @@ class YSIReaderBin:
             fid = ysi_file
             fid.seek(0)
 
+
         record_type = []
         self.num_params=0
 

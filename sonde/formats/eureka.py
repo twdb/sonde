@@ -9,19 +9,13 @@
 from __future__ import absolute_import
 
 import datetime
-import pkg_resources
-import re
-from StringIO import StringIO
 import xlrd
-import csv
-
 import numpy as np
 import quantities as pq
 
-from sonde import util
 from .. import sonde
-from .. import quantities as sq
-from ..timezones import cdt, cst
+from sonde import util
+from sonde import quantities as sq
 
 class EurekaDataset(sonde.BaseSondeDataset):
     """
@@ -34,6 +28,8 @@ class EurekaDataset(sonde.BaseSondeDataset):
         self.manufacturer = 'eureka'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
+        self.data = dict()
+        self.dates = []
         super(EurekaDataset, self).__init__()
 
 
@@ -70,7 +66,6 @@ class EurekaDataset(sonde.BaseSondeDataset):
 
         # determine parameters provided and in what units
         self.parameters = dict()
-        self.data = dict()
 
         for parameter in eureka_data.parameters:
             try:
@@ -114,8 +109,9 @@ class EurekaReader:
     """
     def __init__(self, data_file, tzinfo=None):
         self.default_tzinfo = tzinfo
-        self.num_params = 0
+        self.header_lines = []
         self.parameters = []
+        self.site_name = ''
         self.file_ext = data_file.split('.')[-1].lower()
 
         if self.file_ext =='xls':
@@ -157,7 +153,6 @@ class EurekaReader:
         """
 
         fid.seek(0)
-        self.header_lines = []
 
         buf = fid.readline()
 

@@ -11,6 +11,8 @@ from sonde import Sonde
 from sonde import quantities as sq
 from sonde.timezones import cst, cdt
 
+# global tz
+tz = None
 
 def test_files():
     test_file_paths = glob.glob('./*_test_files/*_test.txt')
@@ -28,11 +30,9 @@ def test_files():
 
 def check_file(test_file_path, sonde_file_path):
     global tz
-    tz = None
     test_file = ConfigObj(test_file_path, unrepr=True)
 
     file_format = test_file['header']['format']
-
 
     # force cst, as the python naive datetime automatically converts
     # to cst which tends to screw things up
