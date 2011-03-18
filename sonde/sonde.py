@@ -7,20 +7,22 @@
 """
 from __future__ import absolute_import
 
+import csv
 import datetime
 from exceptions import NotImplementedError
+import os
 import re
+import tempfile
+from StringIO import StringIO
 
 import numpy as np
-import os
 import quantities as pq
 import pytz
 import seawater.csiro
 import xlrd
-import csv
-from StringIO import StringIO
 
 from sonde import quantities as sq
+from sonde import util
 from sonde.timezones import cst,cdt,UTCStaticOffset
 
 
@@ -159,7 +161,7 @@ def autodetect(data_file, filename=None):
     file_ext = filename.split('.')[-1].lower()
 
     if file_ext and file_ext=='xls':
-        xls2csv(data_file, fid)
+        fid = util.xls_to_csv(data_file)
 
     fid.seek(0)
 
@@ -198,31 +200,6 @@ def autodetect(data_file, filename=None):
     else:
         return False
 
-
-def xls2csv(data_file, csv_file):
-    """
-    Converts excel files to csv equivalents
-    assumes all data is in first worksheet
-    """
-    wb = xlrd.open_workbook(data_file)
-    sh = wb.sheet_by_index(0)
-
-    if type(csv_file) == str:
-        bc = open(csv_file, 'w')
-    else:
-        bc = csv_file
-
-    bcw = csv.writer(bc,csv.excel)
-
-    for row in range(sh.nrows):
-        this_row = []
-        for col in range(sh.ncols):
-            val = sh.cell_value(row, col)
-            if isinstance(val, unicode):
-                val = val.encode('utf8')
-            this_row.append(val)
-
-        bcw.writerow(this_row)
 
 def find_tz(dt):
     """

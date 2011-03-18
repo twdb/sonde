@@ -135,13 +135,12 @@ class GreenspanReader:
         self.format_version = format_version
         self.num_params = 0
         self.parameters = []
-        file_buf = StringIO()
         self.file_ext = data_file.split('.')[-1].lower()
 
         if self.file_ext =='xls':
-            self.xls2csv(data_file, file_buf)
+            file_buf = open(util.xls_to_csv(data_file), 'rb')
         else:
-            file_buf.write(open(data_file, 'r').read())
+            file_buf = open(data_file, 'r')
 
         if not self.format_version:
             self.format_version = self.detect_format_version(file_buf)
@@ -150,33 +149,6 @@ class GreenspanReader:
 
         if tzinfo:
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
-
-
-    def xls2csv(self, data_file, csv_file):
-        """
-        Converts excel files to csv equivalents
-        assumes all data is in first worksheet
-        """
-        wb = xlrd.open_workbook(data_file)
-        sh = wb.sheet_by_index(0)
-
-        if type(csv_file) == str:
-            bc = open(csv_file, 'w')
-
-        else:
-            bc = csv_file
-
-        bcw = csv.writer(bc,csv.excel)
-
-        for row in range(sh.nrows):
-            this_row = []
-            for col in range(sh.ncols):
-                val = sh.cell_value(row, col)
-                if isinstance(val, unicode):
-                    val = val.encode('utf8')
-                this_row.append(val)
-
-            bcw.writerow(this_row)
 
 
     def detect_format_version(self, data_file):
@@ -227,7 +199,6 @@ class GreenspanReader:
         """
         if type(data_file) == str:
             fid = open(data_file, 'r')
-
         else:
             fid = data_file
 
