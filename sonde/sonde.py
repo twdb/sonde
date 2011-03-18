@@ -8,7 +8,6 @@
 from __future__ import absolute_import
 
 import datetime
-from exceptions import NotImplementedError
 import os
 
 import numpy as np
