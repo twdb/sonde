@@ -21,12 +21,13 @@ from .. import sonde
 from .. import quantities as sq
 from ..timezones import cdt, cst
 
+
 class MergeDataset(sonde.BaseSondeDataset):
     """
-    Dataset object that represents the data merged from multiple data files
-    using sonde.merge
-    timezone is default.timezone. parameter names/units are from the master list
-    data is a dict containing all the data with param names and units.
+    Dataset object that represents the data merged from multiple data
+    files using sonde.merge timezone is default.timezone. parameter
+    names/units are from the master list data is a dict containing all
+    the data with param names and units.
     """
     def __init__(self, metadata, paramdata):
         idx = self._indices_duplicate_data(metadata['dates'], paramdata)
@@ -44,14 +45,9 @@ class MergeDataset(sonde.BaseSondeDataset):
             self.parameters[param] = param
             self.data[param] = paramdata[param][idx][sort_idx]
 
-        #self.format_parameters = {
-        #    'serial_number' : metadata['instrument_serial_number'][idx][sort_idx]
-        #    }
-
-
         self.dates = metadata['dates'][idx][sort_idx]
-        #I don't think the following line is needed
-        #super(MergeDataset, self).__init__()
+        # I don't think the following line is needed
+        # super(MergeDataset, self).__init__()
 
     def _indices_duplicate_data(self, dates, data):
         """
@@ -64,8 +60,8 @@ class MergeDataset(sonde.BaseSondeDataset):
             dtypes.append('f8')
             names.append(param)
 
-        tmp_data = np.zeros(dates.size, dtype=np.dtype({'names':names,
-                                                  'formats':dtypes}))
+        tmp_data = np.zeros(dates.size, dtype=np.dtype({'names': names,
+                                                        'formats': dtypes}))
         tmp_data['datetime'] = dates
         for param in data.keys():
             tmp_data[param] = data[param]

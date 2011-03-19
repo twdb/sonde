@@ -18,6 +18,7 @@ from .. import sonde
 from .. import quantities as sq
 from ..timezones import cdt, cst
 
+
 class MacroctdDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a macroctd cv or xls
@@ -31,21 +32,20 @@ class MacroctdDataset(sonde.BaseSondeDataset):
         self.default_tzinfo = tzinfo
         super(MacroctdDataset, self).__init__()
 
-
     def _read_data(self):
         """
         Read the macroctd data file
         """
-        param_map = {'Temperature' : 'water_temperature',
-                     'EC' : 'water_electrical_conductivity',
-                     'Pressure' : 'water_depth_non_vented',
-                     'Battery' : 'instrument_battery_voltage',
+        param_map = {'Temperature': 'water_temperature',
+                     'EC': 'water_electrical_conductivity',
+                     'Pressure': 'water_depth_non_vented',
+                     'Battery': 'instrument_battery_voltage',
                      }
 
-        unit_map = {'degC' : pq.degC,
-                    'mS/cm' : sq.mScm,
-                    'psi' : pq.psi,
-                    'volts' : pq.volt,
+        unit_map = {'degC': pq.degC,
+                    'mS/cm': sq.mScm,
+                    'psi': pq.psi,
+                    'volts': pq.volt,
                     }
 
         macroctd_data = MacroctdReader(self.data_file, self.default_tzinfo)
@@ -61,16 +61,16 @@ class MacroctdDataset(sonde.BaseSondeDataset):
                 #ignore params that have no data
                 if not np.all(np.isnan(parameter.data)):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
-                    self.data[param_map[parameter.name]] = parameter.data * punit
+                    self.data[param_map[parameter.name]] = parameter.data * \
+                                                           punit
             except:
                 print 'Un-mapped Parameter/Unit Type'
                 print 'Macroctd Parameter Name:', parameter.name
                 print 'Macroctd Unit Name:', parameter.unit
                 raise
 
-
         self.format_parameters = {
-            'header_lines' : macroctd_data.header_lines,
+            'header_lines': macroctd_data.header_lines,
             }
 
         self.serial_number = macroctd_data.serial_number
@@ -96,7 +96,6 @@ class MacroctdReader:
         if tzinfo:
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
-
     def read_macroctd(self, data_file):
         """
         Open and read a Macroctd file.
@@ -112,11 +111,11 @@ class MacroctdReader:
         self.serial_number = buf.split(',')[3]
 
         while buf:
-            if buf[0:9]=='@AVERAGES':
+            if buf[0:9] == '@AVERAGES':
                 break
 
-            if buf[0:11]=='@DEPLOYMENT':
-                self.site_name = buf.split(None,1)[-1].strip('"\r\n')
+            if buf[0:11] == '@DEPLOYMENT':
+                self.site_name = buf.split(None, 1)[-1].strip('"\r\n')
 
             self.header_lines.append(buf)
             buf = fid.readline()
@@ -129,13 +128,13 @@ class MacroctdReader:
 
         self.dates = np.array(
             [datetime.datetime.strptime(d + t, '%m/%d/%y%H:%M')
-             for d,t in zip(data['Date'],data['Time'])]
+             for d, t in zip(data['Date'], data['Time'])]
             )
 
         #atm pressure correction for macroctd
         data['Pressure'] -= 14.7
         #assign param & unit names
-        for param,unit in zip(params,units):
+        for param, unit in zip(params, units):
             self.num_params += 1
             self.parameters.append(Parameter(param.strip(), unit.strip()))
 

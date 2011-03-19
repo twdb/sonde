@@ -186,16 +186,16 @@ def autodetect(data_file, filename=None):
 
     #read second line
     line2 = fid.readline()
-    if line2.lower().find('log file name') != -1: #binary junk in first line
+    if line2.lower().find('log file name') != -1:  # binary junk in first line
         return 'hydrotech'
 
     #check for ysi
     if line1[0] == 'A':
-        return 'ysi_binary' #binary
+        return 'ysi_binary'  # binary
     if line1.find('=') != -1:
-        return 'ysi_text' #txt file
+        return 'ysi_text'  # txt file
     if file_ext and file_ext == 'cdf':
-        return 'ysi_cdf' #cdf file
+        return 'ysi_cdf'  # cdf file
 
     #eureka try and detect degree symbol
     if line2.find('\xb0') != -1:
@@ -249,8 +249,7 @@ def merge(file_list, tz_list=None):
         try:
             if tz == 'auto':
                 tmp = Sonde(file_name)
-                #utc_offset = default_utc_static_offset + int(default_timezone.dst(tmp.setup_time).seconds/3600)
-                #tz = UTCStaticOffset(utc_offset)
+                # tz = UTCStaticOffset(utc_offset)
                 tz = find_tz(tmp.setup_time)
             elif isinstance(tz, str):
                 tz = UTCStaticOffset(int(tz.lower().strip('utc')))
@@ -462,7 +461,6 @@ class BaseSondeDataset(object):
         write_data['datetime'] = np.array(
             [datetime.datetime.strftime(dt, '%Y/%m/%d %H:%M:%S')
              for dt in dates])
-
 
         for key, val in metadata.items():
             if isinstance(val, np.ndarray):

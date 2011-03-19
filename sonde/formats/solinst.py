@@ -22,6 +22,7 @@ from .. import sonde
 from .. import quantities as sq
 from ..timezones import cdt, cst
 
+
 class SolinstDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a solinst cv or xls
@@ -35,24 +36,23 @@ class SolinstDataset(sonde.BaseSondeDataset):
         self.default_tzinfo = tzinfo
         super(SolinstDataset, self).__init__()
 
-
     def _read_data(self):
         """
         Read the solinst data file
         """
-        param_map = {'TEMPERATURE' : 'water_temperature',
-                     'Temperature' : 'water_temperature',
-                     '1: Conductivity' : 'water_specific_conductance',
-                     'LEVEL' : 'water_depth_non_vented',
-                     'Level' : 'water_depth_non_vented',
-                     'pressure?' : 'air_pressure',
+        param_map = {'TEMPERATURE': 'water_temperature',
+                     'Temperature': 'water_temperature',
+                     '1: Conductivity': 'water_specific_conductance',
+                     'LEVEL': 'water_depth_non_vented',
+                     'Level': 'water_depth_non_vented',
+                     'pressure?': 'air_pressure',
                      }
 
-        unit_map = {'Deg C' : pq.degC,
-                    'DEG C' : pq.degC,
-                    'm' : sq.mH2O,
+        unit_map = {'Deg C': pq.degC,
+                    'DEG C': pq.degC,
+                    'm': sq.mH2O,
                     'ft': sq.ftH2O,
-                    'mS/cm' : sq.mScm,
+                    'mS/cm': sq.mScm,
                     }
 
         solinst_data = SolinstReader(self.data_file, self.default_tzinfo)
@@ -68,7 +68,8 @@ class SolinstDataset(sonde.BaseSondeDataset):
                 #ignore params that have no data
                 if not np.all(np.isnan(parameter.data)):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
-                    self.data[param_map[parameter.name]] = parameter.data * punit
+                    self.data[param_map[parameter.name]] = parameter.data * \
+                                                           punit
             except:
                 print 'Un-mapped Parameter/Unit Type'
                 print 'Solinst Parameter Name:', parameter.name
@@ -76,12 +77,13 @@ class SolinstDataset(sonde.BaseSondeDataset):
                 raise
 
         self.format_parameters = {
-            'project_id' : solinst_data.project_id,
+            'project_id': solinst_data.project_id,
             }
 
         self.site_name = solinst_data.site_name
         self.serial_number = solinst_data.serial_number
         self.dates = solinst_data.dates
+
 
 class SolinstReader:
     """
@@ -116,71 +118,76 @@ class SolinstReader:
         units = []
         start_reading = False
         while buf:
-            if buf=='[Instrument info from data header]':
+            if buf == '[Instrument info from data header]':
                 start_reading = True
 
             if not start_reading:
                 buf = fid.readline().strip(' \r\n')
                 continue
 
-            if buf=='[Data]':
+            if buf == '[Data]':
                 self.num_rows = int(fid.readline().strip(' \r\n'))
                 break
 
             fields = buf.split('=', 1)
 
-            if fields[0].strip()=='Instrument type':
+            if fields[0].strip() == 'Instrument type':
                 self.model = fields[1].strip()
 
-            if fields[0].strip()=='Serial number':
-                self.serial_number = fields[1].strip('. ').split()[0].split('-')[-1]
+            if fields[0].strip() == 'Serial number':
+                self.serial_number = fields[1].strip('. ').split()[0]\
+                                     .split('-')[-1]
 
-            if fields[0].strip()=='Instrument number':
+            if fields[0].strip() == 'Instrument number':
                 self.project_id = fields[1].strip()
 
-            if fields[0].strip()=='Location':
+            if fields[0].strip() == 'Location':
                 self.site_name = fields[1].strip()
 
-            if fields[0].strip()=='Identification':
+            if fields[0].strip() == 'Identification':
                 params.append(fields[1])
                 buf = fid.readline().strip(' \r\n')
                 fields = buf.split('=', 1)
-                if fields[0].strip()=='Unit':
+                if fields[0].strip() == 'Unit':
                     units.append(fields[1].strip())
-                elif fields[0].strip()=='Reference':
-                    #assumes unit field is seperate by at least two spaces. single
-                    #space is considered part of unit name
-                    units.append(re.sub('\s{1,} ', ',', fields[1]).split(',')[-1])
+                elif fields[0].strip() == 'Reference':
+                    # assumes unit field is seperate by at least two
+                    # spaces; single space is considered part of unit
+                    # name
+                    units.append(re.sub('\s{1,} ', ',',
+                                        fields[1]).split(',')[-1])
 
             buf = fid.readline().strip(' \r\n')
 
         #skip over rest of header
         #while buf:
-        #    if buf=='[Data]':
+        #    if buf == '[Data]':
         #        self.num_rows = int(fid.readline().strip(' \r\n'))
         #        break
         #
         #    buf = fid.readline().strip(' \r\n')
 
-        fields = ['Date','Time'] + params
+        fields = ['Date', 'Time'] + params
 
         #below command is skipping last line of data
         #data = np.genfromtxt(fid, dtype=None, names=fields, skip_footer=1)
         buf = fid.read()
-        data = np.genfromtxt(StringIO(buf.split('END')[0]), dtype=None, names=fields)
+        data = np.genfromtxt(StringIO(buf.split('END')[0]),
+                             dtype=None, names=fields)
 
         self.dates = np.array(
             [datetime.datetime.strptime(d + t, '%Y/%m/%d%H:%M:%S.0')
-             for d,t in zip(data['Date'],data['Time'])]
+             for d, t in zip(data['Date'], data['Time'])]
             )
 
         #assign param & unit names
-        for param,unit in zip(params,units):
+        for param, unit in zip(params, units):
             self.num_params += 1
             self.parameters.append(Parameter(param.strip(), unit.strip()))
 
         for ii in range(self.num_params):
-            param = re.sub('[?.:]', '', self.parameters[ii].name).replace(' ','_')
+            param = re.sub('[?.:]', '',
+                           self.parameters[ii].name).replace(' ', '_')
             self.parameters[ii].data = data[param]
 
 

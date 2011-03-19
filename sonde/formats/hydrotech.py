@@ -24,6 +24,7 @@ from .. import sonde
 from .. import quantities as sq
 from ..timezones import cdt, cst
 
+
 class HydrotechDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a hydrotech txt
@@ -41,20 +42,20 @@ class HydrotechDataset(sonde.BaseSondeDataset):
         """
         Read the hydrotech data file
         """
-        param_map = {'Temp' : 'water_temperature',
-                     'SpCond' : 'water_specific_conductance',
-                     'Sal' : 'seawater_salinity',
-                     'Dep25' : 'water_depth_non_vented',
-                     'IBatt' : 'instrument_battery_voltage',
+        param_map = {'Temp': 'water_temperature',
+                     'SpCond': 'water_specific_conductance',
+                     'Sal': 'seawater_salinity',
+                     'Dep25': 'water_depth_non_vented',
+                     'IBatt': 'instrument_battery_voltage',
                      }
 
-        unit_map = {'\xf8C' : pq.degC,
-                    'mS/cm' : sq.mScm,
-                    'uS/cm' : sq.uScm,
-                    'mg/l' : sq.mgl,
-                    'meters' : sq.mH2O,
-                    'Volts' : pq.volt,
-                    'ppt' : sq.psu,
+        unit_map = {'\xf8C': pq.degC,
+                    'mS/cm': sq.mScm,
+                    'uS/cm': sq.uScm,
+                    'mg/l': sq.mgl,
+                    'meters': sq.mH2O,
+                    'Volts': pq.volt,
+                    'ppt': sq.psu,
                     }
 
         hydrotech_data = HydrotechReader(self.data_file, self.default_tzinfo)
@@ -70,7 +71,8 @@ class HydrotechDataset(sonde.BaseSondeDataset):
                 #ignore params that have no data
                 if not np.all(np.isnan(parameter.data)):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
-                    self.data[param_map[parameter.name]] = parameter.data * punit
+                    self.data[param_map[parameter.name]] = parameter.data * \
+                                                           punit
             except:
                 print 'Un-mapped Parameter/Unit Type'
                 print 'Hydrotech Parameter Name:', parameter.name
@@ -78,11 +80,11 @@ class HydrotechDataset(sonde.BaseSondeDataset):
                 raise
 
         self.format_parameters = {
-            'model' : hydrotech_data.model,
-            'log_file_name' : hydrotech_data.log_file_name,
-            'logging_interval' : hydrotech_data.logging_interval,
-            'sensor_warmup_time' : hydrotech_data.sensor_warmup_time,
-            'circltr_warmup_time' : hydrotech_data.circltr_warmup_time,
+            'model': hydrotech_data.model,
+            'log_file_name': hydrotech_data.log_file_name,
+            'logging_interval': hydrotech_data.logging_interval,
+            'sensor_warmup_time': hydrotech_data.sensor_warmup_time,
+            'circltr_warmup_time': hydrotech_data.circltr_warmup_time,
             }
 
         self.serial_number = hydrotech_data.serial_number
@@ -91,6 +93,7 @@ class HydrotechDataset(sonde.BaseSondeDataset):
         self.stop_time = hydrotech_data.stop_time
 
         self.dates = hydrotech_data.dates
+
 
 class HydrotechReader:
     """
@@ -117,11 +120,12 @@ class HydrotechReader:
         fid = open(data_file)
         file_string = fid.read()
         #change no data string from # to NaN
-        file_string = re.sub('#', 'NaN' , file_string)
+        file_string = re.sub('#', 'NaN', file_string)
         #remove quotes
-        file_string = re.sub('"', '' , file_string)
+        file_string = re.sub('"', '', file_string)
         #prepend # to non data lines
-        file_string = re.sub(re.compile('^(\D)',re.MULTILINE), '#\\1' , file_string)
+        file_string = re.sub(re.compile('^(\D)', re.MULTILINE),
+                             '#\\1', file_string)
         #remove junk binary characters
 
         return StringIO(file_string)
@@ -136,7 +140,6 @@ class HydrotechReader:
         else:
             fid = data_file
 
-
         fid.seek(0)
         fmt = '%m%d%y%H%M%S'
         strp = '#,\r\n'
@@ -150,7 +153,7 @@ class HydrotechReader:
         if 'MiniSonde' in buf:
             self.model, self.serial_number = buf.split()
         else:
-            self.model =''
+            self.model = ''
             self.serial_number = ''
 
         self.log_file_name = fid.readline().strip(strp).split(':')[-1].strip()
@@ -160,22 +163,27 @@ class HydrotechReader:
 
         d = fid.readline().strip(strp).split(':')[-1].strip()
         t = fid.readline().strip(strp).split(':')[-1].strip()
-        self.setup_time = datetime.datetime.strptime(d+t, fmt)
+        self.setup_time = datetime.datetime.strptime(d + t, fmt)
         d = fid.readline().strip(strp).split(':')[-1].strip()
         t = fid.readline().strip(strp).split(':')[-1].strip()
-        self.start_time = datetime.datetime.strptime(d+t, fmt)
+        self.start_time = datetime.datetime.strptime(d + t, fmt)
         d = fid.readline().strip(strp).split(':')[-1].strip()
         t = fid.readline().strip(strp).split(':')[-1].strip()
-        self.stop_time = datetime.datetime.strptime(d+t, fmt)
+        self.stop_time = datetime.datetime.strptime(d + t, fmt)
         interval = fid.readline().strip(strp).split(':')[-1].strip()
         sensor_warmup = fid.readline().strip(strp).split(':')[-1].strip()
         circltr_warmup = fid.readline().strip(strp).split(':')[-1].strip()
-        self.logging_interval = int(interval[0:2])*3600 + int(interval[2:4])*60 + int(interval[4:6])
-        self.sensor_warmup_time = int(sensor_warmup[0:2])*3600 + int(sensor_warmup[2:4])*60 + int(sensor_warmup[4:6])
-        self.circltr_warmup_time = int(circltr_warmup[0:2])*3600 + int(circltr_warmup[2:4])*60 + int(circltr_warmup[4:6])
+        self.logging_interval = int(interval[0:2]) * 3600 + \
+                                int(interval[2:4]) * 60 + int(interval[4:6])
+        self.sensor_warmup_time = int(sensor_warmup[0:2]) * 3600 + \
+                                  int(sensor_warmup[2:4]) * 60 + \
+                                  int(sensor_warmup[4:6])
+        self.circltr_warmup_time = int(circltr_warmup[0:2]) * 3600 + \
+                                   int(circltr_warmup[2:4]) * 60 + \
+                                   int(circltr_warmup[4:6])
 
         buf = fid.readline().strip(strp)
-        while buf[0:4]!='Date':
+        while buf[0:4] != 'Date':
             buf = fid.readline().strip(strp)
 
         fields = buf.split(',')
@@ -190,23 +198,24 @@ class HydrotechReader:
         field_names = []
         ncol = 0
         for field in fields:
-            if field!='':
+            if field != '':
                 cols.append(ncol)
                 field_names.append(field)
 
             ncol += 1
 
+        data = np.genfromtxt(fid, delimiter=',', dtype=None, names=field_names,
+                             usecols=cols, missing_values='NaN',
+                             filling_values=np.nan)
 
-        data = np.genfromtxt(fid, delimiter=',', dtype=None, names=field_names, usecols = cols,  missing_values='NaN', filling_values=np.nan)
-
-        if len(data['Date'][0].split('/')[-1])==2:
+        if len(data['Date'][0].split('/')[-1]) == 2:
             fmt = '%m/%d/%y%H:%M:%S'
         else:
             fmt = '%m/%d/%Y%H:%M:%S'
 
         self.dates = np.array(
             [datetime.datetime.strptime(d + t, fmt)
-             for d,t in zip(data['Date'],data['Time'])]
+             for d, t in zip(data['Date'], data['Time'])]
             )
 
         if tzinfo:
@@ -215,14 +224,15 @@ class HydrotechReader:
             self.stop_time = self.stop_time.replace(tzinfo=tzinfo)
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
-        for param,unit in zip(params,units):
-            if param!='':
+        for param, unit in zip(params, units):
+            if param != '':
                 self.num_params += 1
                 self.parameters.append(Parameter(param, unit))
 
         for ii in range(self.num_params):
             param = self.parameters[ii].name
             self.parameters[ii].data = data[param]
+
 
 class Parameter:
     """

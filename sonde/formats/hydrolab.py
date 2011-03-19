@@ -21,6 +21,7 @@ from .. import sonde
 from .. import quantities as sq
 from ..timezones import cdt, cst
 
+
 class HydrolabDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a Hydrolab txt
@@ -37,39 +38,38 @@ class HydrolabDataset(sonde.BaseSondeDataset):
         self.default_tzinfo = tzinfo
         super(HydrolabDataset, self).__init__()
 
-
     def _read_data(self):
         """
         Read the Hydrolab txt data file
         """
-        param_map = {'Temp' : 'water_temperature',
-                     'Conductivity' : 'water_electrical_conductivity',
-                     'SpCond' : 'water_specific_conductance',
-                     'Salin' : 'seawater_salinity',
-                     'DO % Sat' : 'water_dissolved_oxygen_percent_saturation',
-                     'DO mg/l' : 'water_dissolved_oxygen_concentration',
-                     'pH' : 'water_ph',
-                     'Depth' : 'water_depth_non_vented',
-                     'Level' : 'water_depth_non_vented',
-                     'Batt' : 'instrument_battery_voltage',
-                     'Turb' : 'water_turbidity',
+        param_map = {'Temp': 'water_temperature',
+                     'Conductivity': 'water_electrical_conductivity',
+                     'SpCond': 'water_specific_conductance',
+                     'Salin': 'seawater_salinity',
+                     'DO % Sat': 'water_dissolved_oxygen_percent_saturation',
+                     'DO mg/l': 'water_dissolved_oxygen_concentration',
+                     'pH': 'water_ph',
+                     'Depth': 'water_depth_non_vented',
+                     'Level': 'water_depth_non_vented',
+                     'Batt': 'instrument_battery_voltage',
+                     'Turb': 'water_turbidity',
                      'Redox': 'NotImplemented',
                      }
 
-        unit_map = {'deg C' : pq.degC,
-                    'deg F' : pq.degF,
-                    'deg K' : pq.degK,
-                    'mS/cm' : sq.mScm,
-                    'uS/cm' : sq.uScm,
-                    '% Sat' : pq.percent,
-                    'mg/l' : sq.mgl,
-                    'units' : pq.dimensionless,
-                    'meters' : sq.mH2O,
-                    'feet' : sq.ftH2O,
-                    'volts' : pq.volt,
-                    'ppt' : sq.psu,
-                    'NTU' : sq.ntu,
-                    'mV'  : 'NotImplemented',
+        unit_map = {'deg C': pq.degC,
+                    'deg F': pq.degF,
+                    'deg K': pq.degK,
+                    'mS/cm': sq.mScm,
+                    'uS/cm': sq.uScm,
+                    '% Sat': pq.percent,
+                    'mg/l': sq.mgl,
+                    'units': pq.dimensionless,
+                    'meters': sq.mH2O,
+                    'feet': sq.ftH2O,
+                    'volts': pq.volt,
+                    'ppt': sq.psu,
+                    'NTU': sq.ntu,
+                    'mV': 'NotImplemented',
                     }
 
         hydrolab_data = HydrolabReader(self.data_file, self.default_tzinfo)
@@ -85,7 +85,8 @@ class HydrolabDataset(sonde.BaseSondeDataset):
                 #ignore params that have no data
                 if not np.all(np.isnan(parameter.data)):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
-                    self.data[param_map[parameter.name]] = parameter.data * punit
+                    self.data[param_map[parameter.name]] = parameter.data \
+                                                           * punit
             except:
                 print 'Un-mapped Parameter/Unit Type'
                 print 'Hydrolab Parameter Name:', parameter.name
@@ -126,7 +127,6 @@ class HydrolabReader:
             self.stop_time = self.stop_time.replace(tzinfo=tzinfo)
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
-
     def read_hydrolab(self, hydrolab_file):
         """
         Open and read a Hydrolab txt file.
@@ -158,10 +158,14 @@ class HydrolabReader:
         # are always MMDDYY & HHMMSS which is true for the sample of
         # files inspected
         fmt = '%m%d%y%H%M%S'
-        self.setup_time = datetime.datetime.strptime(setup_date + setup_time, fmt)
-        self.start_time = datetime.datetime.strptime(start_date + start_time, fmt)
+        self.setup_time = datetime.datetime.strptime(setup_date + setup_time,
+                                                     fmt)
+        self.start_time = datetime.datetime.strptime(start_date + start_time,
+                                                     fmt)
         self.stop_time = datetime.datetime.strptime(stop_date + stop_time, fmt)
-        self.logging_interval = int(interval[0:2])*3600 + int(interval[2:4])*60 + int(interval[4:6])
+        self.logging_interval = int(interval[0:2]) * 3600 + \
+                                int(interval[2:4]) * 60 + \
+                                int(interval[4:6])
         self.header_lines = []
 
         #read variables and units.
@@ -180,15 +184,15 @@ class HydrolabReader:
                 lbuf = list(buf.strip('\r\n'))
                 loc = 0
                 for param in allparams.split():
-                    loc = allparams.find(param,loc) + len(param)
+                    loc = allparams.find(param, loc) + len(param)
                     try:
                         lbuf[loc] = ','
                     except:
-                        pass #last position
+                        pass  # last position
                 units = "".join(lbuf).split(',')[1:]
-                for param,unit in zip(params,units):
+                for param, unit in zip(params, units):
                     self.num_params += 1
-                    if param=='DO':
+                    if param == 'DO':
                         name = param + ' ' + unit.strip()
                     else:
                         name = param
@@ -205,12 +209,15 @@ class HydrolabReader:
         fmt = '%m%d%y%H%M%S'
         data_str = ''
         re_date = re.compile(' *Date')
-        re_data = re.compile('^[0-9]') # only process lines starting with a number
+
+        # only process lines starting with a number
+        re_data = re.compile('^[0-9]')
+
         re_clean_special_char = re.compile('[&@\*?]')
 
-        # re_data = re.compile('((?!Date)(?![0-9]))', re.M) matches only junk lines
-        # might be more efficient to work out how to use the above to strip out all
-        # junk lines in one go.
+        # re_data = re.compile('((?!Date)(?![0-9]))', re.M) matches
+        # only junk lines might be more efficient to work out how to
+        # use the above to strip out all junk lines in one go.
         for buf in fid.readlines():
             if re_date.match(buf):
                 log_date = buf.split(':')[-1].strip()
@@ -218,11 +225,14 @@ class HydrolabReader:
             if re_data.match(buf):
                 try:
                     time_field, data_line = buf.split(None, 1)
-                    log_time.append(datetime.datetime.strptime(log_date + time_field, fmt))
+                    log_time.append(datetime.datetime.strptime(
+                        log_date + time_field, fmt))
                     #fix for incomplete lines
                     if len(data_line.split()) < self.num_params:
                         data_line = data_line.strip('\r\n')
-                        data_line += (self.num_params - len(data_line.split()))*' N ' + '\n'
+                        data_line += (self.num_params - \
+                                      len(data_line.split())) * \
+                                      ' N ' + '\n'
                     data_str = data_str + data_line
                 except:
                     continue
@@ -243,7 +253,8 @@ class HydrolabReader:
         data = data[idx]
 
         for ii in range(self.num_params):
-            self.parameters[ii].data = data[:,ii]
+            self.parameters[ii].data = data[:, ii]
+
 
 class Parameter:
     """

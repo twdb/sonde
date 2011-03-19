@@ -34,7 +34,7 @@ ppt = psu
 dl = pq.dimensionless
 
 #unit of speed
-mps = pq.UnitQuantity('Speed', pq.m/pq.second, symbol='m/s')
+mps = pq.UnitQuantity('Speed', pq.m / pq.second, symbol='m/s')
 
 #: Unit of specific conductivity - microSiemens per centimeter
 uScm = pq.UnitQuantity('Specific Conductivity',
@@ -42,10 +42,8 @@ uScm = pq.UnitQuantity('Specific Conductivity',
                        symbol='uS/cm')
 
 #: Units of Depth/Water Surface Elevation - meters/ft of water
-#mH20 = pq.m * pq.conventional_water
-#ftH20 = pq.ft * pq.conventional_water
-mH2O = pq.UnitQuantity('meters of water', pq.m * pq.conventional_water, symbol='mH2O')
-#ftH2O = pq.UnitQuantity('feet of water', pq.m * pq.conventional_water, symbol='ftH2O')
-ftH2O = pq.ftH2O #since ftH20 already exists in pq
+mH2O = pq.UnitQuantity('meters of water', pq.m * pq.conventional_water,
+                       symbol='mH2O')
+ftH2O = pq.ftH2O  # since ftH20 already exists in pq
 #: Pressure in dbar
 dbar = pq.UnitQuantity('decibar', pq.CompoundUnit('0.1*bar'), symbol='dbar')

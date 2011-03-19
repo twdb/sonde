@@ -12,8 +12,8 @@ from pytz.tzinfo import StaticTzInfo
 class UTCStaticOffset(StaticTzInfo):
     def __init__(self, offset):
         if type(offset) != int:
-            raise ValueError, "Offset must be an integer value"
-        
+            raise ValueError("Offset must be an integer value")
+
         self._utcoffset = timedelta(hours=1) * offset
         sign = "+" if offset > 0 else ""
         self._tzname = "UTC" + sign + str(offset)

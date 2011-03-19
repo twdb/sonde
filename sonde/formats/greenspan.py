@@ -24,6 +24,7 @@ from .. import sonde
 from .. import quantities as sq
 from ..timezones import cdt, cst
 
+
 class GreenspanDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a greenspan txt
@@ -40,44 +41,43 @@ class GreenspanDataset(sonde.BaseSondeDataset):
         self.default_tzinfo = tzinfo
         super(GreenspanDataset, self).__init__()
 
-
     def _read_data(self):
         """
         Read the greenspan data file
         """
-        param_map = {'Temperature' : 'water_temperature',
-                     'EC' : 'water_electrical_conductivity', #Double Check?
-                     'EC Raw' : 'water_electrical_conductivity',
-                     'EC Norm' : 'water_specific_conductance',
-                     #'SpCond' : 'water_specific_conductance???',
-                     'Salinity' : 'seawater_salinity',
-                     #'DO % Sat' : 'water_dissolved_oxygen_percent_saturation',
-                     'DO' : 'water_dissolved_oxygen_concentration',
-                     'pH' : 'water_ph',
-                     'Pressure' : 'water_depth_non_vented',
-                     #'Level' : 'water_depth_non_vented',
-                     'Batt' : 'instrument_battery_voltage',
-                     'Battery' : 'instrument_battery_voltage',
-                     'TDS' : 'TDS01',
+        param_map = {'Temperature': 'water_temperature',
+                     'EC': 'water_electrical_conductivity',  # Double Check?
+                     'EC Raw': 'water_electrical_conductivity',
+                     'EC Norm': 'water_specific_conductance',
+                     #'SpCond': 'water_specific_conductance???',
+                     'Salinity': 'seawater_salinity',
+                     #'DO % Sat': 'water_dissolved_oxygen_percent_saturation',
+                     'DO': 'water_dissolved_oxygen_concentration',
+                     'pH': 'water_ph',
+                     'Pressure': 'water_depth_non_vented',
+                     #'Level': 'water_depth_non_vented',
+                     'Batt': 'instrument_battery_voltage',
+                     'Battery': 'instrument_battery_voltage',
+                     'TDS': 'TDS01',
                      #'Redox': 'NotImplemented',
                      }
 
-        unit_map = {'deg_C' : pq.degC,
-                    'Celcius' : pq.degC,
-                    'Celsius' : pq.degC,
-                    'deg_F' : pq.degF,
-                    'deg_K' : pq.degK,
-                    'mS/cm' : sq.mScm,
-                    'uS/cm' : sq.uScm,
-                    'mg/l' : sq.mgl,
-                    'pH' : pq.dimensionless,
-                    'm' : sq.mH2O,
-                    'Metres' : sq.mH2O,
-                    'ft' : sq.ftH2O,
-                    'volts' : pq.volt,
-                    'Volts' : pq.volt,
-                    'volt' : pq.volt,
-                    'psu' : sq.psu,
+        unit_map = {'deg_C': pq.degC,
+                    'Celcius': pq.degC,
+                    'Celsius': pq.degC,
+                    'deg_F': pq.degF,
+                    'deg_K': pq.degK,
+                    'mS/cm': sq.mScm,
+                    'uS/cm': sq.uScm,
+                    'mg/l': sq.mgl,
+                    'pH': pq.dimensionless,
+                    'm': sq.mH2O,
+                    'Metres': sq.mH2O,
+                    'ft': sq.ftH2O,
+                    'volts': pq.volt,
+                    'Volts': pq.volt,
+                    'volt': pq.volt,
+                    'psu': sq.psu,
                     }
 
         greenspan_data = GreenspanReader(self.data_file, self.default_tzinfo)
@@ -93,22 +93,24 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                 #ignore params that have no data
                 if not np.all(np.isnan(parameter.data)):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
-                    self.data[param_map[parameter.name]] = parameter.data * punit
+                    self.data[param_map[parameter.name]] = parameter.data * \
+                                                           punit
             except:
                 print 'Un-mapped Parameter/Unit Type'
                 print 'Greenspan Parameter Name:', parameter.name
                 print 'Greenspan Unit Name:', parameter.unit
                 raise
 
-        if (greenspan_data.format_version == '2.4.1') or (greenspan_data.format_version == '2.3.1'):
+        if (greenspan_data.format_version == '2.4.1') or \
+               (greenspan_data.format_version == '2.3.1'):
             self.format_parameters = {
-                'converter_name' : greenspan_data.converter_name,
-                'source_file_name' : greenspan_data.source_file_name,
-                'target_file_name' : greenspan_data.target_file_name,
-                'site_information' : greenspan_data.site_information,
-                'firmware_version' : greenspan_data.firmware_version,
-                'top_of_case' : greenspan_data.top_of_case,
-                'raingage' : greenspan_data.raingage,
+                'converter_name': greenspan_data.converter_name,
+                'source_file_name': greenspan_data.source_file_name,
+                'target_file_name': greenspan_data.target_file_name,
+                'site_information': greenspan_data.site_information,
+                'firmware_version': greenspan_data.firmware_version,
+                'top_of_case': greenspan_data.top_of_case,
+                'raingage': greenspan_data.raingage,
                 }
 
             self.serial_number = greenspan_data.serial_number
@@ -116,10 +118,11 @@ class GreenspanDataset(sonde.BaseSondeDataset):
 
         elif greenspan_data.format_version == 'block':
             self.format_parameters = {
-                'header_lines' : greenspan_data.header_lines
+                'header_lines': greenspan_data.header_lines
                 }
 
         self.dates = greenspan_data.dates
+
 
 class GreenspanReader:
     """
@@ -137,7 +140,7 @@ class GreenspanReader:
         self.parameters = []
         self.file_ext = data_file.split('.')[-1].lower()
 
-        if self.file_ext =='xls':
+        if self.file_ext == 'xls':
             file_buf = open(util.xls_to_csv(data_file), 'rb')
         else:
             file_buf = open(data_file, 'r')
@@ -149,7 +152,6 @@ class GreenspanReader:
 
         if tzinfo:
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
-
 
     def detect_format_version(self, data_file):
         """
@@ -211,11 +213,12 @@ class GreenspanReader:
 
         fid.seek(0)
 
-        if (self.format_version == '2.4.1') or (self.format_version == '2.3.1'):
+        if (self.format_version == '2.4.1') or \
+               (self.format_version == '2.3.1'):
             self.converter_name = fid.readline().split(',')[1].rstrip('\r\n')
             self.source_file_name = fid.readline().split(',')[2].rstrip('\r\n')
             self.target_file_name = fid.readline().split(',')[2].rstrip('\r\n')
-            fid.readline() # skip junk
+            fid.readline()  # skip junk
             self.site_name = fid.readline().split(',')[-1].rstrip(' \r\n')
             self.site_information = fid.readline().split(',')[1].rstrip(' \r\n')
             self.instrument_type = fid.readline().split(',')[-1].rstrip(' \r\n')
@@ -233,15 +236,17 @@ class GreenspanReader:
             units = fid.readline().rstrip('\r\n').split(',')[3:]
 
             #clean param & unit names
-            for param,unit in zip(params,units):
-                self.parameters.append(Parameter(param.strip('()_'), unit.strip('()_')))
+            for param, unit in zip(params, units):
+                self.parameters.append(Parameter(param.strip('()_'),
+                                                 unit.strip('()_')))
 
             #read data
             fid.seek(0)
-            datestr = np.genfromtxt(fid, delimiter=',', skip_header=15, usecols=(1), dtype='|S')
-            if self.file_ext=='xls': #xlrd reads in dates as floats
+            datestr = np.genfromtxt(fid, delimiter=',', skip_header=15,
+                                    usecols=(1), dtype='|S')
+            if self.file_ext == 'xls':  # xlrd reads in dates as floats
                 self.dates = np.array(
-                    [(datetime.datetime(*xlrd.xldate_as_tuple(dt,0)))
+                    [(datetime.datetime(*xlrd.xldate_as_tuple(dt, 0)))
                      for dt in datestr]
                     )
             else:
@@ -250,12 +255,12 @@ class GreenspanReader:
                      for dt in datestr]
                     )
 
-            #self.dates = np.array([datetime.datetime.strptime(dt, '%d/%m/%Y %H:%M:%S') for dt in datestr])
             fid.seek(0)
-            self.data = np.genfromtxt(fid, delimiter=',', skip_header=15, usecols=cols, dtype=float)
+            self.data = np.genfromtxt(fid, delimiter=',', skip_header=15,
+                                      usecols=cols, dtype=float)
 
             for ii in range(len(self.parameters)):
-                self.parameters[ii].data = self.data[:,ii]
+                self.parameters[ii].data = self.data[:, ii]
 
         elif self.format_version == 'block':
 
@@ -279,13 +284,14 @@ class GreenspanReader:
                     self.num_params += 1
                     param = 'Batt'
                     unit = 'volts'
-                    self.parameters.append(Parameter(param.strip('()_'), unit.strip('()_')))
-
+                    self.parameters.append(Parameter(param.strip('()_'),
+                                                     unit.strip('()_')))
 
                 if buf[0:3] == '# C':
                     self.num_params += 1
                     unit, param = buf.split()[2:]
-                    self.parameters.append(Parameter(param.strip('()_'), unit.strip('()_')))
+                    self.parameters.append(Parameter(param.strip('()_'),
+                                                     unit.strip('()_')))
 
                 buf = fid.readline()
 
@@ -300,11 +306,12 @@ class GreenspanReader:
                     if dt != prev_dt:
                         prev_dt = dt
                         data.append(row)
-                        dates.append(datetime.datetime.strptime(buf.strip('\r\n'), fmt))
+                        dates.append(datetime.datetime.strptime(
+                            buf.strip('\r\n'), fmt))
                         row = np.zeros(self.num_params)
                         row[:] = np.nan
 
-                elif buf[0]  == 'D':
+                elif buf[0] == 'D':
                     col = int(buf[1])
                     row[col] = float(buf.split()[1])
 
@@ -320,11 +327,12 @@ class GreenspanReader:
             data = np.array(data[1:])
             self.dates = np.array(dates)
             for ii in range(self.num_params):
-                self.parameters[ii].data = data[:,ii]
+                self.parameters[ii].data = data[:, ii]
 
         else:
             print 'Unknown Format Type'
             raise
+
 
 class Parameter:
     """

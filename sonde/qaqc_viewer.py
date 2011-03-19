@@ -11,12 +11,10 @@ from enthought.traits.api import HasTraits, Instance
 from enthought.traits.ui.api import Item, Group, View
 
 # Chaco imports
-from enthought.chaco.api import Plot,ArrayDataSource, ArrayPlotData, BarPlot, DataRange1D, \
-        LabelAxis, LinearMapper, VPlotContainer, PlotAxis, PlotGrid, \
-        LinePlot, add_default_grids, PlotLabel
+from enthought.chaco.api import Plot, ArrayDataSource, ArrayPlotData, \
+     BarPlot, DataRange1D, LabelAxis, LinearMapper, VPlotContainer, \
+     PlotAxis, PlotGrid, LinePlot, add_default_grids, PlotLabel
 from enthought.chaco.tools.api import PanTool, ZoomTool
-
-
 from enthought.chaco.scales.api import CalendarScaleSystem
 from enthought.chaco.scales_tick_generator import ScalesTickGenerator
 
@@ -24,12 +22,13 @@ from sonde import Sonde
 import time
 import numpy as np
 
+
 class BaseViewer(HasTraits):
     main_tab = Instance(Component)
 
     traits_view = View(Item('main_tab', editor=ComponentEditor),
          width=500, height=500, resizable=True, title="Salinity Plot")
-    
+
     def __init__(self, **kwargs):
         HasTraits.__init__(self, **kwargs)
         self.init_data()
@@ -37,13 +36,12 @@ class BaseViewer(HasTraits):
     def init_data(self):
         file_name = '/home/dpothina/work/apps/pysonde/tests/ysi_test_files/BAYT_20070323_CDT_YS1772AA_000.dat'
         sonde = Sonde(file_name)
-        sal_ds = np.array([1,2,3,4,5,6,7,8])#sonde.data['seawater_salinity']
-        time_ds = sal_ds**2#[time.mktime(date.utctimetuple()) for date in sonde.dates]
+        sal_ds = np.array([1, 2, 3, 4, 5, 6, 7, 8])  # sonde.data['seawater_salinity']
+        time_ds = sal_ds**2  # [time.mktime(date.utctimetuple()) for date in sonde.dates]
         #time_ds = ArrayDataSource(dt)
         #sal_ds = ArrayDataSource(salinity, sort_order="none")
         self.plot_data = ArrayPlotData(sal_ds=sal_ds,
                                   time_ds=time_ds)
-
 
     def _main_tab_default(self):
         self.sal_plot = Plot(self.plot_data)
@@ -64,9 +62,9 @@ class BaseViewer(HasTraits):
         #                                  max_zoom_out_factor=10.0,
         #                                  ))
 
-        container = VPlotContainer(bgcolor = "lightblue",
-                                   spacing = 40, 
-                                   padding = 50,
+        container = VPlotContainer(bgcolor="lightblue",
+                                   spacing=40,
+                                   padding=50,
                                    fill_padding=False)
         container.add(sal_plot)
         #container.add(price_plot)
@@ -80,7 +78,7 @@ class BaseViewer(HasTraits):
     #    return View(Group(Item('main_tab', editor=ComponentEditor)),
     #                width=500, height=500, resizable=True, title="Salinity Plot")
 
-#===============================================================================
+#==============================================================================
 # Attributes to use for the plot view.
 #size=(800,600)
 #title="Salinity plot example"

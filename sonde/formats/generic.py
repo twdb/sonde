@@ -19,11 +19,12 @@
     unit header prepended by single #:
       yyyy/mm/dd HH:MM:SS, Pa, mS/cm, PSU, degC, mH2O, n/a, n/a, n/a
       (units must be from supported_units_list)
-      
+
     comma seperated data
 
     special columns or header items:
-        original_data_file_name, instrument_manufacturer, instrument_serial_number
+        original_data_file_name, instrument_manufacturer,
+          instrument_serial_number
         if these exist they will overide self.manufacturer,
         self.data_file and self.serial_number
 
@@ -44,10 +45,11 @@ from .. import sonde
 from .. import quantities as sq
 from ..timezones import UTCStaticOffset
 
+
 class GenericDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a generic csv
-    file. 
+    file.
     """
     def __init__(self, data_file):
         self.manufacturer = 'generic'
@@ -60,18 +62,18 @@ class GenericDataset(sonde.BaseSondeDataset):
         Read the generic data file
         """
 
-        unit_map = {'degc' : pq.degC,
-                    'degf' : pq.degC,
-                    'm' : sq.mH2O,
-                    'mh2o' : sq.mH2O,
+        unit_map = {'degc': pq.degC,
+                    'degf': pq.degC,
+                    'm': sq.mH2O,
+                    'mh2o': sq.mH2O,
                     'ft': sq.ftH2O,
-                    'fth2o' : sq.ftH2O,
-                    'ms/cm' : sq.mScm,
-                    'psu' : sq.psu,
-                    'pa' : pq.Pa,
-                    'v' : pq.volt,
-                    'mg/l' : sq.mgl,
-                    '%' : pq.percent,
+                    'fth2o': sq.ftH2O,
+                    'ms/cm': sq.mScm,
+                    'psu': sq.psu,
+                    'pa': pq.Pa,
+                    'v': pq.volt,
+                    'mg/l': sq.mgl,
+                    '%': pq.percent,
                     'nd': pq.dimensionless,
                     'ntu': sq.ntu,
                     }
@@ -82,7 +84,7 @@ class GenericDataset(sonde.BaseSondeDataset):
         metadata = dict()
 
         for parameter in generic_data.parameters:
-            if parameter.unit!='n/a':
+            if parameter.unit != 'n/a':
                 if parameter.name.lower() in sonde.master_parameter_list:
                     pcode = parameter.name.lower()
                 else:
@@ -94,27 +96,30 @@ class GenericDataset(sonde.BaseSondeDataset):
                         self.parameters[pcode] = sonde.master_parameter_list[pcode]
                         self.data[pcode] = parameter.data * punit
                 except:
-                     print 'Un-mapped Unit Type'
-                     print 'Unit Name:', parameter.unit
-                     raise
+                    print 'Un-mapped Unit Type'
+                    print 'Unit Name:', parameter.unit
+                    raise
             else:
                 metadata[parameter.name.lower()] = parameter.data
 
         self.format_parameters = generic_data.format_parameters
 
         #overide default metadata if present in file
-        names =['manufacturer', 'data_file', 'serial_number']
-        kwds = ['instrument_manufacturer', 'original_data_file', 'instrument_serial_number']
-        for name,kwd in zip(names,kwds):
+        names = ['manufacturer', 'data_file', 'serial_number']
+        kwds = ['instrument_manufacturer', 'original_data_file',
+                'instrument_serial_number']
+        for name, kwd in zip(names, kwds):
             #check format_parameters
-            idx = [i for i in self.format_parameters.keys() if i.lower() == kwd]
-            if idx!=[]:
-               exec('self.'+name+'=self.format_parameters[idx[0]]')
+            idx = [i for i
+                   in self.format_parameters.keys() if i.lower() == kwd]
+            if idx != []:
+                exec('self.' + name + '=self.format_parameters[idx[0]]')
             idx = [i for i in metadata.keys() if i.lower() == kwd]
-            if idx!=[]:
-               exec('self.'+name+' = metadata[idx[0]]')
+            if idx != []:
+                exec('self.' + name + ' = metadata[idx[0]]')
 
         self.dates = generic_data.dates
+
 
 class GenericReader:
     """
@@ -130,7 +135,8 @@ class GenericReader:
         self.parameters = []
         self.format_parameters = {}
         self.read_generic(data_file)
-        self.dates = [i.replace(tzinfo=self.default_tzinfo) for i in self.dates]
+        self.dates = [i.replace(tzinfo=self.default_tzinfo)
+                      for i in self.dates]
 
     def read_generic(self, data_file):
         """
@@ -145,16 +151,17 @@ class GenericReader:
         fid = open(data_file)
         buf = fid.readline().strip('# ')
         while buf:
-            if buf[0:8].lower()=='datetime':
+            if buf[0:8].lower() == 'datetime':
                 params = buf.split(',')
-                units =  fid.readline().strip('# ').split(',')
+                units = fid.readline().strip('# ').split(',')
                 break
 
-            key,val = buf.split(':')
-            self.format_parameters[key.strip()]=val.strip()
+            key, val = buf.split(':')
+            self.format_parameters[key.strip()] = val.strip()
             buf = fid.readline().strip('# ')
 
-        utc_offset = int(self.format_parameters['timezone'].lower().strip('utc'))
+        utc_offset = int(
+            self.format_parameters['timezone'].lower().strip('utc'))
         self.default_tzinfo = UTCStaticOffset(utc_offset)
         data = np.genfromtxt(fid, dtype=None, names=params, delimiter=',')
         self.dates = np.array(
@@ -163,7 +170,7 @@ class GenericReader:
             )
 
         #assign param & unit names
-        for param,unit in zip(params[1:],units[1:]):
+        for param, unit in zip(params[1:], units[1:]):
             self.num_params += 1
             self.parameters.append(Parameter(param.strip(), unit.strip()))
 
@@ -178,7 +185,6 @@ class Parameter:
     name, unit and data
     """
     def __init__(self, param_name, param_unit):
-
         self.name = param_name
         self.unit = param_unit
         self.data = []

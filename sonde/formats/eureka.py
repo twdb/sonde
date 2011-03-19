@@ -17,6 +17,7 @@ from .. import sonde
 from sonde import util
 from sonde import quantities as sq
 
+
 class EurekaDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a eureka cv or xls
@@ -32,34 +33,33 @@ class EurekaDataset(sonde.BaseSondeDataset):
         self.dates = []
         super(EurekaDataset, self).__init__()
 
-
     def _read_data(self):
         """
         Read the eureka data file
         """
-        param_map = {'Temp.' : 'water_temperature',
-                     'SC' : 'water_specific_conductance',
-                     'SAL' : 'seawater_salinity',
-                     'DO Sat' : 'water_dissolved_oxygen_percent_saturation',
-                     'DO SAT' : 'water_dissolved_oxygen_percent_saturation',
-                     'DO' : 'water_dissolved_oxygen_concentration',
-                     'pH' : 'water_ph',
-                     'Depth' : 'water_depth_non_vented',
-                     'Bat.' : 'instrument_battery_voltage',
+        param_map = {'Temp.': 'water_temperature',
+                     'SC': 'water_specific_conductance',
+                     'SAL': 'seawater_salinity',
+                     'DO Sat': 'water_dissolved_oxygen_percent_saturation',
+                     'DO SAT': 'water_dissolved_oxygen_percent_saturation',
+                     'DO': 'water_dissolved_oxygen_concentration',
+                     'pH': 'water_ph',
+                     'Depth': 'water_depth_non_vented',
+                     'Bat.': 'instrument_battery_voltage',
                      }
 
-        unit_map = {'\xb0C' : pq.degC,
-                    '\xc2\xb0C' : pq.degC,
-                    '\xb0F' : pq.degF,
-                    '\xc2\xb0F' : pq.degF,
-                    'mS/cm' : sq.mScm,
-                    'uS/cm' : sq.uScm,
-                    '%Sat' : pq.percent,
-                    'mg/l' : sq.mgl,
-                    '' : pq.dimensionless,
-                    'm' : sq.mH2O,
-                    'V' : pq.volt,
-                    'psu' : sq.psu,
+        unit_map = {'\xb0C': pq.degC,
+                    '\xc2\xb0C': pq.degC,
+                    '\xb0F': pq.degF,
+                    '\xc2\xb0F': pq.degF,
+                    'mS/cm': sq.mScm,
+                    'uS/cm': sq.uScm,
+                    '%Sat': pq.percent,
+                    'mg/l': sq.mgl,
+                    '': pq.dimensionless,
+                    'm': sq.mH2O,
+                    'V': pq.volt,
+                    'psu': sq.psu,
                     }
 
         eureka_data = EurekaReader(self.data_file, self.default_tzinfo)
@@ -75,7 +75,8 @@ class EurekaDataset(sonde.BaseSondeDataset):
                 #ignore params that have no data
                 if not np.all(np.isnan(parameter.data)):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
-                    self.data[param_map[parameter.name]] = parameter.data * punit
+                    self.data[param_map[parameter.name]] = parameter.data * \
+                                                           punit
             except:
                 print 'Un-mapped Parameter/Unit Type'
                 print 'Eureka Parameter Name:', parameter.name
@@ -83,7 +84,7 @@ class EurekaDataset(sonde.BaseSondeDataset):
                 raise
 
         self.format_parameters = {
-            'header_lines' : eureka_data.header_lines,
+            'header_lines': eureka_data.header_lines,
             }
 
         if hasattr(eureka_data, 'site_name'):
@@ -114,7 +115,7 @@ class EurekaReader:
         self.site_name = ''
         self.file_ext = data_file.split('.')[-1].lower()
 
-        if self.file_ext =='xls':
+        if self.file_ext == 'xls':
             file_buf = open(util.xls_to_csv(data_file), 'rb')
         else:
             file_buf = open(data_file)
@@ -125,7 +126,8 @@ class EurekaReader:
         # it might be formatted as a number, in which case it gets
         # read in with a trailing '.0'; I'm not sure if this is a
         # eureka thing or an xlrd thing
-        if hasattr(self, 'serial_number') and self.serial_number.rfind('.0') == len(self.serial_number) - 2:
+        if hasattr(self, 'serial_number') and \
+               self.serial_number.rfind('.0') == len(self.serial_number) - 2:
             self.serial_number = self.serial_number[:-2]
 
         if tzinfo:
@@ -135,7 +137,6 @@ class EurekaReader:
                 self.stop_time = self.stop_time.replace(tzinfo=tzinfo)
 
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
-
 
     def read_eureka(self, data_file):
         """
@@ -157,7 +158,7 @@ class EurekaReader:
         buf = fid.readline()
 
         while buf:
-            if buf[0:4]=='Date':
+            if buf[0:4] == 'Date':
                 break
 
             self.header_lines.append(buf)
@@ -167,14 +168,15 @@ class EurekaReader:
             if 'Serial Number' in buf:
                 self.serial_number = buf.split(',')[1].strip()
             if 'Start time' in buf:
-                d,t = buf.strip().split()[3:5]
-                self.setup_time = datetime.datetime.strptime(d + t, '%m/%d/%Y%H:%M:%S')
+                d, t = buf.strip().split()[3:5]
+                self.setup_time = datetime.datetime.strptime(
+                    d + t, '%m/%d/%Y%H:%M:%S')
             if 'Stop time' in buf:
-                d,t = buf.strip().split()[3:5]
-                self.stop_time = datetime.datetime.strptime(d + t, '%m/%d/%Y%H:%M:%S')
+                d, t = buf.strip().split()[3:5]
+                self.stop_time = datetime.datetime.strptime(
+                    d + t, '%m/%d/%Y%H:%M:%S')
 
             buf = fid.readline()
-
 
         fields = buf.strip('\r\n').split(',')
         params = fields[2:]
@@ -182,27 +184,28 @@ class EurekaReader:
 
         data = np.genfromtxt(fid, delimiter=',', dtype=None, names=fields)
 
-        if self.file_ext=='xls': #xlrd reads in dates as floats
+        if self.file_ext == 'xls':  # xlrd reads in dates as floats
             self.dates = np.array(
-                [(datetime.datetime(*xlrd.xldate_as_tuple(d,0)) +  datetime.timedelta(t))
-                 for d,t in zip(data['Date'],data['Time'])]
+                [(datetime.datetime(*xlrd.xldate_as_tuple(d, 0))
+                  + datetime.timedelta(t))
+                 for d, t in zip(data['Date'], data['Time'])]
                 )
         else:
             self.dates = np.array(
                 [datetime.datetime.strptime(d + t, '%m/%d/%Y%H:%M:%S')
-                 for d,t in zip(data['Date'],data['Time'])]
+                 for d, t in zip(data['Date'], data['Time'])]
                 )
 
         #assign param & unit names
-        for param,unit in zip(params,units):
+        for param, unit in zip(params, units):
             # grab serial number from the second 'Manta' field if it
             # exists
             if param.strip() == 'Manta':
                 if 'Manta_1' in data.dtype.fields:
                     self.serial_number = data['Manta_1'][0].strip()
 
-            elif param.strip() != '': #remove trailing blank column
-                if param=='SAL': #fix unitless Salinity column
+            elif param.strip() != '':  # remove trailing blank column
+                if param == 'SAL':  # fix unitless Salinity column
                     unit = 'psu'
 
                 self.parameters.append(Parameter(param.strip(), unit.strip()))

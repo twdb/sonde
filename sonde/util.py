@@ -3,6 +3,7 @@ import tempfile
 
 import xlrd
 
+
 def xls_to_csv(xls_file):
     """
     Converts excel files to csv equivalents
@@ -39,4 +40,3 @@ def xls_to_csv(xls_file):
             csv_writer.writerow(this_row)
 
     return csv_file_path
-
