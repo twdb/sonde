@@ -9,6 +9,7 @@ from __future__ import absolute_import
 
 import datetime
 import os
+import warnings
 
 import numpy as np
 import quantities as pq
@@ -128,7 +129,7 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
         return GenericDataset(data_file, *args, **kwargs)
 
     if file_format == False:
-        print "File Format Autodetection Failed"
+        warnings.warn("File Format Autodetection Failed", Warning)
         raise
 
     else:
@@ -255,7 +256,7 @@ def merge(file_list, tz_list=None):
                 tz = UTCStaticOffset(int(tz.lower().strip('utc')))
             dataset = Sonde(file_name, tzinfo=tz)
         except:
-            print 'merged failed: ', file_name
+            warnings.warn('merged failed: %s' % file_name, Warning)
             continue
 
         fn_list = np.zeros(len(dataset.dates), dtype='|S100')
@@ -283,7 +284,7 @@ def merge(file_list, tz_list=None):
                 tmp_data = no_data
 
             data[param] = np.hstack((data[param], tmp_data))
-        print 'merged: ', file_name
+        print 'merged: %s' % file_name
 
     for param, unit in master_parameter_list.items():
         if np.all(np.isnan(data[param])):
@@ -395,7 +396,8 @@ class BaseSondeDataset(object):
             self._write_csv(file_name, metadata, self.dates, data,
                             disclaimer, float_fmt)
         else:
-            print 'Unknown output file_format: ', file_format
+            warnings.warn('Unknown output file_format: %s' % file_format,
+                          Warning)
             raise
 
     def _write_csv(self, file_name, metadata, dates, data, disclaimer,

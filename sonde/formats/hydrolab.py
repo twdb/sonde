@@ -13,6 +13,7 @@ import re
 from StringIO import StringIO
 import struct
 import time
+import warnings
 
 import numpy as np
 import quantities as pq
@@ -87,11 +88,13 @@ class HydrolabDataset(sonde.BaseSondeDataset):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
                     self.data[param_map[parameter.name]] = parameter.data \
                                                            * punit
-            except:
-                print 'Un-mapped Parameter/Unit Type'
-                print 'Hydrolab Parameter Name:', parameter.name
-                print 'Hydrolab Unit Name:', parameter.unit
-                raise
+            except KeyError:
+                warnings.warn('Un-mapped Parameter/Unit Type:\n'
+                              '%s parameter name: "%s"\n'
+                              '%s unit name: "%s"' %
+                              (self.file_format, parameter.name,
+                               self.file_format, parameter.unit),
+                              Warning)
 
         self.format_parameters = {
             'log_file_name': hydrolab_data.log_file_name,
@@ -245,7 +248,7 @@ class HydrolabReader:
             data = np.genfromtxt(StringIO(data_str), dtype=float)
         except:
             #no data in file
-            print 'No Data Found In File'
+            warnings.warn('No Data Found In File', Warning)
             raise
 
         #de_duplicate data since some hydrolabs have repeat values

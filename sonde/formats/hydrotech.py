@@ -10,12 +10,13 @@
 """
 from __future__ import absolute_import
 
+import csv
 import datetime
 import pkg_resources
 import re
 from StringIO import StringIO
+import warnings
 import xlrd
-import csv
 
 import numpy as np
 import quantities as pq
@@ -73,11 +74,13 @@ class HydrotechDataset(sonde.BaseSondeDataset):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
                     self.data[param_map[parameter.name]] = parameter.data * \
                                                            punit
-            except:
-                print 'Un-mapped Parameter/Unit Type'
-                print 'Hydrotech Parameter Name:', parameter.name
-                print 'Hydrotech Unit Name:', parameter.unit
-                raise
+            except KeyError:
+                warnings.warn('Un-mapped Parameter/Unit Type:\n'
+                              '%s parameter name: "%s"\n'
+                              '%s unit name: "%s"' %
+                              (self.file_format, parameter.name,
+                               self.file_format, parameter.unit),
+                              Warning)
 
         self.format_parameters = {
             'model': hydrotech_data.model,

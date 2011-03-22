@@ -10,12 +10,13 @@
 """
 from __future__ import absolute_import
 
+import csv
 import datetime
 import pkg_resources
 import re
 from StringIO import StringIO
+import warnings
 import xlrd
-import csv
 
 import numpy as np
 import quantities as pq
@@ -95,11 +96,13 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
                     self.data[param_map[parameter.name]] = parameter.data * \
                                                            punit
-            except:
-                print 'Un-mapped Parameter/Unit Type'
-                print 'Greenspan Parameter Name:', parameter.name
-                print 'Greenspan Unit Name:', parameter.unit
-                raise
+            except KeyError:
+                warnings.warn('Un-mapped Parameter/Unit Type:\n'
+                              '%s parameter name: "%s"\n'
+                              '%s unit name: "%s"' %
+                              (self.file_format, parameter.name,
+                               self.file_format, parameter.unit),
+                              Warning)
 
         if (greenspan_data.format_version == '2.4.1') or \
                (greenspan_data.format_version == '2.3.1'):
@@ -161,7 +164,7 @@ class GreenspanReader:
         """
 
         if type(data_file) == str:
-            print 'Expects File Object'
+            warnings.warn('Expects File Object', Warning)
 
         else:
             fid = data_file
@@ -330,7 +333,7 @@ class GreenspanReader:
                 self.parameters[ii].data = data[:, ii]
 
         else:
-            print 'Unknown Format Type'
+            warnings.warn('Unknown Format Type', Warning)
             raise
 
 

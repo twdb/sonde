@@ -112,11 +112,13 @@ class YSIDataset(sonde.BaseSondeDataset):
                 punit = unit_map[(parameter.unit).strip()]
                 self.parameters[pcode] = sonde.master_parameter_list[pcode]
                 self.data[param_map[parameter.name]] = parameter.data * punit
-            except:
-                print 'Un-mapped Parameter/Unit Type'
-                print 'YSI Parameter Name:', parameter.name
-                print 'YSI Unit Name:', parameter.unit
-                raise
+            except KeyError:
+                warnings.warn('Un-mapped Parameter/Unit Type:\n'
+                              '%s parameter name: "%s"\n'
+                              '%s unit name: "%s"' %
+                              (self.file_format, parameter.name,
+                               self.file_format, parameter.unit),
+                              Warning)
 
         self.dates = ysi_data.dates
 

@@ -10,6 +10,7 @@ from __future__ import absolute_import
 
 import datetime
 import pkg_resources
+import warnings
 
 import numpy as np
 import quantities as pq
@@ -63,11 +64,13 @@ class MacroctdDataset(sonde.BaseSondeDataset):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
                     self.data[param_map[parameter.name]] = parameter.data * \
                                                            punit
-            except:
-                print 'Un-mapped Parameter/Unit Type'
-                print 'Macroctd Parameter Name:', parameter.name
-                print 'Macroctd Unit Name:', parameter.unit
-                raise
+            except KeyError:
+                warnings.warn('Un-mapped Parameter/Unit Type:\n'
+                              '%s parameter name: "%s"\n'
+                              '%s unit name: "%s"' %
+                              (self.file_format, parameter.name,
+                               self.file_format, parameter.unit),
+                              Warning)
 
         self.format_parameters = {
             'header_lines': macroctd_data.header_lines,

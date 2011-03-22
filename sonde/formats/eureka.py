@@ -12,6 +12,7 @@ import datetime
 import xlrd
 import numpy as np
 import quantities as pq
+import warnings
 
 from .. import sonde
 from sonde import util
@@ -77,11 +78,13 @@ class EurekaDataset(sonde.BaseSondeDataset):
                     self.parameters[pcode] = sonde.master_parameter_list[pcode]
                     self.data[param_map[parameter.name]] = parameter.data * \
                                                            punit
-            except:
-                print 'Un-mapped Parameter/Unit Type'
-                print 'Eureka Parameter Name:', parameter.name
-                print 'Eureka Unit Name:', parameter.unit
-                raise
+            except KeyError:
+                warnings.warn('Un-mapped Parameter/Unit Type:\n'
+                              '%s parameter name: "%s"\n'
+                              '%s unit name: "%s"' %
+                              (self.file_format, parameter.name,
+                               self.file_format, parameter.unit),
+                              Warning)
 
         self.format_parameters = {
             'header_lines': eureka_data.header_lines,

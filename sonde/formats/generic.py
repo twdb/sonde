@@ -31,12 +31,13 @@
 """
 from __future__ import absolute_import
 
+import csv
 import datetime
 import pkg_resources
 import re
 from StringIO import StringIO
+import warnings
 import xlrd
-import csv
 
 import numpy as np
 import quantities as pq
@@ -88,17 +89,18 @@ class GenericDataset(sonde.BaseSondeDataset):
                 if parameter.name.lower() in sonde.master_parameter_list:
                     pcode = parameter.name.lower()
                 else:
-                    print 'Un-mapped Parameter: ', parameter.name.lower()
-                    raise
+                    warnings.warn('Un-mapped Parameter: %s' %
+                                  parameter.name.lower(),
+                                  Warning)
                 try:
                     punit = unit_map[(parameter.unit.lower()).strip()]
                     if not np.all(np.isnan(parameter.data)):
                         self.parameters[pcode] = sonde.master_parameter_list[pcode]
                         self.data[pcode] = parameter.data * punit
-                except:
-                    print 'Un-mapped Unit Type'
-                    print 'Unit Name:', parameter.unit
-                    raise
+                except KeyError:
+                    warnings.warn('Un-mapped Unit Type\n'
+                                  'Unit Name: %s' % parameter.unit,
+                                  Warning)
             else:
                 metadata[parameter.name.lower()] = parameter.data
 
