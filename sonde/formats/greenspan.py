@@ -211,7 +211,6 @@ class GreenspanReader:
         """
         Read header information
         """
-
         fid.seek(0)
 
         if (self.format_version == '2.4.1') or \
@@ -230,7 +229,6 @@ class GreenspanReader:
             fid.readline()
             #column 0,1,2 = 'Data', 'dd/mm/yyyy hh:mm:ss', 'Type/Comment'
             #column [3:] = actual data
-            fid.readline()
             fields = fid.readline().rstrip('\r\n').split(',')
             cols = range(len(fields))[3:]
             params = fields[3:]
