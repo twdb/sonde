@@ -119,6 +119,8 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                 'firmware_version': greenspan_data.firmware_version,
                 'top_of_case': greenspan_data.top_of_case,
                 'raingage': greenspan_data.raingage,
+                'log_file_name': greenspan_data.source_file_name\
+                                .split('\\')[-1].split('.')[0],
                 }
 
             self.serial_number = greenspan_data.serial_number
