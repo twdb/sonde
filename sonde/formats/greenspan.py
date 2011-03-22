@@ -12,6 +12,7 @@ from __future__ import absolute_import
 
 import csv
 import datetime
+import os.path
 import pkg_resources
 import re
 from StringIO import StringIO
@@ -148,8 +149,10 @@ class GreenspanReader:
         self.parameters = []
         self.file_ext = data_file.split('.')[-1].lower()
 
+        temp_file_path = None
         if self.file_ext == 'xls':
-            file_buf = open(util.xls_to_csv(data_file), 'rb')
+            temp_file_path = util.xls_to_csv(data_file)
+            file_buf = open(temp_file_path, 'rb')
         else:
             file_buf = open(data_file, 'r')
 
@@ -157,6 +160,10 @@ class GreenspanReader:
             self.format_version = self.detect_format_version(file_buf)
 
         self.read_greenspan(file_buf)
+
+        file_buf.close()
+        if temp_file_path:
+            os.remove(temp_file_path)
 
         if tzinfo:
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
