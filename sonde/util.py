@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 import tempfile
 
 import xlrd
@@ -40,3 +41,15 @@ def xls_to_csv(xls_file):
             csv_writer.writerow(this_row)
 
     return csv_file_path
+
+
+def possibly_corrupt_xls_date_to_datetime(date_val):
+    """
+    xls files generally return date columns as strings containing a
+    float value, but these values can be corrupt depending on how the
+    file has been saved/exported
+    """
+    try:
+        return datetime(*xlrd.xldate_as_tuple(float(date_val), 0))
+    except ValueError:
+        return datetime.strptime(date_val, '%d/%m/%Y %H:%M:%S')

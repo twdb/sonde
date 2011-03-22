@@ -24,6 +24,7 @@ import quantities as pq
 from .. import sonde
 from .. import quantities as sq
 from ..timezones import cdt, cst
+from .. import util
 
 
 class GreenspanDataset(sonde.BaseSondeDataset):
@@ -243,15 +244,19 @@ class GreenspanReader:
             fid.seek(0)
             datestr = np.genfromtxt(fid, delimiter=',', skip_header=15,
                                     usecols=(1), dtype='|S')
-            if self.file_ext == 'xls':  # xlrd reads in dates as floats
+
+            # xlrd reads in dates as floats, but excel isn't too
+            # careful about datatypes and depending on how the file
+            # has been handled, there's a chance that the dates have
+            # already been converted to strings
+            if self.file_ext == 'xls':
                 self.dates = np.array(
-                    [(datetime.datetime(*xlrd.xldate_as_tuple(dt, 0)))
-                     for dt in datestr])
+                    [util.possibly_corrupt_xls_date_to_datetime(dt)
+                      for dt in datestr])
             else:
                 self.dates = np.array(
                     [datetime.datetime.strptime(dt, '%d/%m/%Y %H:%M:%S')
                      for dt in datestr])
-
 
             fid.seek(0)
             self.data = np.genfromtxt(fid, delimiter=',', skip_header=15,
