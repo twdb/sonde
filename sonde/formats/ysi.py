@@ -13,6 +13,7 @@ import re
 from StringIO import StringIO
 import struct
 import time
+import warnings
 
 import numpy as np
 import quantities as pq
@@ -385,7 +386,8 @@ class YSIReaderBin:
                     self.parameters[ii].data.append(recs[ii + 1])
 
             else:
-                print 'Type not implemented yet:', record_type
+                warnings.warn('Type not implemented yet: %s' % record_type,
+                              Warning)
                 break
 
             record_type = fid.read(1)
