@@ -165,6 +165,13 @@ class GreenspanReader:
         if temp_file_path:
             os.remove(temp_file_path)
 
+        # if the serial number just contains numbers the cell holding
+        # it might be formatted as a number, in which case it gets
+        # read in with a trailing '.0'
+        if hasattr(self, 'serial_number') and \
+               self.serial_number.rfind('.0') == len(self.serial_number) - 2:
+            self.serial_number = self.serial_number[:-2]
+
         if tzinfo:
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
