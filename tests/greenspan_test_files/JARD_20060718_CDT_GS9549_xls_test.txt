@@ -40,7 +40,7 @@ stop_time = '10/18/2006 14:00:00'
 # 'water_depth_non_vented' : Water Surface Elevation (No Atm Pressure Correction)
 # 'water_depth_vented' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = [Batt, DO,Temp, EC, pH]
-parameters = ['instrument_battery_voltage','water_dissolved_oxygen_concentration','water_temperature','water_specific_conductance','water_ph']
+parameters = ['instrument_battery_voltage','water_dissolved_oxygen_concentration','water_temperature','water_electrical_conductivity','water_ph']
 
 
 # units (comma delimited, in column order)
