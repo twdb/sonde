@@ -235,8 +235,9 @@ class GreenspanReader:
             self.converter_name = fid.readline().split(',')[1].rstrip('\r\n')
             self.source_file_name = fid.readline().split(',')[2].rstrip('\r\n')
             self.target_file_name = fid.readline().split(',')[2].rstrip('\r\n')
+            #from nose.tools import set_trace; set_trace()
             fid.readline()  # skip junk
-            self.site_name = fid.readline().split(',')[-1].rstrip(' \r\n')
+            self.site_name = fid.readline().split(',')[1].rstrip(' \r\n')
             self.site_information = fid.readline().split(',')[1].rstrip(' \r\n')
             self.instrument_type = fid.readline().split(',')[-1].rstrip(' \r\n')
             self.serial_number = fid.readline().split(',')[1].rstrip('\x00\r\n')
