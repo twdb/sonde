@@ -34,6 +34,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
     `tzinfo` is a datetime.tzinfo object that represents the timezone
     of the timestamps in the binary file.
     """
+
     def __init__(self, data_file, tzinfo=None, format_version=None):
         self.file_format = 'greenspan'
         self.manufacturer = 'greenspan'
@@ -121,7 +122,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
 
         elif greenspan_data.format_version == 'block':
             self.format_parameters = {
-                'header_lines': greenspan_data.header_lines
+                'header_lines': greenspan_data.header_lines,
                 }
 
         self.dates = greenspan_data.dates
@@ -136,6 +137,7 @@ class GreenspanReader:
     datetime.tzinfo object that represents the timezone of the
     timestamps in the txt file.
     """
+
     def __init__(self, data_file, tzinfo=None, format_version=None):
         self.default_tzinfo = tzinfo
         self.format_version = format_version
@@ -165,7 +167,6 @@ class GreenspanReader:
 
         if type(data_file) == str:
             warnings.warn('Expects File Object', Warning)
-
         else:
             fid = data_file
 
@@ -186,13 +187,10 @@ class GreenspanReader:
 
         if 'Greenspan data converter .dll Version:  2. 4. 1' in hdr:
             fmt = '2.4.1'
-
         elif 'Greenspan data converter .dll Version:  2. 3. 1' in hdr:
             fmt = '2.3.1'
-
         elif '# GREENSPAN' in hdr:
             fmt = 'block'
-
         else:
             fmt = 'unknown'
 
@@ -250,13 +248,12 @@ class GreenspanReader:
             if self.file_ext == 'xls':  # xlrd reads in dates as floats
                 self.dates = np.array(
                     [(datetime.datetime(*xlrd.xldate_as_tuple(dt, 0)))
-                     for dt in datestr]
-                    )
+                     for dt in datestr])
             else:
                 self.dates = np.array(
                     [datetime.datetime.strptime(dt, '%d/%m/%Y %H:%M:%S')
-                     for dt in datestr]
-                    )
+                     for dt in datestr])
+
 
             fid.seek(0)
             self.data = np.genfromtxt(fid, delimiter=',', skip_header=15,
@@ -342,8 +339,8 @@ class Parameter:
     Class that implements the a structure to return a parameters
     name, unit and data
     """
-    def __init__(self, param_name, param_unit):
 
+    def __init__(self, param_name, param_unit):
         self.name = param_name
         self.unit = param_unit
         self.data = []
