@@ -60,7 +60,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
                      #'Level': 'water_depth_non_vented',
                      'Batt': 'instrument_battery_voltage',
                      'Battery': 'instrument_battery_voltage',
-                     'TDS': 'TDS01',
+                     'TDS': 'water_total_dissolved_salts',
                      #'Redox': 'NotImplemented',
                      }
 
