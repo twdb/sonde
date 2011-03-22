@@ -52,8 +52,8 @@ parameters = ['water_depth_non_vented','water_temperature', 'water_electrical_co
 # dissolved oxygen: mgl (mg/l), percent (% Sat)
 # turbidity: ntu
 # ph (dimensionless): dl 
-#These are the header of parameters = [Volts,Celsius,Metres,uS/cm,uS/cm,mg/l,psu]
-units = ['volt', 'degC', 'uScm']
+#These are the header of parameters = [(ft________),(deg_C_____),(uS/cm_____)]
+units = ['psu', 'degC', 'uScm']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
