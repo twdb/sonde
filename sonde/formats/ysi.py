@@ -92,7 +92,7 @@ class YSIDataset(sonde.BaseSondeDataset):
                 'logging_interval': ysi_data.logging_interval,
                 'begin_log_time': ysi_data.begin_log_time,
                 'first_sample_time': ysi_data.first_sample_time,
-                'pad2': ysi_data.pad2
+                'pad2': ysi_data.pad2,
                 }
             self.site_name = ysi_data.site_name
             self.serial_number = ysi_data.serial_number
@@ -100,8 +100,7 @@ class YSIDataset(sonde.BaseSondeDataset):
         else:
             ysi_data = YSIReaderTxt(self.data_file, self.default_tzinfo,
                                     self.param_file)
-            self.format_parameters = {
-                }
+            self.format_parameters = {}
 
         # determine parameters provided and in what units
         self.parameters = dict()
