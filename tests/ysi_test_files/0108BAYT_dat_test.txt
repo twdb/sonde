@@ -41,7 +41,7 @@ stop_time = '03/13/2008 14:00:33'
 # 'water_depth_non_vented' : Water Surface Elevation (No Atm Pressure Correction)
 # 'water_depth_vented' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = ["Date","Time","Temp","SpCond","Depth","ODO%","Battery","Cond","ODO Conc","Salinity"]
-parameters = ['water_temperature','water_depth_non_vented','water_dissolved_oxygen_percent_saturation','instrument_battery_voltage','water_electrical_conductivity','water_dissolved_oxygen_concentration','seawater_salinity']
+parameters = ['water_temperature','water_depth_non_vented','water_dissolved_oxygen_percent_saturation','instrument_battery_voltage','water_electrical_conductivity']
 
 
 # units (comma delimited, in column order)
@@ -54,7 +54,7 @@ parameters = ['water_temperature','water_depth_non_vented','water_dissolved_oxyg
 # turbidity: ntu
 # ph (dimensionless): dl 
 #These are the header of parameters = ["M/D/Y","h:m:s","C","mS/cm","m","%","V","mS/cm","mg/L","ppt"]
-units = ['degC', 'mH2O', 'percent', 'volt', 'mScm', 'mgl', 'ppt']
+units = ['degC', 'mH2O', 'percent', 'volt', 'mScm']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
@@ -66,14 +66,14 @@ units = ['degC', 'mH2O', 'percent', 'volt', 'mScm', 'mgl', 'ppt']
 # three records from some random location in the file and the last
 # three records of data
 test_data = """[ #Do not edit this line
-['01/29/2008 09:00:33', 22.56, -0.093, 103.2, 6.6, -0.000, 8.93, 0.00],
-['01/29/2008 10:00:33', 20.20, -0.096, 101.3, 6.6, -0.000, 9.17, 0.00],
-['01/29/2008 11:00:33', 20.04, -0.085, 103.5, 6.6, -0.000, 9.40, 0.00],
-['02/15/2008 05:00:34', 15.46, 2.222, 90.6, 5.9, 18.815, 8.30, 13.95],
-['02/15/2008 06:00:34', 15.53, 2.192, 86.1, 5.9, 18.501, 7.89, 13.67],
-['02/15/2008 07:00:34', 15.50, 2.110, 88.7, 5.9, 18.028, 8.16, 13.30],
-['03/13/2008 12:00:33', 20.09, -0.066, 103.9, 5.6, -0.000, 9.43, 0.00],
-['03/13/2008 13:00:33', 21.16, -0.075, 104.3, 5.6, -0.000, 9.27, 0.00],
-['03/13/2008 14:00:33', 22.51, -0.083, 104.3, 5.6, -0.000, 9.03, 0.00],
+['01/29/2008 09:00:33', 22.56, -0.093, 103.2, 6.6, -0.000],
+['01/29/2008 10:00:33', 20.20, -0.096, 101.3, 6.6, -0.000],
+['01/29/2008 11:00:33', 20.04, -0.085, 103.5, 6.6, -0.000],
+['02/15/2008 05:00:34', 15.46, 2.222, 90.6, 5.9, 18.815],
+['02/15/2008 06:00:34', 15.53, 2.192, 86.1, 5.9, 18.501],
+['02/15/2008 07:00:34', 15.50, 2.110, 88.7, 5.9, 18.028],
+['03/13/2008 12:00:33', 20.09, -0.066, 103.9, 5.6, -0.000],
+['03/13/2008 13:00:33', 21.16, -0.075, 104.3, 5.6, -0.000],
+['03/13/2008 14:00:33', 22.51, -0.083, 104.3, 5.6, -0.000],
 ]   #Do not edit this line
 """ #Do not edit this line
