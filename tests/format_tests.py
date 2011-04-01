@@ -14,12 +14,15 @@ from sonde.timezones import cst, cdt
 # global tz
 tz = None
 
+
 def test_files():
     test_file_paths = glob.glob('./*_test_files/*_test.txt')
 
     for test_file_path in test_file_paths:
         tested_file_extension = test_file_path.split('_')[-2]
-        tested_file_path = '.'.join([test_file_path.rsplit('_' + tested_file_extension, 1)[0],
+        tested_file_base = test_file_path.rsplit('_' + tested_file_extension,
+                                                 1)[0]
+        tested_file_path = '.'.join([tested_file_base,
                                      tested_file_extension])
 
         yield check_file, test_file_path, tested_file_path
@@ -36,13 +39,13 @@ def check_file(test_file_path, sonde_file_path):
 
     # force cst, as the python naive datetime automatically converts
     # to cst which tends to screw things up
-    if 'tz' in test_file['format_parameters'] and test_file['format_parameters']['tz'].lower() == 'cdt':
+    if 'tz' in test_file['format_parameters'] and \
+           test_file['format_parameters']['tz'].lower() == 'cdt':
         tz = cdt
     else:
         tz = cst
 
     sonde = Sonde(sonde_file_path, file_format=file_format, tzinfo=tz)
-
     check_format_parameters(test_file['format_parameters'], sonde)
 
     parameters = test_file['data']['parameters']
@@ -92,21 +95,28 @@ def check_format_parameters(format_parameters, sonde):
         # used to be in the format_parameters dict but now they are on
         # the sonde object and it's not worth the effort to rearrange
         # all the test files
-        sonde_parameters = ['serial_number', 'site_name', 'setup_time', 'start_time', 'stop_time']
+        sonde_parameters = ['serial_number', 'site_name', 'setup_time',
+                            'start_time', 'stop_time']
 
         if parameter_name in sonde_parameters:
-            assert hasattr(sonde, parameter_name), "format parameter '%s' not found in sonde.format_parameters" % parameter_name
+            assert hasattr(sonde, parameter_name), \
+                   "format parameter '%s' not found in " \
+                   "sonde.format_parameters" % parameter_name
             sonde_parameter = getattr(sonde, parameter_name)
 
         else:
-            assert parameter_name in sonde.format_parameters, "format parameter '%s' not found in sonde.format_parameters" % parameter_name
+            assert parameter_name in sonde.format_parameters, \
+                   "format parameter '%s' not found in " \
+                   "sonde.format_parameters" % parameter_name
             sonde_parameter = sonde.format_parameters[parameter_name]
 
         # if we are testing a datetime value
         if re.match('\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}', test_value):
             test_value = _convert_to_aware_datetime(test_value)
 
-        assert test_value == sonde_parameter, "format parameter '%s' doesn't match: %s != %s" % (parameter_name, test_value, sonde_parameter)
+        assert test_value == sonde_parameter, \
+               "format parameter '%s' doesn't match: '%s' != '%s'" % \
+               (parameter_name, test_value, sonde_parameter)
 
 
 def _tz_offset_string(tzinfo):
@@ -117,7 +127,7 @@ def _tz_offset_string(tzinfo):
     """
     offset = tzinfo.utcoffset(tzinfo)
 
-    hours = offset.days * 24 + offset.seconds/3600
+    hours = offset.days * 24 + offset.seconds / 3600
     minutes = (offset.seconds % 3600) / 60
 
     return "%+03d%02d" % (hours, minutes)
