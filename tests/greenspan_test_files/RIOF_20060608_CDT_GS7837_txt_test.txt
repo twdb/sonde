@@ -5,13 +5,13 @@ format = 'greenspan'
 
 [format_parameters]
 # log file name: if present in file else leave blank
-log_file_name = 'GS_025399_SB1S'
+log_file_name = 
 
 # timezone: if present in file else leave blank
 tz = 
 
 # site name: if present in file else leave blank
-site_name = 'JDM4'
+site_name = 
 
 # instrument serial number, if present in file else leave blank
 serial_number = 
@@ -40,7 +40,7 @@ stop_time = '07/18/2006 14:00:00'
 # 'water_depth_non_vented' : Water Surface Elevation (No Atm Pressure Correction)
 # 'water_depth_vented' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = [Batt, DO, Temp, Ec, pH]
-parameters = ['instrument_battery_voltage','water_dissolved_oxygen_concentration','water_temperature','water_specific_conductance','water_ph']
+parameters = ['instrument_battery_voltage','water_dissolved_oxygen_concentration','water_temperature','water_electrical_conductivity','water_ph']
 
 
 # units (comma delimited, in column order)
@@ -65,14 +65,14 @@ units = ['volt', 'mgl', 'degC','uScm', 'dl']
 # three records from some random location in the file and the last
 # three records of data
 test_data = """[ #Do not edit this line
-['06/08/2006 14:00:00', 'nan', 00008.6, 0031.57, 002615., 0008.97],
-['06/08/2006 15:00:00', 'nan', 00010.6, 0032.04, 002591., 0008.98],
-['06/08/2006 16:00:00', 'nan', 00011.0, 0032.54, 002583., 0009.02],
-['06/25/2006 00:00:00', 10.35, 00004.8, 0030.13, 014153., 0008.72],
-['06/25/2006 01:00:00', 'nan', 00004.6, 0029.92, 012982., 0008.69],
-['06/25/2006 02:00:00', 'nan', 00004.3, 0029.75, 013487., 0008.68],
-['07/18/2006 12:00:00', 'nan', 00000.1, 0032.14, 002613., 0007.89],
-['07/18/2006 13:00:00', 'nan', 00000.1, 0032.84, 002613., 0007.88],
-['07/18/2006 14:00:00', 'nan', 00000.1, 0033.56, -000107, 0007.41],
+['06/08/2006 14:00:00', 'nan', 8.6, 31.57, 2615., 8.97],
+['06/08/2006 15:00:00', 'nan', 10.6,32.04, 2591., 8.98],
+['06/08/2006 16:00:00', 'nan', 11.0,32.54, 2583., 9.02],
+['06/25/2006 00:00:00', 10.35, 4.8, 30.13, 14153.,8.72],
+['06/25/2006 01:00:00', 'nan', 4.6, 29.92, 12982.,8.69],
+['06/25/2006 02:00:00', 'nan', 4.3, 29.75, 13487.,8.68],
+['07/18/2006 12:00:00', 'nan',-0.1, 32.14, 2613., 7.89],
+['07/18/2006 13:00:00', 'nan',-0.1, 32.84, 2613., 7.88],
+['07/18/2006 14:00:00', 'nan',-0.1, 33.56, -107., 7.41],
 ]   #Do not edit this line
 """ #Do not edit this line

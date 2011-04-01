@@ -11,7 +11,7 @@ log_file_name =
 tz = 
 
 # site name: if present in file else leave blank
-site_name =
+site_name = 
 
 # instrument serial number, if present in file else leave blank
 serial_number ='00000000' 
@@ -53,7 +53,7 @@ parameters = ['water_depth_non_vented','water_temperature', 'water_electrical_co
 # turbidity: ntu
 # ph (dimensionless): dl 
 #These are the header of parameters = [(ft________),(deg_C_____),(uS/cm_____)]
-units = ['psu', 'degC', 'uScm']
+units = ['ftH2O', 'degC', 'uScm']
 
 # Now we need to provide a list of known data values to test against.
 # For each data record that needs to be tested, the first value should
@@ -71,8 +71,8 @@ test_data = """[ #Do not edit this line
 ['03/14/2006 04:45:00', 0, 18.98, 31465.9],
 ['03/14/2006 05:00:00', 0, 19.02, 31473],
 ['03/14/2006 05:05:00', 0, 19.06, 29413.6],
-['10/05/2006 11:30:00', 0, 27.34, 25982.8],
-['10/05/2006 11:45:00', 0, 27.43, 26067.4],
-['10/05/2006 12:00:00', 0, 27.52, 2339.4],
+['05/10/2006 11:30:00', 0, 27.34, 25982.8],
+['05/10/2006 11:45:00', 0, 27.43, 26067.4],
+['05/10/2006 12:00:00', 0, 27.52, 2339.4],
 ]   #Do not edit this line
 """ #Do not edit this line
