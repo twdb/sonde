@@ -28,6 +28,10 @@ from ..timezones import cdt, cst
 from .. import util
 
 
+class BadDatafileError(IOError):
+    pass
+
+
 class GreenspanDataset(sonde.BaseSondeDataset):
     """
     Dataset object that represents the data contained in a greenspan txt
@@ -252,38 +256,75 @@ class GreenspanReader:
             params = fields[3:]
             units = fid.readline().rstrip('\r\n').split(',')[3:]
 
-            #clean param & unit names
-            for param, unit in zip(params, units):
-                self.parameters.append(Parameter(param.strip('()_'),
-                                                 unit.strip('()_')))
+            # skip Channel Number line
+            fid.readline()
 
             #read data
-            fid.seek(0)
-            datestr = np.genfromtxt(fid, delimiter=',', skip_header=15,
-                                    usecols=(1), dtype='|S')
+            data_start = fid.tell()
+
+            datestr = [line.split(',')[1] for line in fid]
 
             # xlrd reads in dates as floats, but excel isn't too
             # careful about datatypes and depending on how the file
             # has been handled, there's a chance that the dates have
             # already been converted to strings
-            if self.file_ext == 'xls':
-                self.dates = np.array(
-                    [util.possibly_corrupt_xls_date_to_datetime(dt)
-                      for dt in datestr])
-            else:
-                self.dates = np.array(
-                    [datetime.datetime.strptime(dt, '%d/%m/%Y %H:%M:%S')
-                     for dt in datestr])
+            number_of_unique_dates = len(np.unique(np.array(
+                [util.possibly_corrupt_xls_date_to_datetime(dt,
+                                                            self.xlrd_datemode)
+                 for dt in datestr])))
 
-            fid.seek(0)
-            self.data = np.genfromtxt(fid, delimiter=',', skip_header=15,
-                                      usecols=cols, dtype=float)
+            self.dates = np.array((datetime.datetime(1900, 1, 1), ) \
+                                  * number_of_unique_dates)
 
-            for ii in range(len(self.parameters)):
-                self.parameters[ii].data = self.data[:, ii]
+            for param, unit in zip(params, units):
+                param_name, unit_name = param.strip('()_'), unit.strip('()_')
+
+                # clean param & unit names
+                self.parameters.append(Parameter(param_name,
+                                                 unit_name))
+                # initialize data dict with empty arrays
+                self.data[param_name] = np.array((np.nan,) * len(self.dates))
+            fid.seek(data_start)
+            data_count = -1
+            last_date = None
+            for line in fid:
+                line_split = line.split(',')
+                date = util.possibly_corrupt_xls_date_to_datetime(
+                    line_split[1])
+                if date != last_date:
+                    if last_date and date < last_date:
+                        raise BadDatafileError(
+                            "Non-sequential timestamps found in file '%s'. "
+                            "This shouldn't happen!" % (fid.name,))
+
+                    data_count += 1
+                    self.dates[data_count] = date
+
+                for i, parameter in enumerate(self.parameters, start=3):
+                    val = line_split[i].strip()
+                    if date == last_date:
+                        if np.isnan(self.data[parameter.name][data_count]):
+                            if val != '':
+                                self.data[parameter.name][data_count] = \
+                                                                      float(val)
+                        elif val != '':
+                            warnings.warn("Conflicting values for parameter "
+                                          "'%s' on date: %s" % (
+                                              parameter.name,
+                                              self.dates[data_count]), Warning)
+                            self.data[parameter.name][data_count] = float(val)
+                    else:
+                        if val == '':
+                            self.data[parameter.name][data_count] = np.nan
+                        else:
+                            self.data[parameter.name][data_count] = float(val)
+
+                last_date = date
+
+            for ii, parameter in enumerate(self.parameters):
+                self.parameters[ii].data = self.data[parameter.name]
 
         elif self.format_version == 'block':
-
             self.header_lines = []
             self.header_lines.append(fid.readline())
             buf = fid.readline()
