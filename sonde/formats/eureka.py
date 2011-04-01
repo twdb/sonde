@@ -9,10 +9,12 @@
 from __future__ import absolute_import
 
 import datetime
-import xlrd
+import os
+import warnings
+
 import numpy as np
 import quantities as pq
-import warnings
+import xlrd
 
 from .. import sonde
 from sonde import util
@@ -118,19 +120,21 @@ class EurekaReader:
         self.site_name = ''
         self.file_ext = data_file.split('.')[-1].lower()
 
+        temp_file_path = None
         if self.file_ext == 'xls':
-            file_buf = open(util.xls_to_csv(data_file), 'rb')
+            temp_file_path, self.xlrd_datemode = util.xls_to_csv(data_file)
+            file_buf = open(temp_file_path, 'rb')
         else:
             file_buf = open(data_file)
 
-        self.read_eureka(file_buf)
-
-        # if the serial number just contains numbers the cell holding
-        # it might be formatted as a number, in which case it gets
-        # read in with a trailing '.0'
-        if hasattr(self, 'serial_number') and \
-               self.serial_number.rfind('.0') == len(self.serial_number) - 2:
-            self.serial_number = self.serial_number[:-2]
+        try:
+            self.read_eureka(file_buf)
+        except:
+            raise
+        finally:
+            file_buf.close()
+            if temp_file_path:
+                os.remove(temp_file_path)
 
         if tzinfo:
             if hasattr(self, 'setup_time'):

@@ -11,7 +11,8 @@ def xls_to_csv(xls_file):
     assumes all data is in first worksheet
 
     Returns a string containing the file path to a temp file
-    containing the converted csv file
+    containing the converted csv file, plus the workbook's datemode
+    (useful if you need to convert dates later on)
     """
     temp_csv_fid, csv_file_path = tempfile.mkstemp()
     with open(csv_file_path, 'wb') as csv_file:
@@ -27,6 +28,7 @@ def xls_to_csv(xls_file):
 
         workbook = xlrd.open_workbook(xls_file_path)
         sheet = workbook.sheet_by_index(0)
+        datemode = workbook.datemode
 
         csv_writer = csv.writer(csv_file, csv.excel)
 
@@ -40,16 +42,16 @@ def xls_to_csv(xls_file):
 
             csv_writer.writerow(this_row)
 
-    return csv_file_path
+    return csv_file_path, datemode
 
 
-def possibly_corrupt_xls_date_to_datetime(date_val):
+def possibly_corrupt_xls_date_to_datetime(date_val, datemode=0):
     """
     xls files generally return date columns as strings containing a
     float value, but these values can be corrupt depending on how the
     file has been saved/exported
     """
     try:
-        return datetime(*xlrd.xldate_as_tuple(float(date_val), 0))
-    except ValueError:
         return datetime.strptime(date_val, '%d/%m/%Y %H:%M:%S')
+    except ValueError:
+        return datetime(*xlrd.xldate_as_tuple(float(date_val), datemode))

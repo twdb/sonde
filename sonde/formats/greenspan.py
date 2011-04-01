@@ -150,22 +150,28 @@ class GreenspanReader:
         self.num_params = 0
         self.parameters = []
         self.file_ext = data_file.split('.')[-1].lower()
+        self.data = {}
+        self.dates = []
+        self.xlrd_datemode = 0
 
         temp_file_path = None
         if self.file_ext == 'xls':
-            temp_file_path = util.xls_to_csv(data_file)
+            temp_file_path, self.xlrd_datemode = util.xls_to_csv(data_file)
             file_buf = open(temp_file_path, 'rb')
         else:
             file_buf = open(data_file, 'r')
 
-        if not self.format_version:
-            self.format_version = self.detect_format_version(file_buf)
+        try:
+            if not self.format_version:
+                self.format_version = self.detect_format_version(file_buf)
 
-        self.read_greenspan(file_buf)
-
-        file_buf.close()
-        if temp_file_path:
-            os.remove(temp_file_path)
+            self.read_greenspan(file_buf)
+        except:
+            raise
+        finally:
+            file_buf.close()
+            if temp_file_path:
+                os.remove(temp_file_path)
 
         if tzinfo:
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
