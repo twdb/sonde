@@ -89,9 +89,8 @@ class GreenspanDataset(sonde.BaseSondeDataset):
         greenspan_data = GreenspanReader(self.data_file, self.default_tzinfo)
 
         # determine parameters provided and in what units
-        self.parameters = dict()
-        self.data = dict()
-
+        self.parameters = {}
+        self.data = {}
         for parameter in greenspan_data.parameters:
             try:
                 pcode = param_map[(parameter.name).strip()]
@@ -350,16 +349,16 @@ class GreenspanReader:
             for ii in range(self.num_params):
                 self.parameters[ii].data = data[:, ii]
 
+        else:
+            warnings.warn('Unknown Format Type', Warning)
+            raise
+
         # if the serial number just contains numbers the cell holding
         # it might be formatted as a number, in which case it gets
         # read in with a trailing '.0'
         if hasattr(self, 'serial_number') and \
                self.serial_number.rfind('.0') == len(self.serial_number) - 2:
             self.serial_number = self.serial_number[:-2]
-
-        else:
-            warnings.warn('Unknown Format Type', Warning)
-            raise
 
 
 class Parameter:
