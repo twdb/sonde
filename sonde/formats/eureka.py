@@ -216,6 +216,13 @@ class EurekaReader:
 
                 self.parameters.append(Parameter(param.strip(), unit.strip()))
 
+        # if the serial number just contains numbers the cell holding
+        # it might be formatted as a number, in which case it gets
+        # read in with a trailing '.0'
+        if hasattr(self, 'serial_number') and \
+               self.serial_number.rfind('.0') == len(self.serial_number) - 2:
+            self.serial_number = self.serial_number[:-2]
+
         for ii in range(len(self.parameters)):
             param = (self.parameters[ii].name).strip(' .').replace(' ', '_')
             self.parameters[ii].data = data[param]
