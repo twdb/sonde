@@ -16,24 +16,25 @@ tz = None
 
 
 def test_files():
-    test_file_paths = glob.glob('./*_test_files/*_test.txt')
+    test_config_paths = glob.glob('./*_test_files/*_test.txt')
 
-    for test_file_path in test_file_paths:
-        tested_file_extension = test_file_path.split('_')[-2]
-        tested_file_base = test_file_path.rsplit('_' + tested_file_extension,
-                                                 1)[0]
-        tested_file_path = '.'.join([tested_file_base,
-                                     tested_file_extension])
+    for test_config_path in test_config_paths:
+        sonde_file_extension = test_config_path.split('_')[-2]
+        sonde_file_base = test_config_path.rsplit('_' + sonde_file_extension,
+                                                  1)[0]
+        sonde_file_path = '.'.join([sonde_file_base,
+                                    sonde_file_extension])
 
-        yield check_file, test_file_path, tested_file_path
+        test_file_config = ConfigObj(open(test_config_path), unrepr=True)
 
-        test_file_descriptor = open(test_file_path)
-        yield check_file, test_file_descriptor, tested_file_path
+        yield check_file, test_file_config, sonde_file_path
+
+        with open(sonde_file_path) as sonde_file_fid:
+            yield check_file, test_file_config, sonde_file_fid
 
 
-def check_file(test_file_path, sonde_file_path):
+def check_file(test_file, sonde_file):
     global tz
-    test_file = ConfigObj(test_file_path, unrepr=True)
 
     file_format = test_file['header']['format']
 
@@ -45,7 +46,7 @@ def check_file(test_file_path, sonde_file_path):
     else:
         tz = cst
 
-    sonde = Sonde(sonde_file_path, file_format=file_format, tzinfo=tz)
+    sonde = Sonde(sonde_file, file_format=file_format, tzinfo=tz)
     check_format_parameters(test_file['format_parameters'], sonde)
 
     parameters = test_file['data']['parameters']
