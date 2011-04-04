@@ -127,19 +127,20 @@ class EurekaReader:
         temp_file_path = None
         if self.file_ext == 'xls':
             temp_file_path, self.xlrd_datemode = util.xls_to_csv(self.file_name)
-            fid = open(temp_file_path, 'rb')
+            file_buf = open(temp_file_path, 'rb')
         else:
             if type(data_file) == str:
-                fid = open(data_file)
+                file_buf = open(data_file)
             elif type(data_file) == file:
-                fid = data_file
+                file_buf = data_file
 
         try:
-            self.read_eureka(fid)
+            self.read_eureka(file_buf)
         except:
             raise
         finally:
-            fid.close()
+            if type(data_file) == str:
+                file_buf.close()
             if temp_file_path:
                 os.remove(temp_file_path)
 
@@ -156,19 +157,19 @@ class EurekaReader:
         Open and read a Eureka file.
         """
         if type(data_file) == str:
-            fid = open(data_file, 'r')
+            file_buf = open(data_file, 'r')
         else:
-            fid = data_file
-        self.read_data(fid)
+            file_buf = data_file
+        self.read_data(file_buf)
 
-    def read_data(self, fid):
+    def read_data(self, file_buf):
         """
         Read header information
         """
 
-        fid.seek(0)
+        file_buf.seek(0)
 
-        buf = fid.readline()
+        buf = file_buf.readline()
 
         while buf:
             if buf[0:4] == 'Date':
@@ -189,13 +190,13 @@ class EurekaReader:
                 self.stop_time = datetime.datetime.strptime(
                     d + t, '%m/%d/%Y%H:%M:%S')
 
-            buf = fid.readline()
+            buf = file_buf.readline()
 
         fields = buf.strip('\r\n').split(',')
         params = fields[2:]
-        units = fid.readline().strip('\r\n').split(',')[2:]
+        units = file_buf.readline().strip('\r\n').split(',')[2:]
 
-        data = np.genfromtxt(fid, delimiter=',', dtype=None, names=fields)
+        data = np.genfromtxt(file_buf, delimiter=',', dtype=None, names=fields)
 
         if self.file_ext == 'xls':  # xlrd reads in dates as floats
             self.dates = np.array(
