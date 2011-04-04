@@ -47,7 +47,7 @@ class GreenspanDataset(sonde.BaseSondeDataset):
         self.data_file = data_file
         self.format_version = format_version
         self.default_tzinfo = tzinfo
-        super(GreenspanDataset, self).__init__()
+        super(GreenspanDataset, self).__init__(data_file)
 
     def _read_data(self):
         """

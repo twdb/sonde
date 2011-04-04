@@ -37,7 +37,7 @@ class HydrotechDataset(sonde.BaseSondeDataset):
         self.manufacturer = 'hydrotech'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
-        super(HydrotechDataset, self).__init__()
+        super(HydrotechDataset, self).__init__(data_file)
 
     def _read_data(self):
         """

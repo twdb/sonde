@@ -35,7 +35,7 @@ class SolinstDataset(sonde.BaseSondeDataset):
         self.manufacturer = 'solinst'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
-        super(SolinstDataset, self).__init__()
+        super(SolinstDataset, self).__init__(data_file)
 
     def _read_data(self):
         """

@@ -34,7 +34,7 @@ class EurekaDataset(sonde.BaseSondeDataset):
         self.default_tzinfo = tzinfo
         self.data = dict()
         self.dates = []
-        super(EurekaDataset, self).__init__()
+        super(EurekaDataset, self).__init__(data_file)
 
     def _read_data(self):
         """

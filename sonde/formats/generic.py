@@ -56,7 +56,7 @@ class GenericDataset(sonde.BaseSondeDataset):
         self.manufacturer = 'generic'
         self.file_format = 'generic'
         self.data_file = data_file
-        super(GenericDataset, self).__init__()
+        super(GenericDataset, self).__init__(data_file)
 
     def _read_data(self):
         """

@@ -40,7 +40,7 @@ class YSIDataset(sonde.BaseSondeDataset):
         self.data_file = data_file
         self.param_file = param_file
         self.default_tzinfo = tzinfo
-        super(YSIDataset, self).__init__()
+        super(YSIDataset, self).__init__(data_file)
 
     def _read_data(self):
         """

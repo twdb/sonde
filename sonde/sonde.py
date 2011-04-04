@@ -305,7 +305,11 @@ class BaseSondeDataset(object):
     #: standard units
     parameters = {}
 
-    def __init__(self):
+    def __init__(self, data_file=None):
+        if type(data_file) == str:
+            self.file_name = data_file
+        elif type(data_file) == file:
+            self.file_name = data_file.name
         self.data = {}
         self.dates = []
         self.format_parameters = {}
