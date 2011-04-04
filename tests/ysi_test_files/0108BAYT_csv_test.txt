@@ -1,6 +1,6 @@
 [header]
 # format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka
-format = 'ysi'
+format = 'ysi_csv'
 
 
 [format_parameters]
