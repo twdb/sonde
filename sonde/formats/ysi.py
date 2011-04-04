@@ -167,6 +167,9 @@ class YSIReaderTxt:
             fid = data_file
 
         #read header
+        fid_initial_location = fid.tell()
+        fid.seek(0)
+
         buf = fid.readline().strip('\r\n')
         if buf.find(',') > 0:
             dlm = ','
@@ -232,6 +235,8 @@ class YSIReaderTxt:
             data = np.genfromtxt(fid, dtype=None, names=fields, delimiter=',')
         else:
             data = np.genfromtxt(fid, dtype=None, names=fields)
+
+        fid.seek(fid_initial_location)
 
         if fields[0].lower() == 'datetime':
             self.dates = np.array(
