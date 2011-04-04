@@ -26,12 +26,13 @@ class MacroctdDataset(sonde.BaseSondeDataset):
     file. It accepts one optional parameters, `tzinfo` is a datetime.tzinfo
     object that represents the timezone of the timestamps in the file.
     """
+
     def __init__(self, data_file, tzinfo=None):
         self.file_format = 'macroctd'
         self.manufacturer = 'macroctd'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
-        super(MacroctdDataset, self).__init__()
+        super(MacroctdDataset, self).__init__(data_file)
 
     def _read_data(self):
         """
@@ -90,10 +91,12 @@ class MacroctdReader:
     datetime.tzinfo object that represents the timezone of the
     timestamps in the txt file.
     """
+
     def __init__(self, data_file, tzinfo=None):
         self.default_tzinfo = tzinfo
         self.num_params = 0
         self.parameters = []
+
         self.read_macroctd(data_file)
 
         if tzinfo:
@@ -103,8 +106,12 @@ class MacroctdReader:
         """
         Open and read a Macroctd file.
         """
+        if type(data_file) == str:
+            fid = open(data_file)
+        elif type(data_file) == file:
+            fid = data_file
+            initial_file_location = fid.tell()
 
-        fid = open(data_file)
         self.header_lines = []
 
         buf = fid.readline()
@@ -129,10 +136,14 @@ class MacroctdReader:
 
         data = np.genfromtxt(fid, delimiter=',', dtype=None, names=fields)
 
+        if type(data_file) == str:
+            fid.close()
+        else:
+            fid.seek(initial_file_location)
+
         self.dates = np.array(
             [datetime.datetime.strptime(d + t, '%m/%d/%y%H:%M')
-             for d, t in zip(data['Date'], data['Time'])]
-            )
+             for d, t in zip(data['Date'], data['Time'])])
 
         #atm pressure correction for macroctd
         data['Pressure'] -= 14.7
@@ -151,6 +162,7 @@ class Parameter:
     Class that implements the a structure to return a parameters
     name, unit and data
     """
+
     def __init__(self, param_name, param_unit):
 
         self.name = param_name
