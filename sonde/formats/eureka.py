@@ -118,21 +118,28 @@ class EurekaReader:
         self.header_lines = []
         self.parameters = []
         self.site_name = ''
-        self.file_ext = data_file.split('.')[-1].lower()
+        if type(data_file) == str:
+            self.file_name = data_file
+        elif type(data_file) == file:
+            self.file_name = data_file.name
+        self.file_ext = self.file_name.split('.')[-1].lower()
 
         temp_file_path = None
         if self.file_ext == 'xls':
-            temp_file_path, self.xlrd_datemode = util.xls_to_csv(data_file)
-            file_buf = open(temp_file_path, 'rb')
+            temp_file_path, self.xlrd_datemode = util.xls_to_csv(self.file_name)
+            fid = open(temp_file_path, 'rb')
         else:
-            file_buf = open(data_file)
+            if type(data_file) == str:
+                fid = open(data_file)
+            elif type(data_file) == file:
+                fid = data_file
 
         try:
-            self.read_eureka(file_buf)
+            self.read_eureka(fid)
         except:
             raise
         finally:
-            file_buf.close()
+            fid.close()
             if temp_file_path:
                 os.remove(temp_file_path)
 
