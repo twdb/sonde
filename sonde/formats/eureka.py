@@ -27,6 +27,7 @@ class EurekaDataset(sonde.BaseSondeDataset):
     file. It accepts one optional parameters, `tzinfo` is a datetime.tzinfo
     object that represents the timezone of the timestamps in the file.
     """
+
     def __init__(self, data_file, tzinfo=None):
         self.file_format = 'eureka'
         self.manufacturer = 'eureka'
@@ -113,6 +114,7 @@ class EurekaReader:
     datetime.tzinfo object that represents the timezone of the
     timestamps in the txt file.
     """
+
     def __init__(self, data_file, tzinfo=None):
         self.default_tzinfo = tzinfo
         self.header_lines = []
@@ -126,7 +128,8 @@ class EurekaReader:
 
         temp_file_path = None
         if self.file_ext == 'xls':
-            temp_file_path, self.xlrd_datemode = util.xls_to_csv(self.file_name)
+            temp_file_path, self.xlrd_datemode = util.xls_to_csv(
+                self.file_name)
             file_buf = open(temp_file_path, 'rb')
         else:
             if type(data_file) == str:
@@ -202,13 +205,12 @@ class EurekaReader:
             self.dates = np.array(
                 [(datetime.datetime(*xlrd.xldate_as_tuple(d, 0))
                   + datetime.timedelta(t))
-                 for d, t in zip(data['Date'], data['Time'])]
-                )
+                 for d, t in zip(data['Date'], data['Time'])])
+
         else:
             self.dates = np.array(
                 [datetime.datetime.strptime(d + t, '%m/%d/%Y%H:%M:%S')
-                 for d, t in zip(data['Date'], data['Time'])]
-                )
+                 for d, t in zip(data['Date'], data['Time'])])
 
         #assign param & unit names
         for param, unit in zip(params, units):
@@ -241,8 +243,8 @@ class Parameter:
     Class that implements the a structure to return a parameters
     name, unit and data
     """
-    def __init__(self, param_name, param_unit):
 
+    def __init__(self, param_name, param_unit):
         self.name = param_name
         self.unit = param_unit
         self.data = []

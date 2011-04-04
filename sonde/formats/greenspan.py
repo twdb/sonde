@@ -276,8 +276,8 @@ class GreenspanReader:
             # has been handled, there's a chance that the dates have
             # already been converted to strings
             number_of_unique_dates = len(np.unique(np.array(
-                [util.possibly_corrupt_xls_date_to_datetime(dt,
-                                                            self.xlrd_datemode)
+                [util.possibly_corrupt_xls_date_to_datetime(
+                    dt, self.xlrd_datemode)
                  for dt in datestr])))
 
             self.dates = np.array((datetime.datetime(1900, 1, 1), ) \
