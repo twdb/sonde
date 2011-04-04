@@ -149,11 +149,6 @@ def autodetect(data_file, filename=None):
     containing the filename
     """
 
-    if type(data_file) == str:
-        fid = open(data_file, 'r')
-    else:
-        fid = data_file
-
     if not filename:
         if type(data_file) == str:
             filename = data_file
@@ -165,41 +160,54 @@ def autodetect(data_file, filename=None):
     file_ext = filename.split('.')[-1].lower()
 
     if file_ext and file_ext == 'xls':
-        fid = util.xls_to_csv(data_file)
+        temp_csv_path, xls_read_mode = util.xls_to_csv(data_file)
+        fid = open(temp_csv_path, 'rb')
+        lines = [fid.readline() for i in range(2)]
+        fid.close()
+        os.remove(temp_csv_path)
 
-    fid.seek(0)
+    else:
+        if type(data_file) == str:
+            fid = open(data_file, 'r')
+        else:
+            fid = data_file
 
-    #read first line
-    line1 = fid.readline()
+        file_initial_location = fid.tell()
+        fid.seek(0)
+        lines = [fid.readline() for i in range(2)]
+        fid.seek(file_initial_location)
 
-    if line1.lower().find('greenspan') != -1:
+
+    if lines[0].lower().find('greenspan') != -1:
         return 'greenspan'
-    if line1.lower().find('macrocdt') != -1:
+    if lines[0].lower().find('macrocdt') != -1:
         return 'macroctd'
-    if line1.lower().find('minisonde4a') != -1:
+    if lines[0].lower().find('minisonde4a') != -1:
         return 'hydrotech'
-    if line1.lower().find('data file for datalogger.') != -1:
+    if lines[0].lower().find('data file for datalogger.') != -1:
         return 'solinst'
-    if line1.lower().find('log file name') != -1:
+    if lines[0].lower().find('log file name') != -1:
         return 'hydrolab'
-    if line1.lower().find('pysonde csv format') != -1:
+    if lines[0].lower().find('pysonde csv format') != -1:
         return 'generic'
 
     #read second line
-    line2 = fid.readline()
-    if line2.lower().find('log file name') != -1:  # binary junk in first line
+    lines[1] = fid.readline()
+
+    # possible binary junk in first line of hydrotech file
+    if lines[1].lower().find('log file name') != -1:
         return 'hydrotech'
 
     #check for ysi
-    if line1[0] == 'A':
+    if lines[0][0] == 'A':
         return 'ysi_binary'  # binary
-    if line1.find('=') != -1:
+    if lines[0].find('=') != -1:
         return 'ysi_text'  # txt file
     if file_ext and file_ext == 'cdf':
         return 'ysi_cdf'  # cdf file
 
     #eureka try and detect degree symbol
-    if line2.find('\xb0') != -1:
+    if lines[1].find('\xb0') != -1:
         return 'eureka'
     else:
         return False
