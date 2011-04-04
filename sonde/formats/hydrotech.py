@@ -120,7 +120,11 @@ class HydrotechReader:
         a # to the beginning of comment lines.
         Returns a StringIO object
         """
-        fid = open(data_file)
+        if type(data_file) == str:
+            fid = open(data_file)
+        elif type(data_file) == file:
+            fid = data_file
+
         file_string = fid.read()
         #change no data string from # to NaN
         file_string = re.sub('#', 'NaN', file_string)
