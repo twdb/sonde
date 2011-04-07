@@ -216,7 +216,7 @@ class HydrolabReader:
         # only process lines starting with a number
         re_data = re.compile('^[0-9]')
 
-        re_clean_special_char = re.compile('[&@\*?]')
+        re_clean_special_char = re.compile('[&@\*?$]')
 
         # re_data = re.compile('((?!Date)(?![0-9]))', re.M) matches
         # only junk lines might be more efficient to work out how to
@@ -227,6 +227,7 @@ class HydrolabReader:
 
             if re_data.match(buf):
                 try:
+                    buf = re_clean_special_char.sub('', buf)
                     time_field, data_line = buf.split(None, 1)
                     log_time.append(datetime.datetime.strptime(
                         log_date + time_field, fmt))
@@ -242,7 +243,6 @@ class HydrolabReader:
 
         self.dates = np.array(log_time)
         data_str = re.sub('#', 'N', data_str)
-        data_str = re_clean_special_char.sub('', data_str)
 #        import pdb; pdb.set_trace()
         try:
             data = np.genfromtxt(StringIO(data_str), dtype=float)
