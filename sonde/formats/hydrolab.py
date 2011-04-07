@@ -31,6 +31,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
     object that represents the timezone of the timestamps in the
     binary file.
     """
+
     def __init__(self, data_file, tzinfo=None, param_file=None):
         self.file_format = 'hydrolab'
         self.manufacturer = 'hydrolab'
@@ -118,6 +119,7 @@ class HydrolabReader:
     datetime.tzinfo object that represents the timezone of the
     timestamps in the txt file.
     """
+
     def __init__(self, data_file, tzinfo=None):
         self.default_tzinfo = tzinfo
         self.num_params = 0
@@ -201,7 +203,6 @@ class HydrolabReader:
                         name = param
 
                     self.parameters.append(Parameter(name, unit))
-
                 break
             else:
                 self.header_lines.append(buf)
@@ -243,7 +244,6 @@ class HydrolabReader:
 
         self.dates = np.array(log_time)
         data_str = re.sub('#', 'N', data_str)
-#        import pdb; pdb.set_trace()
         try:
             data = np.genfromtxt(StringIO(data_str), dtype=float)
         except:
@@ -264,8 +264,8 @@ class Parameter:
     Class that implements the a structure to return a parameters
     name, unit and data
     """
-    def __init__(self, param_name, param_unit):
 
+    def __init__(self, param_name, param_unit):
         self.name = param_name
         self.unit = param_unit
         self.data = []
