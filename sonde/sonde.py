@@ -96,6 +96,10 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
     if not file_format:
         file_format = autodetect(data_file)
 
+        if file_format == False:
+            raise Exception("File Format Autodetection Failed. Try "
+                            "must specifying the file_format.")
+
     if 'ysi' in file_format.lower():
         from sonde.formats.ysi import YSIDataset
         return YSIDataset(data_file, *args, **kwargs)
@@ -127,10 +131,6 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
     if file_format.lower() == 'generic':
         from sonde.formats.generic import GenericDataset
         return GenericDataset(data_file, *args, **kwargs)
-
-    if file_format == False:
-        warnings.warn("File Format Autodetection Failed", Warning)
-        raise
 
     else:
         raise NotImplementedError("file format '%s' is not supported" % \
