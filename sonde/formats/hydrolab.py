@@ -200,8 +200,9 @@ class HydrolabReader:
                     if param == 'DO':
                         name = param + ' ' + unit.strip()
                     else:
-                        name = param
+                        name = param.strip()
 
+                    unit = unit.strip()
                     self.parameters.append(Parameter(name, unit))
                 break
             else:
@@ -216,7 +217,6 @@ class HydrolabReader:
 
         # only process lines starting with a number
         re_data = re.compile('^[0-9]')
-
         re_clean_special_char = re.compile('[&@\*?$]')
 
         # re_data = re.compile('((?!Date)(?![0-9]))', re.M) matches
