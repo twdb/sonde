@@ -96,6 +96,10 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
     if not file_format:
         file_format = autodetect(data_file)
 
+        if file_format == False:
+            raise Exception("File Format Autodetection Failed. Try "
+                            "must specifying the file_format.")
+
     if 'ysi' in file_format.lower():
         from sonde.formats.ysi import YSIDataset
         return YSIDataset(data_file, *args, **kwargs)
@@ -136,10 +140,6 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
         from sonde.formats.espey import EspeyDataset
         return EspeyDataset(data_file, *args, **kwargs)
 
-    if file_format == False:
-        warnings.warn("File Format Autodetection Failed", Warning)
-        raise
-
     else:
         raise NotImplementedError("file format '%s' is not supported" % \
                                    (file_format,))
@@ -147,14 +147,13 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
 
 def autodetect(data_file, filename=None):
     """
-    autodetect file_format based on file
-    return file_format string if successful or
-    False if unable to determine format
+    returns file_format string if successfully able to detect file
+    format, returns False otherwise.
 
-    data_file can be either a filename string or a file-like object,
-    if it is a file-like object, you can pass a file_name string if
-    the file-like object doesn't have a name or filename attribute
-    containing the filename
+    data_file can be either a filename string or a file-like object.
+    If it is a file-like object you can pass a file_name string if the
+    file-like object doesn't have a name or filename attribute
+    containing the filename.
     """
 
     if not filename:

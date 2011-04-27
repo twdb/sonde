@@ -31,6 +31,7 @@ class HydrolabDataset(sonde.BaseSondeDataset):
     object that represents the timezone of the timestamps in the
     binary file.
     """
+
     def __init__(self, data_file, tzinfo=None, param_file=None):
         self.file_format = 'hydrolab'
         self.manufacturer = 'hydrolab'
@@ -118,6 +119,7 @@ class HydrolabReader:
     datetime.tzinfo object that represents the timezone of the
     timestamps in the txt file.
     """
+
     def __init__(self, data_file, tzinfo=None):
         self.default_tzinfo = tzinfo
         self.num_params = 0
@@ -198,10 +200,10 @@ class HydrolabReader:
                     if param == 'DO':
                         name = param + ' ' + unit.strip()
                     else:
-                        name = param
+                        name = param.strip()
 
+                    unit = unit.strip()
                     self.parameters.append(Parameter(name, unit))
-
                 break
             else:
                 self.header_lines.append(buf)
@@ -215,8 +217,7 @@ class HydrolabReader:
 
         # only process lines starting with a number
         re_data = re.compile('^[0-9]')
-
-        re_clean_special_char = re.compile('[&@\*?]')
+        re_clean_special_char = re.compile('[&@\*?$]')
 
         # re_data = re.compile('((?!Date)(?![0-9]))', re.M) matches
         # only junk lines might be more efficient to work out how to
@@ -227,6 +228,7 @@ class HydrolabReader:
 
             if re_data.match(buf):
                 try:
+                    buf = re_clean_special_char.sub('', buf)
                     time_field, data_line = buf.split(None, 1)
                     log_time.append(datetime.datetime.strptime(
                         log_date + time_field, fmt))
@@ -242,8 +244,6 @@ class HydrolabReader:
 
         self.dates = np.array(log_time)
         data_str = re.sub('#', 'N', data_str)
-        data_str = re_clean_special_char.sub('', data_str)
-#        import pdb; pdb.set_trace()
         try:
             data = np.genfromtxt(StringIO(data_str), dtype=float)
         except:
@@ -264,8 +264,8 @@ class Parameter:
     Class that implements the a structure to return a parameters
     name, unit and data
     """
-    def __init__(self, param_name, param_unit):
 
+    def __init__(self, param_name, param_unit):
         self.name = param_name
         self.unit = param_unit
         self.data = []

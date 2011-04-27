@@ -1,0 +1,84 @@
+[header]
+# format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka,solinst
+format = 'hydrolab'
+
+
+[format_parameters]
+# log file name: if present in file else leave blank
+log_file_name = 'brd_03sep'
+
+# timezone: if present in file else leave blank
+tz = 
+
+# site name: if present in file else leave blank
+site_name =
+
+# instrument serial number, if present in file else leave blank
+serial_number =
+
+
+
+# datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
+# file header then leave blank
+setup_time = '09/29/2003 16:05:23'
+start_time = '10/01/2003 12:00:00'
+stop_time = '11/14/2003 23:59:59'
+
+
+[data]
+# parameters provided (comma delimited, in column order)
+# air_pressure : Atmospheric Pressure
+# instrument_battery_voltage : Battery Voltage
+# water_specific_conductance : Specific Conductance(Normalized @25degC)
+# water_electrical_conductivity : Conductivity(Not Normalized)
+# water_dissolved_oxygen_concentration : Dissolved Oxygen Concentration
+# water_dissolved_oxygen_percent_saturation : Dissolved Oxygen Saturation Concentration
+# water_ph : pH Level
+# seawater_salinity : Salinity
+# water_temperature : Water Temperature
+# air_temperature : Air Temperature
+# water_turbidity : Turbidity
+# water_depth_non_vented : Water Surface Elevation (No Atm Pressure Correction)
+# water_depth_vented : Water Surface Elevation (Atm Pressure Corrected)
+parameters = ['water_temperature', 'water_ph', 'water_specific_conductance', 'seawater_salinity', 'water_dissolved_oxygen_concentration', 'water_depth_non_vented', 'instrument_battery_voltage']
+
+# units (comma delimited, in column order)
+# depth: ftH2O (feet), mH2O (meters), psi
+# conductivity: uScm (uS/cm), mScm (mS/cm)
+# salinity: ppt, psu
+# temperature: degC, degF
+# battery: volt
+# dissolved oxygen: mgl (mg/l), percent (% Sat)
+# turbidity: ntu
+# ph (dimensionless): dl
+units = ['degC', 'dl', 'mScm', 'ppt', 'mgl', 'mH2O', 'volt']
+
+# Now we need to provide a list of known data values to test against.
+# For each data record that needs to be tested, the first value should
+# be the datetime in the "MM/DD/YYYY hh:mm:ss" format, followed by a
+# comma delimited list of parameter values in column order as
+# above. If there are parameter values that are not available for some
+# reason (e.g. a sensor goes out), enter the value as "nan". This list
+# should include AT LEAST the first three records of data, a set of
+# three records from some random location in the file and the last
+# three records of data
+test_data = """[
+['10/01/2003 12:00:00', 27.37, 7.41, 0.031, 0.0, 7.71, 3.3, 14.1],
+['10/01/2003 13:00:00', 23.62, 7.97, 49.7, 32.6, 7.47, 5.1, 14.1],
+['10/01/2003 14:00:00', 23.80, 7.98, 49.4, 32.4, 8.22, 1.2, 14.0],
+['10/01/2003 15:00:00', 23.93, 7.98, 49.3, 32.3, 8.31, 0.6, 14.0],
+['10/01/2003 16:00:00', 24.08, 7.99, 50.0, 32.8, 8.39, -0.3, 14.0],
+['10/26/2003 22:00:00', 20.16, 7.48, 49.2, 32.2, 4.90, 20.5, 12.1],
+['10/26/2003 23:00:00', 20.16, 7.50, 50.4, 33.1, 4.78, 21.1, 12.1],
+['10/27/2003 00:00:00', 19.83, 7.53, 50.3, 33.0, 4.95, 20.8, 12.1],
+['10/27/2003 01:00:00', 20.07, 7.55, 50.0, 32.9, 4.92, 20.8, 12.1],
+['10/27/2003 02:00:00', 20.41, 7.57, 49.2, 32.2, 4.78, 21.0, 12.3],
+['10/27/2003 03:00:00', 20.27, 7.58, 49.2, 32.2, 4.78, 20.9, 12.1],
+['10/27/2003 04:00:00', 20.07, 7.58, 49.5, 32.4, 4.82, 20.9, 12.1],
+['11/13/2003 12:00:00', 24.26, 7.61, 46.2, 30.0, 3.51, 23.8, 8.9],
+['11/13/2003 13:00:00', 28.07, 7.08, 0.974, 0.5, 6.93, 5.0, 8.6],
+['11/13/2003 14:00:00', 28.03, 7.16, 0.884, 0.5, 7.06, 3.8, 8.8],
+['11/13/2003 15:00:00', 25.44, 7.09, 0.703, 0.4, 8.60, 0.4, 8.8],
+['11/13/2003 16:00:00', 24.81, 7.13, 0.648, 0.3, 7.44, 8.5, 8.7],
+]
+"""
