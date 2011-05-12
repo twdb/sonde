@@ -131,11 +131,11 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
     if file_format.lower() == 'generic':
         from sonde.formats.generic import GenericDataset
         return GenericDataset(data_file, *args, **kwargs)
-    
+
     if file_format.lower() == 'midgewater':
         from sonde.formats.midgewater import MidgewaterDataset
         return MidgewaterDataset(data_file, *args, **kwargs)
-        
+
     if file_format.lower() == 'espey':
         from sonde.formats.espey import EspeyDataset
         return EspeyDataset(data_file, *args, **kwargs)
@@ -218,15 +218,15 @@ def autodetect(data_file, filename=None):
     if lines[1].find('\xb0') > -1 or lines[2].find('Manta') > -1 or \
            lines[0].find('Start time : ') > -1:
         return 'eureka'
-        
+
     # files from various intruments processed by an old script.
     if lines[0].lower().find('request date') != -1:
         return 'midgewater'
-    
+
     # ascii files for ysi in brazos riv.
     if lines[0].find('===') != -1:
         return 'espey'
-    
+
     else:
         return False
 
