@@ -201,6 +201,10 @@ def autodetect(data_file, filename=None):
     if lines[1].lower().find('log file name') != -1:
         return 'hydrotech'
 
+    # ascii files for ysi in brazos riv.
+    if lines[0].find('espey') != -1:
+        return 'espey'
+
     #check for ysi:
     # binary
     if lines[0][0] == 'A':
@@ -222,11 +226,6 @@ def autodetect(data_file, filename=None):
     # files from various intruments processed by an old script.
     if lines[0].lower().find('request date') != -1:
         return 'midgewater'
-
-    # ascii files for ysi in brazos riv.
-    if lines[0].find('===') != -1:
-        return 'espey'
-
     else:
         return False
 
