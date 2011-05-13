@@ -161,7 +161,6 @@ class ESPEYReaderTxt:
         fid.seek(0)
 
         # skip initial 'espey' header line
-        fid.readline()
         buf = fid.readline().strip('\r\n').lstrip('&,')
         dlm = ','
 
