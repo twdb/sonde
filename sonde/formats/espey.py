@@ -60,47 +60,37 @@ class EspeyDataset(sonde.BaseSondeDataset):
                      'ODO': 'water_dissolved_oxygen_concentration',
                      'ODO Conc': 'water_dissolved_oxygen_concentration',
                      'pH': 'water_ph',
-                     'Depth': 'water_depth_non_vented',
+                     # 'Depth': 'water_depth_non_vented',
                      'Battery': 'instrument_battery_voltage',
+                     'Press': 'water_pressure',
+                     'Atmospheric Pressure at Time(i)': 'air_pressure',
+                     # 'Final Depth (ft)': 'water_depth_vented',
+                     'WSE Elevation': 'water_surface_elevation',
                      }
 
-        unit_map = {'C': pq.degC,
+        unit_map = {'%': pq.percent,
+                    'C': pq.degC,
                     'F': pq.degF,
                     'K': pq.degK,
-                    'mS/cm': sq.mScm,
-                    'uS/cm': sq.uScm,
-                    '%': pq.percent,
-                    'mg/L': sq.mgl,
-                    'pH': pq.dimensionless,
-                    'meters': sq.mH2O,
-                    'm': sq.mH2O,
                     'feet': sq.ftH2O,
+                    'ft': sq.ftH2O,
+                    'ft above NAVD 88': pq.ft,
+                    'inches Hg': pq.inHg,
+                    'm': sq.mH2O,
+                    'meters': sq.mH2O,
+                    'mg/L': sq.mgl,
+                    'mS/cm': sq.mScm,
+                    'pH': pq.dimensionless,
+                    'psig': pq.psi,
+                    'ppt': sq.psu,
                     'volts': pq.volt,
                     'V': pq.volt,
-                    'ppt': sq.psu,
+                    'uS/cm': sq.uScm,
                     }
 
-        if self.file_format.split('_')[-1] == 'binary':
-            espey_data = ESPEYReaderBin(self.data_file, self.default_tzinfo,
+        espey_data = ESPEYReaderTxt(self.data_file, self.default_tzinfo,
                                     self.param_file)
-            self.format_parameters = {
-                'log_file_name': espey_data.log_file_name,
-                'instr_type': espey_data.instr_type,
-                'system_sig': espey_data.system_sig,
-                'prog_ver': espey_data.prog_ver,
-                'pad1': espey_data.pad1,
-                'logging_interval': espey_data.logging_interval,
-                'begin_log_time': espey_data.begin_log_time,
-                'first_sample_time': espey_data.first_sample_time,
-                'pad2': espey_data.pad2,
-                }
-            self.site_name = espey_data.site_name
-            self.serial_number = espey_data.serial_number
-
-        else:
-            espey_data = ESPEYReaderTxt(self.data_file, self.default_tzinfo,
-                                    self.param_file)
-            self.format_parameters = {}
+        self.format_parameters = {}
 
         # determine parameters provided and in what units
         self.parameters = dict()
@@ -109,6 +99,7 @@ class EspeyDataset(sonde.BaseSondeDataset):
             try:
                 pcode = param_map[(parameter.name).strip()]
                 punit = unit_map[(parameter.unit).strip()]
+                from nose.tools import set_trace; set_trace()
                 self.parameters[pcode] = sonde.master_parameter_list[pcode]
                 self.data[param_map[parameter.name]] = parameter.data * punit
             except KeyError:
@@ -170,31 +161,20 @@ class ESPEYReaderTxt:
         fid_initial_location = fid.tell()
         fid.seek(0)
 
-        buf = fid.readline().strip('\r\n')
-        if buf.find(',') > 0:
-            dlm = ','
-        else:
-            dlm = None
+        # skip initial 'espey' header line
+        fid.readline()
+        buf = fid.readline().strip('\r\n').lstrip('&,')
+        dlm = ','
 
         while buf:
-            if dlm == ',':
-                if buf.split(',')[0].strip(' "').lower() == 'date' or \
-                       buf.split(',')[0].strip(' "').lower() == 'datetime':
-                    param_fields = buf.split(',')
-                    param_units = fid.readline().strip('\r\n').split(',')
+            if buf.split(',')[1].strip(' "').lower() == 'date' or \
+                   buf.split(',')[1].strip(' "').lower() == 'datetime':
+                param_fields = buf.lstrip('&,').split(',')
+                param_units = fid.readline().strip('&,\r\n').split(',')
 
-                if len(buf.split(',')[0].strip(' "').split('/')) == 3:
-                    line1 = buf.split(',')
-                    break
-            else:
-                if buf.split()[0].strip(' "').lower() == 'date' or \
-                       buf.split()[0].strip(' "').lower() == 'datetime':
-                    param_fields = buf.split()
-                    units_fields = fid.readline().strip('\r\n').split()
-
-                if len(buf.split()[0].strip(' "').split('/')) == 3:
-                    line1 = buf.split()
-                    break
+            if len(buf.split(',')[0].strip(' "').split('/')) == 3:
+                line1 = buf.split(',')
+                break
 
             buf = fid.readline().strip('\r\n')
 
@@ -206,49 +186,30 @@ class ESPEYReaderTxt:
             fields.append(param.strip(' "'))
             units.append(unit.strip(' "'))
 
-        #work out date format
-        if fields[0].lower() == 'datetime':
-            datestr, timestr = line1[0].split()
-            start = 1
-        else:
-            datestr = line1[0]
-            timestr = line1[1]
-            start = 2
+        datestr = line1[1]
+        timestr = line1[2]
+        start = 2
 
-        if max([len(d) for d in datestr.split('/')]) == 4:
-            y = '%Y'
-        else:
-            y = '%y'
-
-        fmt = re.sub('([mMdD])', '%\\1',
-                     param_units[0].lower()).replace('y', y).strip(' "')
-
-        if len(timestr.split(':')) == 3:
-            fmt += ' %H:%M:%S'
-        else:
-            fmt += ' %H:%M'
+        fmt = '%m/%d/%Y %H:%M:%S'
 
         params = fields[start:]
         units = units[start:]
         fid.seek(-len(buf) - 2, 1)  # move back to above first line of data
-        if dlm == ',':
-            data = np.genfromtxt(fid, dtype=None, names=fields, delimiter=',')
-        else:
-            data = np.genfromtxt(fid, dtype=None, names=fields)
+
+        null_handler = lambda v: float(v) if v != '#VALUE!' and v != '' else None
+        data = np.genfromtxt(fid, usecols=range(1, 18), dtype=None,
+                             names=fields, delimiter=',',
+                             missing_values=['#VALUE!', ''],
+                             converters=dict([(i, null_handler) for i in range(10,19)]),
+                             filling_values=None, comments='%')
 
         fid.seek(fid_initial_location)
 
-        if fields[0].lower() == 'datetime':
-            self.dates = np.array(
-                [datetime.strptime(d.strip('"'), fmt)
-                 for d in data['DateTime']]
-                )
-        else:
-            self.dates = np.array(
-                [datetime.strptime(d.strip('"') + ' ' + \
-                                            t.strip('"'), fmt)
-                 for d, t in zip(data['Date'], data['Time'])]
-                )
+        self.dates = np.array(
+            [datetime.strptime(d.strip('"') + ' ' + \
+                               t.strip('"'), fmt)
+             for d, t in zip(data['Date'], data['Time'])]
+            )
 
         #assign param & unit names
         for param, unit in zip(params, units):
@@ -256,7 +217,8 @@ class ESPEYReaderTxt:
             self.parameters.append(Parameter(param.strip(), unit.strip()))
 
         for ii in range(self.num_params):
-            param = re.sub('[?.:%]', '',
+            # from nose.tools import set_trace; set_trace()
+            param = re.sub('[?.:%()]', '',
                            self.parameters[ii].name).replace(' ', '_')
             self.parameters[ii].data = data[param]
 
