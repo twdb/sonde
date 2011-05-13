@@ -38,29 +38,31 @@ default_timezone = pytz.timezone('US/Central')
 #: guidelines
 master_parameter_list = {
     'air_pressure': ('Atmospheric Pressure', pq.pascal),
-    'instrument_battery_voltage': ('Battery Voltage', pq.volt),
-    'water_specific_conductance': ('Specific Conductance(Normalized @25degC)',
-                                   sq.mScm),
-    'water_electrical_conductivity': (
-        'Electrical Conductivity(Not Normalized)', sq.mScm),
-    'water_dissolved_oxygen_concentration': (
-        'Dissolved Oxygen Concentration', sq.mgl),
-    'water_dissolved_oxygen_percent_saturation': (
-        'Dissolved Oxygen Saturation Concentration', pq.percent),
-    'water_ph': ('pH Level', pq.dimensionless),
-    'seawater_salinity': ('Salinity', sq.psu),
-    'water_temperature': ('Water Temperature', pq.degC),
     'air_temperature': ('Air Temperature', pq.degC),
-    'water_total_dissolved_salts': ('Total Dissolved Salts', sq.mgl),
-    'water_turbidity': ('Turbidity', sq.ntu),
+    'eastward_water_velocity': ('Eastward Water Velocity', sq.mps),
+    'instrument_battery_voltage': ('Battery Voltage', pq.volt),
+    'northward_water_velocity': ('Northward Water Velocity', sq.mps),
+    'seawater_salinity': ('Salinity', sq.psu),
     'water_depth_non_vented': (
         'Depth is the vertical distance below the water surface. '
         '(No Atm Pressure Correction)', sq.mH2O),
     'water_depth_vented': (
         'Depth is the vertical distance below the water surface. '
         '(w/ Atm Pressure Correction)', sq.mH2O),
-    'northward_water_velocity': ('Northward Water Velocity', sq.mps),
-    'eastward_water_velocity': ('Eastward Water Velocity', sq.mps),
+    'water_dissolved_oxygen_concentration': (
+        'Dissolved Oxygen Concentration', sq.mgl),
+    'water_dissolved_oxygen_percent_saturation': (
+        'Dissolved Oxygen Saturation Concentration', pq.percent),
+    'water_electrical_conductivity': (
+        'Electrical Conductivity(Not Normalized)', sq.mScm),
+    'water_ph': ('pH Level', pq.dimensionless),
+    'water_pressure': ('Water Pressure', pq.psi),
+    'water_specific_conductance': ('Specific Conductance(Normalized @25degC)',
+                                   sq.mScm),
+    'water_surface_elevation': ('Water Surface Elevation', pq.m),
+    'water_temperature': ('Water Temperature', pq.degC),
+    'water_total_dissolved_salts': ('Total Dissolved Salts', sq.mgl),
+    'water_turbidity': ('Turbidity', sq.ntu),
     'upward_water_velocity': ('Upward Water Velocity', sq.mps),
     'water_x_velocity': ('Water Velocity in x direction', sq.mps),
     'water_y_velocity': ('Water in y direction', sq.mps),
