@@ -99,7 +99,6 @@ class EspeyDataset(sonde.BaseSondeDataset):
             try:
                 pcode = param_map[(parameter.name).strip()]
                 punit = unit_map[(parameter.unit).strip()]
-                from nose.tools import set_trace; set_trace()
                 self.parameters[pcode] = sonde.master_parameter_list[pcode]
                 self.data[param_map[parameter.name]] = parameter.data * punit
             except KeyError:
