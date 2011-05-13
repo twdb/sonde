@@ -172,29 +172,19 @@ class YSIReaderTxt:
 
         buf = fid.readline().strip('\r\n')
         if buf.find(',') > 0:
-            dlm = ','
+            delimeter = ','
         else:
-            dlm = None
+            delimeter = None
 
         while buf:
-            if dlm == ',':
-                if buf.split(',')[0].strip(' "').lower() == 'date' or \
-                       buf.split(',')[0].strip(' "').lower() == 'datetime':
-                    param_fields = buf.split(',')
-                    param_units = fid.readline().strip('\r\n').split(',')
+            if buf.split(delimeter)[0].strip(' "').lower() == 'date' or \
+                   buf.split(delimeter)[0].strip(' "').lower() == 'datetime':
+                param_fields = buf.split(',')
+                param_units = fid.readline().strip('\r\n').split(',')
 
-                if len(buf.split(',')[0].strip(' "').split('/')) == 3:
-                    line1 = buf.split(',')
-                    break
-            else:
-                if buf.split()[0].strip(' "').lower() == 'date' or \
-                       buf.split()[0].strip(' "').lower() == 'datetime':
-                    param_fields = buf.split()
-                    units_fields = fid.readline().strip('\r\n').split()
-
-                if len(buf.split()[0].strip(' "').split('/')) == 3:
-                    line1 = buf.split()
-                    break
+            if len(buf.split(delimeter)[0].strip(' "').split('/')) == 3:
+                line1 = buf.split(delimeter)
+                break
 
             buf = fid.readline().strip('\r\n')
 
@@ -231,7 +221,7 @@ class YSIReaderTxt:
         params = fields[start:]
         units = units[start:]
         fid.seek(-len(buf) - 2, 1)  # move back to above first line of data
-        if dlm == ',':
+        if delimeter == ',':
             data = np.genfromtxt(fid, dtype=None, names=fields, delimiter=',')
         else:
             data = np.genfromtxt(fid, dtype=None, names=fields)
