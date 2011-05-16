@@ -1,0 +1,96 @@
+[header]
+# format choices: ysi,greenspan,hydrotech,hydrolab,macroctd,eureka
+format = 'midgewater'
+
+
+[format_parameters]
+# log file name: if present in file else leave blank
+log_file_name =
+
+# timezone: if present in file else leave blank
+tz =
+
+# site name: if present in file else leave blank
+site_name = 'Brazosd'
+
+# instrument serial number, if present in file else leave blank
+serial_number =
+
+
+# datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
+# file header then use first and last line in data
+# datetime provided in first line of data
+setup_time = '09/11/2001 19:00:00'
+start_time = '09/11/2001 19:00:00'
+stop_time = '09/06/2002 10:00:00'
+
+
+[data]
+# parameters provided (comma delimited, in column order)
+# 'air_pressure' : Atmospheric Pressure
+# 'instrument_battery_voltage' : Battery Voltage
+# 'water_specific_conductance' : Specific Conductance(Normalized @25degC)
+# 'water_electrical_conductivity' : Conductivity(Not Normalized)
+# 'water_dissolved_oxygen_concentration' : Dissolved Oxygen Concentration
+# 'water_dissolved_oxygen_percent_saturation' : Dissolved Oxygen Saturation Concentration
+# 'water_ph' : pH Level
+# 'seawater_salinity' : Salinity
+# 'water_temperature' : Water Temperature
+# 'air_temperature' : Air Temperature
+# 'water_turbidity' : Turbidity
+# 'water_depth_non_vented' : Water Surface Elevation (No Atm Pressure Correction)
+# 'water_depth_vented' : Water Surface Elevation (Atm Pressure Corrected)
+# These are the header of parameters = [Temp","","SpCond","","Sal","","IBatt"]
+# Year Month Day Hour Minute Temperature(C) pH Conductivity(mmho) Salinity(ppt) DO(mg/l) WaterLevel(m) Turbidity(ntu) DOSat(%) Battery(volts) SourceFile
+#parameters = ['water_temperature, 'water_ph', 'water_electrical_conductivity', 'seawater_salinity', 'water_dissolved_oxygen_concentration', 'water_depth_non_vented', 'water_turbidity', 'water_dissolved_oxygen_percent_saturation', 'instrument_battery_voltage']
+parameters = ['water_temperature', 'water_electrical_conductivity', 'seawater_salinity', 'water_dissolved_oxygen_concentration', 'water_depth_non_vented']
+
+# units (comma delimited, in column order)
+# depth: ftH2O (feet), mH2O (meters), psi
+# conductivity: uScm (uS/cm), mScm (mS/cm)
+# salinity: ppt, psu
+# temperature: degC, degF
+# battery: volt
+# dissolved oxygen: mgl (mg/l), percent (% Sat)
+# turbidity: ntu
+# ph (dimensionless): dl 
+#These are the header of parameters = [Volts, temp (c), cond ]
+#units = ['degC', 'dl', 'mScm', 'ppt', 'mgl', 'mH2O', 'ntu', 'percent', 'volt']
+units = ['degC', 'mScm', 'ppt', 'mgl', 'mH2O']
+
+# Now we need to provide a list of known data values to test against.
+# For each data record that needs to be tested, the first value should
+# be the datetime in the "MM/DD/YYYY hh:mm:ss" format, followed by a
+# comma delimited list of parameter values in column order as
+# above. If there are parameter values that are not available for some
+# reason (e.g. a sensor goes out), enter the value as "nan". This list
+# should include AT LEAST the first three records of data, a set of
+# three records from some random location in the file and the last
+# three records of data
+test_data = """[ #Do not edit this lin
+['09/11/2001 19:00:00', 27.99, 3.62, 2.0, 5.21, 45.3847],
+['09/11/2001 20:00:00', 27.93, 3.40, 1.8, 5.08, 46.7563],
+['09/11/2001 21:00:00', 27.94, 3.61, 2.0, 5.13, 47.2745],
+['09/11/2001 22:00:00', 27.87, 3.38, 1.8, 5.12, 48.1889],
+['09/11/2001 23:00:00', 27.82, 3.33, 1.8, 5.23, 49.1338],
+['09/12/2001 0:00:00', 27.84, 3.73, 2.0, 5.14, 50.0177],
+['09/12/2001 1:00:00', 27.71, 3.33, 1.8, 5.32, 49.8653],
+['09/12/2001 2:00:00', 27.74, 3.85, 2.1, 5.23, 50.4749],
+['01/31/2002 20:00:00', 17.80, 29.0, 17.9, 5.91, 46.0248],
+['01/31/2002 21:00:00', 17.92, 28.7, 17.6, 5.55, 45.1714],
+['01/31/2002 22:00:00', 18.03, 27.8, 17.0, 5.49, 43.7083],
+['01/31/2002 23:00:00', 18.40, 26.6, 16.2, 5.21, 43.434],
+['02/01/2002 0:00:00', 18.13, 28.6, 17.6, 5.13, 43.6169],
+['02/01/2002 1:00:00', 18.48, 29.2, 18.0, 4.81, 42.9768],
+['02/01/2002 2:00:00', 18.78, 26.3, 16.0, 4.83, 42.3977],
+['02/01/2002 3:00:00', 18.04, 29.8, 18.4, 5.14, 42.8854],
+['02/01/2002 4:00:00', 17.92, 29.4, 18.2, 5.46, 43.5254],
+['02/01/2002 5:00:00', 17.67, 30.2, 18.7, 5.55, 43.7693],
+['09/06/2002 5:00:00', 28.25, 35.7, 22.5, 3.97, 47.6402],
+['09/06/2002 6:00:00', 27.78, 35.9, 22.7, 4.40, 47.945],
+['09/06/2002 7:00:00', 27.40, 36.9, 23.4, 4.63, 48.0974],
+['09/06/2002 8:00:00', 27.28, 37.2, 23.6, 4.79, 48.768],
+['09/06/2002 9:00:00', 27.21, 37.3, 23.7, 4.68, 48.8899],
+['09/06/2002 10:00:00', 27.21, 37.3, 23.7, 4.36, 49.0423],
+]   #Do not edit this line
+""" #Do not edit this line
