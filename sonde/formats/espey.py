@@ -195,10 +195,12 @@ class ESPEYReaderTxt:
         fid.seek(-len(buf) - 2, 1)  # move back to above first line of data
 
         null_handler = lambda v: float(v) if v != '#VALUE!' and v != '' else None
+        converters = dict([(i, null_handler) for i in range(10, 19)])
+
         data = np.genfromtxt(fid, usecols=range(1, 18), dtype=None,
                              names=fields, delimiter=',',
                              missing_values=['#VALUE!', ''],
-                             converters=dict([(i, null_handler) for i in range(10,19)]),
+                             converters=converter_dict,
                              filling_values=None, comments='%')
 
         fid.seek(fid_initial_location)
