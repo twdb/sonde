@@ -55,10 +55,11 @@ class MidgewaterDataset(sonde.BaseSondeDataset):
     Dataset object that represents the data contained in 'midgewater' txt
     file.
     """
-    def __init__(self, data_file):
+    def __init__(self, data_file, tzinfo=None):
         self.manufacturer = 'na'
         self.file_format = 'na'
         self.data_file = data_file
+        self.default_tzinfo = tzinfo
         super(MidgewaterDataset, self).__init__(data_file)
 
     def _read_data(self):
@@ -70,16 +71,16 @@ class MidgewaterDataset(sonde.BaseSondeDataset):
              'Conductivity': 'water_electrical_conductivity',
              'Salinity': 'seawater_salinity',
              'DO': 'water_dissolved_oxygen_concentration',
-             'WaterLevel': 'water_depth_non_vented' ,
+             'WaterLevel': 'water_depth_non_vented',
              'Turbidity': 'water_turbidity',
              'DOSat': 'water_dissolved_oxygen_percent_saturation',
              'Battery': 'instrument_battery_voltage',
              }
 
         unit_map = {'C': pq.degC,
-                    'mmho/cm': sq.mScm,
+                    'mmho': sq.mScm,
                     '%': pq.percent,
-                    'mg/L': sq.mgl,
+                    'mg/l': sq.mgl,
                     'nd': pq.dimensionless,
                     'm': sq.mH2O,
                     'volts': pq.volt,
@@ -87,33 +88,36 @@ class MidgewaterDataset(sonde.BaseSondeDataset):
                     'ntu': sq.ntu
                     }
 
-        midgewater_data = MidgewaterDataReader(self.data_file)
+        midgewater_data = MidgewaterDataReader(
+            self.data_file, tzinfo=self.default_tzinfo)
         self.parameters = dict()
         self.data = dict()
         metadata = dict()
 
         for parameter in midgewater_data.parameters:
-            if parameter.unit != 'n/a':
-                if parameter.name.lower() in sonde.master_parameter_list:
-                    pcode = parameter.name.lower()
-                else:
-                    warnings.warn('Un-mapped Parameter: %s' %
-                                  parameter.name.lower(),
-                                  Warning)
-                try:
-                    punit = unit_map[(parameter.unit.lower()).strip()]
-                    if not np.all(np.isnan(parameter.data)):
-                        self.parameters[pcode] = sonde.master_parameter_list[pcode]
-                        self.data[pcode] = parameter.data * punit
-                    pdb.set_trace()
-                except KeyError:
-                    warnings.warn('Un-mapped Unit Type\n'
-                                  'Unit Name: %s' % parameter.unit,
-                                  Warning)
+            try:
+                pcode = param_map[(parameter.name).strip()]
+                punit = unit_map[(parameter.unit).strip()]
+                # quick and dirty nan check: if all data values are
+                # nans, then we can exclude them
+                if not np.isnan(np.nansum(parameter.data)):
+                    self.parameters[pcode] = sonde.master_parameter_list[pcode]
+                    self.data[param_map[parameter.name]] = parameter.data * punit
+
+            except KeyError:
+                warnings.warn('Un-mapped Parameter/Unit Type:\n'
+                              '%s parameter name: "%s"\n'
+                              '%s unit name: "%s"' %
+                              (self.file_format, parameter.name,
+                               self.file_format, parameter.unit),
+                              Warning)
             else:
                 metadata[parameter.name.lower()] = parameter.data
 
-        self.format_parameters = midgewater_data.format_parameters
+        try:
+            self.site_name = midgewater_data.site_name
+        except AttributeError:
+            pass
 
         #overide default metadata if present in file
         names = ['manufacturer', 'data_file', 'serial_number']
@@ -141,13 +145,12 @@ class MidgewaterDataReader:
     datetime.tzinfo object that represents the timezone of the
     timestamps in the txt file.
     """
-    def __init__(self, data_file):
+    def __init__(self, data_file, tzinfo=None):
         self.num_params = 0
         self.parameters = []
         self.format_parameters = {}
+        self.default_tzinfo = tzinfo
         self.read_midgewater(data_file)
-        self.dates = [i.replace(tzinfo=self.default_tzinfo)
-                      for i in self.dates]
 
     def read_midgewater(self, data_file):
         """
@@ -159,27 +162,41 @@ class MidgewaterDataReader:
         else:
             fid = data_file
 
-        fid = open(data_file)
+        buf = fid.readline()
+        while buf.find('#') == 0:
+            if '# Station Name' in buf:
+                self.site_name = buf.lstrip('# Station Name:').strip()
 
-        params = ['Temperature','pH','Conductivity','Salinity','DO','WaterLevel',
-                  'Turbidity','DOSat','Battery']
-        units = ['C','nd','mmho','ppt','mg/l','m','ntu','%','volts']
-        utc_offset = -6      # This is assumed for data files prior to standard naming
-        self.default_tzinfo = UTCStaticOffset(utc_offset)
-        dtype = [('year', '<i4'), ('month', '<i4'), ('day','<i4'), ('hour', '<i4'),          
-                 ('minute', '<i4'), (params[0],'<f8'), (params[1],'<f8'),
-                 (params[2],'<f8'),(params[3], '<f8'), (params[4], '<f8'),
-                 (params[5], '<f8'),(params[6], '<f8'), (params[7], '<f8'), 
-                 (params[8], '<f8')]
-        data = np.genfromtxt(fid, dtype=dtype, comments='#', usecols=(0,1,2,3,4,
-                            5,6,7,8,9,10,11,12,13))
-#        pdb.set_trace()
-        self.dates = np.array([datetime.datetime(year=y,month=m,day=d,hour=hh,
-                                                 minute=mm) for y,m,d,hh,mm in 
-                                                 zip(data['year'], data['month'],
-                                                     data['day'],data['hour'],
-                                                     data['minute'])])
-                
+            if '# NODATA Value =' in buf:
+                no_data_value = buf.lstrip('# NODATA Value = ').strip()
+
+            buf = fid.readline()
+
+        fid.seek(0)
+
+        params = ['Temperature', 'pH', 'Conductivity', 'Salinity', 'DO',
+                  'WaterLevel', 'Turbidity','DOSat','Battery']
+        units = ['C', 'nd', 'mmho', 'ppt', 'mg/l', 'm', 'ntu', '%', 'volts']
+        dtype = [('year', '<i4'), ('month', '<i4'), ('day','<i4'),
+                 ('hour', '<i4'), ('minute', '<i4'), (params[0],'<f8'),
+                 (params[1],'<f8'), (params[2],'<f8'),(params[3], '<f8'),
+                 (params[4], '<f8'), (params[5], '<f8'), (params[6], '<f8'),
+                 (params[7], '<f8'), (params[8], '<f8')]
+
+        null_handler = lambda v: float(v) if v != no_data_value else None
+        converter_dict = dict([(i, null_handler) for i in range(14)])
+        data = np.genfromtxt(fid, dtype=dtype, comments='#',
+                             usecols=range(14),
+                             converters=converter_dict)
+
+        self.dates = np.array([datetime.datetime(year=y, month=m, day=d,
+                                                 hour=hh, minute=mm,
+                                                 tzinfo=self.default_tzinfo)
+                               for y, m, d, hh, mm
+                               in zip(data['year'], data['month'],
+                                      data['day'], data['hour'],
+                                      data['minute'])])
+
         #assign param & unit names
         for param, unit in zip(params, units):
             self.num_params += 1
