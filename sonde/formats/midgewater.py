@@ -57,7 +57,7 @@ class MidgewaterDataset(sonde.BaseSondeDataset):
     """
     def __init__(self, data_file, tzinfo=None):
         self.manufacturer = 'na'
-        self.file_format = 'na'
+        self.file_format = 'midgewater'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
         super(MidgewaterDataset, self).__init__(data_file)
