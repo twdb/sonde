@@ -214,6 +214,8 @@ def autodetect(data_file, filename=None):
     # txt file
     if lines[0].find('=') != -1:
         return 'ysi_text'
+    if lines[0].find('##YSI ASCII Datafile=') != -1:
+        return 'ysi_ascii'
     # cdf file
     if file_ext and file_ext == 'cdf':
         return 'ysi_cdf'
