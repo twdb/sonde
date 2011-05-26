@@ -140,117 +140,6 @@ class ChannelRec:
         self.data = []
 
 
-class YSIReaderTxt:
-    """
-    A reader object that opens and reads a YSI txt/cdf file.
-
-    `data_file` should be either a file path string or a file-like
-    object. It one optional parameters, `tzinfo` is a datetime.tzinfo
-    object that represents the timezone of the timestamps in the
-    text file.
-    """
-    def __init__(self, data_file, tzinfo=None, param_file=None):
-        self.default_tzinfo = tzinfo
-        self.num_params = 0
-        self.parameters = []
-        self.read_ysi(data_file)
-        if tzinfo:
-            self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
-
-    def read_ysi(self, data_file):
-        """
-        Open and read a YSI text file.
-        """
-        if type(data_file) == str:
-            fid = open(data_file, 'r')
-        else:
-            fid = data_file
-
-        #read header
-        fid_initial_location = fid.tell()
-        fid.seek(0)
-
-        buf = fid.readline().strip('\r\n')
-        if buf.find(',') > 0:
-            delimeter = ','
-        else:
-            delimeter = None
-
-        while buf:
-            if buf.split(delimeter)[0].strip(' "').lower() == 'date' or \
-                   buf.split(delimeter)[0].strip(' "').lower() == 'datetime':
-                param_fields = buf.split(',')
-                param_units = fid.readline().strip('\r\n').split(',')
-
-            if len(buf.split(delimeter)[0].strip(' "').split('/')) == 3:
-                line1 = buf.split(delimeter)
-                break
-
-            buf = fid.readline().strip('\r\n')
-
-        #clean up names & units
-        fields = []
-        params = []
-        units = []
-        for param, unit in zip(param_fields, param_units):
-            fields.append(param.strip(' "'))
-            units.append(unit.strip(' "'))
-
-        #work out date format
-        if fields[0].lower() == 'datetime':
-            datestr, timestr = line1[0].split()
-            start = 1
-        else:
-            datestr = line1[0]
-            timestr = line1[1]
-            start = 2
-
-        if max([len(d) for d in datestr.split('/')]) == 4:
-            y = '%Y'
-        else:
-            y = '%y'
-
-        fmt = re.sub('([mMdD])', '%\\1',
-                     param_units[0].lower()).replace('y', y).strip(' "')
-
-        if len(timestr.split(':')) == 3:
-            fmt += ' %H:%M:%S'
-        else:
-            fmt += ' %H:%M'
-
-        params = fields[start:]
-        units = units[start:]
-        fid.seek(-len(buf) - 2, 1)  # move back to above first line of data
-        if delimeter == ',':
-            data = np.genfromtxt(fid, dtype=None, names=fields, delimiter=',')
-        else:
-            data = np.genfromtxt(fid, dtype=None, names=fields)
-
-        fid.seek(fid_initial_location)
-
-        if fields[0].lower() == 'datetime':
-            self.dates = np.array(
-                [datetime.strptime(d.strip('"'), fmt)
-                 for d in data['DateTime']]
-                )
-        else:
-            self.dates = np.array(
-                [datetime.strptime(d.strip('"') + ' ' + \
-                                            t.strip('"'), fmt)
-                 for d, t in zip(data['Date'], data['Time'])]
-                )
-
-        #assign param & unit names
-        for param, unit in zip(params, units):
-            self.num_params += 1
-            self.parameters.append(Parameter(param.strip(), unit.strip()))
-
-        for ii in range(self.num_params):
-            param = re.sub('[?.:%]', '',
-                           self.parameters[ii].name).replace(' ', '_')
-            self.parameters[ii].data = data[param]
-
-
 class Parameter:
     """
     Class that implements the a structure to return a parameters
@@ -390,3 +279,114 @@ class YSIReaderBin:
 
         if type(ysi_file) == str:
             fid.close()
+
+
+class YSIReaderTxt:
+    """
+    A reader object that opens and reads a YSI txt/cdf file.
+
+    `data_file` should be either a file path string or a file-like
+    object. It one optional parameters, `tzinfo` is a datetime.tzinfo
+    object that represents the timezone of the timestamps in the
+    text file.
+    """
+    def __init__(self, data_file, tzinfo=None, param_file=None):
+        self.default_tzinfo = tzinfo
+        self.num_params = 0
+        self.parameters = []
+        self.read_ysi(data_file)
+        if tzinfo:
+            self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
+
+    def read_ysi(self, data_file):
+        """
+        Open and read a YSI text file.
+        """
+        if type(data_file) == str:
+            fid = open(data_file, 'r')
+        else:
+            fid = data_file
+
+        #read header
+        fid_initial_location = fid.tell()
+        fid.seek(0)
+
+        buf = fid.readline().strip('\r\n')
+        if buf.find(',') > 0:
+            delimeter = ','
+        else:
+            delimeter = None
+
+        while buf:
+            if buf.split(delimeter)[0].strip(' "').lower() == 'date' or \
+                   buf.split(delimeter)[0].strip(' "').lower() == 'datetime':
+                param_fields = buf.split(',')
+                param_units = fid.readline().strip('\r\n').split(',')
+
+            if len(buf.split(delimeter)[0].strip(' "').split('/')) == 3:
+                line1 = buf.split(delimeter)
+                break
+
+            buf = fid.readline().strip('\r\n')
+
+        #clean up names & units
+        fields = []
+        params = []
+        units = []
+        for param, unit in zip(param_fields, param_units):
+            fields.append(param.strip(' "'))
+            units.append(unit.strip(' "'))
+
+        #work out date format
+        if fields[0].lower() == 'datetime':
+            datestr, timestr = line1[0].split()
+            start = 1
+        else:
+            datestr = line1[0]
+            timestr = line1[1]
+            start = 2
+
+        if max([len(d) for d in datestr.split('/')]) == 4:
+            y = '%Y'
+        else:
+            y = '%y'
+
+        fmt = re.sub('([mMdD])', '%\\1',
+                     param_units[0].lower()).replace('y', y).strip(' "')
+
+        if len(timestr.split(':')) == 3:
+            fmt += ' %H:%M:%S'
+        else:
+            fmt += ' %H:%M'
+
+        params = fields[start:]
+        units = units[start:]
+        fid.seek(-len(buf) - 2, 1)  # move back to above first line of data
+        if delimeter == ',':
+            data = np.genfromtxt(fid, dtype=None, names=fields, delimiter=',')
+        else:
+            data = np.genfromtxt(fid, dtype=None, names=fields)
+
+        fid.seek(fid_initial_location)
+
+        if fields[0].lower() == 'datetime':
+            self.dates = np.array(
+                [datetime.strptime(d.strip('"'), fmt)
+                 for d in data['DateTime']]
+                )
+        else:
+            self.dates = np.array(
+                [datetime.strptime(d.strip('"') + ' ' + \
+                                            t.strip('"'), fmt)
+                 for d, t in zip(data['Date'], data['Time'])]
+                )
+
+        #assign param & unit names
+        for param, unit in zip(params, units):
+            self.num_params += 1
+            self.parameters.append(Parameter(param.strip(), unit.strip()))
+
+        for ii in range(self.num_params):
+            param = re.sub('[?.:%]', '',
+                           self.parameters[ii].name).replace(' ', '_')
+            self.parameters[ii].data = data[param]
