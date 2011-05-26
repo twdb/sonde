@@ -56,25 +56,25 @@ def check_file(test_file, sonde_file):
     else:
         tz = cst
 
-    sonde_file = sonde.open_sonde(sonde_file, file_format=file_format,
+    test_sonde = sonde.open_sonde(sonde_file, file_format=file_format,
                                   tzinfo=tz)
-    check_format_parameters(test_file['format_parameters'], sonde_file)
+    check_format_parameters(test_file['format_parameters'], test_sonde)
 
     parameters = test_file['data']['parameters']
     units = test_file['data']['units']
 
     for test_data in test_file['data']['test_data']:
-        check_values_match(test_data, parameters, units, sonde_file)
+        check_values_match(test_data, parameters, units, test_sonde)
 
 
-def check_values_match(test_data, parameters, units, sonde_file):
+def check_values_match(test_data, parameters, units, test_sonde):
     date = _convert_to_aware_datetime(test_data[0])
 
-    assert date in sonde_file.dates, \
-           "date not found in sonde_file: %s" % (date)
+    assert date in test_sonde.dates, \
+           "date not found in test_sonde: %s" % (date)
 
     for parameter, unit, test_value in zip(parameters, units, test_data[1:]):
-        sonde_datum = sonde_file.data[parameter][sonde_file.dates == date]
+        sonde_datum = test_sonde.data[parameter][test_sonde.dates == date]
 
         if unit in pq.__dict__:
             test_quantity = pq.__dict__[unit]
@@ -99,29 +99,29 @@ def check_values_match(test_data, parameters, units, sonde_file):
             assert_almost_equal(test_datum, sonde_datum)
 
 
-def check_format_parameters(format_parameters, sonde_file):
+def check_format_parameters(format_parameters, test_sonde):
     for parameter_name, test_value in format_parameters.items():
         if test_value == '':
             continue
 
-        # parameters on the sonde_file object itself; historically, these
+        # parameters on the test_sonde object itself; historically, these
         # used to be in the format_parameters dict but now they are on
-        # the sonde_file object and it's not worth the effort to rearrange
+        # the test_sonde object and it's not worth the effort to rearrange
         # all the test files
         sonde_parameters = ['serial_number', 'site_name', 'setup_time',
                             'start_time', 'stop_time']
 
         if parameter_name in sonde_parameters:
-            assert hasattr(sonde_file, parameter_name), \
+            assert hasattr(test_sonde, parameter_name), \
                    "format parameter '%s' not found in " \
-                   "sonde_file.format_parameters" % parameter_name
-            sonde_parameter = getattr(sonde_file, parameter_name)
+                   "test_sonde.format_parameters" % parameter_name
+            sonde_parameter = getattr(test_sonde, parameter_name)
 
         else:
-            assert parameter_name in sonde_file.format_parameters, \
+            assert parameter_name in test_sonde.format_parameters, \
                    "format parameter '%s' not found in " \
-                   "sonde_file.format_parameters" % parameter_name
-            sonde_parameter = sonde_file.format_parameters[parameter_name]
+                   "test_sonde.format_parameters" % parameter_name
+            sonde_parameter = test_sonde.format_parameters[parameter_name]
 
         # if we are testing a datetime value
         if re.match('\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}', test_value):
