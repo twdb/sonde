@@ -9,6 +9,7 @@ from __future__ import absolute_import
 
 import datetime
 import os
+import sys
 import warnings
 
 import numpy as np
@@ -285,7 +286,7 @@ def merge(file_list, tz_list=None):
                 tz = UTCStaticOffset(int(tz.lower().strip('utc')))
             dataset = Sonde(file_name, tzinfo=tz)
         except:
-            warnings.warn('merged failed: %s' % file_name, Warning)
+            warnings.warn('merged failed for file %s with error: %s' % (file_name, sys.exc_info()[0]), Warning)
             continue
 
         fn_list = np.zeros(len(dataset.dates), dtype='|S100')
