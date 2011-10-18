@@ -454,7 +454,8 @@ class BaseSondeDataset(object):
                                ', '
             except:
                 unit_header += 'nd, '
-            data[param][np.isnan(data[param])] = metadata['fill_value']
+            fill_value = float(metadata['fill_value']) * data[param].units
+            data[param][np.isnan(data[param])] = fill_value
             dtype_fmts.append('f8')
             fmt += float_fmt + ', '
 
