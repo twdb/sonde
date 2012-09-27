@@ -19,7 +19,7 @@ serial_number = '1067896'
 # datetimes in fmt MM/DD/YYYY hh:mm:ss, if datetimes not provided in
 # file header then use first and last line in data
 # datetime provided in first line of data
-setup_time = '08/21/2012 11:00:00' 
+setup_time = 
 start_time = '08/21/2012 11:00:00' 
 stop_time = '09/21/2012 08:30:00'
 
@@ -40,7 +40,7 @@ stop_time = '09/21/2012 08:30:00'
 # 'water_depth_non_vented' : Water Surface Elevation (No Atm Pressure Correction)
 # 'water_depth_vented' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = ["LEVEL","","TEMPERATURE","","CONDUCTIVITY",]
-parameters = ['water_depth_non_vented', 'water_temperature','water_specific_conductance']
+parameters = ['water_depth_non_vented', 'water_temperature','water_electrical_conductivity']
 
 
 # units (comma delimited, in column order)

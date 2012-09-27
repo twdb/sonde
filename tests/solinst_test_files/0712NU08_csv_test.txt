@@ -40,7 +40,7 @@ stop_time = '08/23/2012 11:45:00'
 # 'water_depth_non_vented' : Water Surface Elevation (No Atm Pressure Correction)
 # 'water_depth_vented' : Water Surface Elevation (Atm Pressure Corrected)
 # These are the header of parameters = ["LEVEL","","TEMPERATURE","","CONDUCTIVITY",]
-parameters = ['water_depth_non_vented', 'water_temperature','water_specific_conductance']
+parameters = ['water_depth_non_vented', 'water_temperature','water_electrical_conductivity']
 
 
 # units (comma delimited, in column order)
