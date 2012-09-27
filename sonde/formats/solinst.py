@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~
 
     This module implements the Solinst format.
-    The files are in .lev format
+    Solinst files have two formats an older .lev format and a newer .csv format
 
 """
 from __future__ import absolute_import
@@ -43,17 +43,23 @@ class SolinstDataset(sonde.BaseSondeDataset):
         """
         param_map = {'TEMPERATURE': 'water_temperature',
                      'Temperature': 'water_temperature',
+                     'air_temperature': 'air_temperature',
                      '1: Conductivity': 'water_specific_conductance',
+                     'CONDUCTIVITY' : 'water_specific_conductance',
                      'LEVEL': 'water_depth_non_vented',
                      'Level': 'water_depth_non_vented',
                      'pressure?': 'air_pressure',
+                     'pressure': 'air_pressure',
                      }
 
         unit_map = {'Deg C': pq.degC,
                     'DEG C': pq.degC,
+                    '\xb0C': pq.degC,
                     'm': sq.mH2O,
                     'ft': sq.ftH2O,
                     'mS/cm': sq.mScm,
+                    '\xb5S/cm': sq.uScm,
+                    'kPa': sq.kPa,
                     }
 
         solinst_data = SolinstReader(self.data_file, self.default_tzinfo)
@@ -102,21 +108,72 @@ class SolinstReader:
         self.num_params = 0
         self.parameters = []
         self.read_solinst(data_file)
+
         if tzinfo:
             self.dates = [i.replace(tzinfo=tzinfo) for i in self.dates]
 
-    def read_solinst(self, data_file):
-        """
-        Open and read a Solinst file.
-        """
-        if type(data_file) == str:
-            fid = open(data_file, 'r')
+    def _read_csv(self, fid, buf):
+        "read csv type solinst file format"
+        params = []
+        units = []
+        barologger = False
+        while buf:
 
-        else:
-            fid = data_file
+            if buf.lower().find('date,') != -1:
+                break
 
-        #read header
-        buf = fid.readline().strip(' \r\n')
+            if buf.find('Serial_number:') != -1:
+                self.serial_number = fid.readline().strip(' \r\n')
+
+            if buf.find('Project ID:') != -1:
+                self.project_id = fid.readline().strip(' \r\n')
+
+            if buf.find('Location:') != -1:
+                self.site_name = fid.readline().strip(' \r\n')
+
+            if buf.lower().find('level') != -1:
+                params.append('LEVEL')
+                units.append(fid.readline().split(':')[-1].strip(' \r\n'))
+                if units[-1]=='kPa':
+                    barologger = True
+      
+            if buf.lower().find('temperature') != -1:
+                params.append('TEMPERATURE')
+                units.append(fid.readline().split(':')[-1].strip(' \r\n'))
+            
+            if buf.lower().find('conductivity') != -1:
+                params.append('CONDUCTIVITY')
+                units.append(fid.readline().split(':')[-1].strip(' \r\n'))
+
+            buf = fid.readline().strip(' \r\n')
+
+        fields = buf.split(',')
+
+        data = np.genfromtxt(fid, delimiter=',', dtype=None, names = fields)
+
+        self.dates = np.array(
+            [datetime.datetime.strptime(d + t, '%Y/%m/%d%H:%M:%S')
+             for d, t in zip(data['Date'], data['Time'])]
+            )
+
+        #assign param & unit names
+        for param, unit in zip(params, units):
+            self.num_params += 1
+            if barologger:
+                if param == 'LEVEL':
+                    self.parameters.append(Parameter('pressure', unit.strip()))
+                if param == 'TEMPERATURE':
+                    self.parameters.append(Parameter('air_temperature', unit.strip()))
+            else:
+                self.parameters.append(Parameter(param.strip(), unit.strip()))
+        
+        for ii in range(self.num_params):
+            self.parameters[ii].data = data[params[ii]]
+
+
+
+    def _read_lev(self, fid, buf):
+        "read .lev type solinst format"
         params = []
         units = []
         start_reading = False
@@ -192,6 +249,27 @@ class SolinstReader:
             param = re.sub('[?.:]', '',
                            self.parameters[ii].name).replace(' ', '_')
             self.parameters[ii].data = data[param]
+
+
+
+    def read_solinst(self, data_file):
+        """
+        Open and read a Solinst file.
+        """
+        if type(data_file) == str:
+            fid = open(data_file, 'r')
+
+        else:
+            fid = data_file
+
+        #read header
+        buf = fid.readline().strip(' \r\n')
+
+        if buf == '[Instrument info from data header]':
+            self._read_lev(fid, buf)
+        else:
+            self._read_csv(fid, buf)
+
 
 
 class Parameter:

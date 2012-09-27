@@ -47,3 +47,5 @@ mH2O = pq.UnitQuantity('meters of water', pq.m * pq.conventional_water,
 ftH2O = pq.ftH2O  # since ftH20 already exists in pq
 #: Pressure in dbar
 dbar = pq.UnitQuantity('decibar', pq.CompoundUnit('0.1*bar'), symbol='dbar')
+#: Pressure in kPa
+kPa = pq.pressure.kPa

@@ -32,6 +32,7 @@ def test_files():
         yield check_file, test_file_config, sonde_file_path
 
         with open(sonde_file_path) as sonde_file_fid:
+            print 'Testing:', sonde_file_path
             yield check_file, test_file_config, sonde_file_fid
 
 
@@ -50,7 +51,7 @@ def check_file(test_file, sonde_file):
 
     # force cst, as the python naive datetime automatically converts
     # to cst which tends to screw things up
-    if 'tz' in test_file['format_parameters'] and \
+    if 'tz' in test_file['format_parameters']['tz'] and \
            test_file['format_parameters']['tz'].lower() == 'cdt':
         tz = cdt
     else:

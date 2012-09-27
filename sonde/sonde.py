@@ -196,6 +196,8 @@ def autodetect(data_file, filename=None):
         return 'hydrotech'
     if lines[0].lower().find('data file for datalogger.') != -1:
         return 'solinst'
+    if lines[0].find('Serial_number:')!= -1 and lines[2].find('Project ID:')!= -1:
+        return 'solinst'
     if lines[0].lower().find('log file name') != -1:
         return 'hydrolab'
     if lines[0].lower().find('pysonde csv format') != -1:
