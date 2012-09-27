@@ -12,7 +12,7 @@ from setuptools import Command, setup, find_packages
 # but they could probably be a few versions lower
 setup(
     name='PySonde',
-    version='0.1',
+    version='0.2',
     license='BSD',
     author='Dharhas Pothina',
     author_email='dharhas.pothina@twdb.state.tx.us',
