@@ -1,0 +1,25 @@
+Metadata-Version: 1.1
+Name: PySonde
+Version: 0.2
+Summary: A utility library for reading various water quality data formats
+Home-page: UNKNOWN
+Author: Andy Wilson
+Author-email: andrew.wilson@twdb.state.tx.us
+License: BSD
+Description: 
+        PySonde
+        -------
+        
+        PySonde is a module for reading water quality data from various sensor
+        formats.
+        
+        
+Keywords: sonde water quality format environment ysi
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

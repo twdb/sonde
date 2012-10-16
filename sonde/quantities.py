@@ -49,3 +49,11 @@ ftH2O = pq.ftH2O  # since ftH20 already exists in pq
 dbar = pq.UnitQuantity('decibar', pq.CompoundUnit('0.1*bar'), symbol='dbar')
 #: Pressure in kPa
 kPa = pq.pressure.kPa
+
+#units of flow rate
+cms  = pq.UnitQuantity('cubic meter per second', pq.meter ** 3 / pq.second, 
+                       symbol='cms')
+cfs = pq.UnitQuantity('cubic feet per second', pq.foot ** 3 / pq.second,
+                      symbol='cfs')
+afd = pq.UnitQuantity('acre foot per day', pq.volume.acre_foot / pq.day,
+                      symbol='afd')
