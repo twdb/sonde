@@ -34,7 +34,8 @@ ppt = psu
 dl = pq.dimensionless
 
 #unit of speed
-mps = pq.UnitQuantity('Speed', pq.m / pq.second, symbol='m/s')
+mps = pq.UnitQuantity('meter per second', pq.m / pq.second, symbol='m/s')
+fps = pq.UnitQuantity('foot per second', pq.foot / pq.second, symbol='ft/s')
 
 #: Unit of specific conductivity - microSiemens per centimeter
 uScm = pq.UnitQuantity('Specific Conductivity',
@@ -53,7 +54,7 @@ kPa = pq.pressure.kPa
 #units of flow rate
 cms  = pq.UnitQuantity('cubic meter per second', pq.meter ** 3 / pq.second, 
                        symbol='cms')
-cfs = pq.UnitQuantity('cubic feet per second', pq.foot ** 3 / pq.second,
+cfs = pq.UnitQuantity('cubic foot per second', pq.foot ** 3 / pq.second,
                       symbol='cfs')
 afd = pq.UnitQuantity('acre foot per day', pq.volume.acre_foot / pq.day,
                       symbol='afd')
