@@ -41,7 +41,7 @@ import xlrd
 
 import numpy as np
 import quantities as pq
-
+import pandas as pd
 
 from .. import sonde
 from .. import quantities as sq
@@ -98,11 +98,9 @@ class MidgewaterDataset(sonde.BaseSondeDataset):
             try:
                 pcode = param_map[(parameter.name).strip()]
                 punit = unit_map[(parameter.unit).strip()]
-                # quick and dirty nan check: if all data values are
-                # nans, then we can exclude them
-                if not np.isnan(np.nansum(parameter.data)):
-                    self.parameters[pcode] = sonde.master_parameter_list[pcode]
-                    self.data[param_map[parameter.name]] = parameter.data * punit
+                self.parameters[pcode] = sonde.master_parameter_list[pcode]
+                import pdb; pdb.set_trace()
+                self.data[param_map[parameter.name]] = parameter.data * punit
 
             except KeyError:
                 warnings.warn('Un-mapped Parameter/Unit Type:\n'
@@ -162,40 +160,22 @@ class MidgewaterDataReader:
         else:
             fid = data_file
 
-        buf = fid.readline()
-        while buf.find('#') == 0:
-            if '# Station Name' in buf:
-                self.site_name = buf.lstrip('# Station Name:').strip()
-
-            if '# NODATA Value =' in buf:
-                no_data_value = buf.lstrip('# NODATA Value = ').strip()
-
-            buf = fid.readline()
-
-        fid.seek(0)
-
         params = ['Temperature', 'pH', 'Conductivity', 'Salinity', 'DO',
                   'WaterLevel', 'Turbidity','DOSat','Battery']
         units = ['C', 'nd', 'mmho', 'ppt', 'mg/l', 'm', 'ntu', '%', 'volts']
-        dtype = [('year', '<i4'), ('month', '<i4'), ('day','<i4'),
-                 ('hour', '<i4'), ('minute', '<i4'), (params[0],'<f8'),
-                 (params[1],'<f8'), (params[2],'<f8'),(params[3], '<f8'),
-                 (params[4], '<f8'), (params[5], '<f8'), (params[6], '<f8'),
-                 (params[7], '<f8'), (params[8], '<f8')]
-
-        null_handler = lambda v: float(v) if v != no_data_value else None
-        converter_dict = dict([(i, null_handler) for i in range(14)])
-        data = np.genfromtxt(fid, dtype=dtype, comments='#',
-                             usecols=range(14),
-                             converters=converter_dict)
-
-        self.dates = np.array([datetime.datetime(year=y, month=m, day=d,
-                                                 hour=hh, minute=mm,
+        names = ['year', 'month', 'day', 'hour', 'minute'] + params + \
+                ['raw_file']
+        data = pd.read_csv(fid, sep='\s*', comment='#', names=names,
+                           na_values='-9.99')
+        data = data.dropna(how='all')
+        self.dates = np.array([datetime.datetime(year=int(y), month=int(m), 
+                                                 day=int(d), hour=int(hh), 
+                                                 minute=int(mm),
                                                  tzinfo=self.default_tzinfo)
-                               for y, m, d, hh, mm
-                               in zip(data['year'], data['month'],
-                                      data['day'], data['hour'],
-                                      data['minute'])])
+                                for y, m, d, hh, mm
+                               in zip(data['year'].values, data['month'].values,
+                                      data['day'].values, data['hour'].values,
+                                      data['minute'].values)])
 
         #assign param & unit names
         for param, unit in zip(params, units):
@@ -204,7 +184,7 @@ class MidgewaterDataReader:
 
         for ii in range(self.num_params):
             param = self.parameters[ii].name
-            self.parameters[ii].data = data[param]
+            self.parameters[ii].data = data[param].dropna()
 
 
 class Parameter:
