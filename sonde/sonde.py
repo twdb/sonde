@@ -101,7 +101,7 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
 
         if file_format == False:
             raise Exception("File Format Autodetection Failed. Try "
-                            "must specifying the file_format.")
+                            "specifying the file_format.")
 
     if 'ysi' in file_format.lower():
         from sonde.formats.ysi import YSIDataset
@@ -142,7 +142,10 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
     if file_format.lower() == 'espey':
         from sonde.formats.espey import EspeyDataset
         return EspeyDataset(data_file, *args, **kwargs)
-
+        
+    if file_format.lower() == 'lcra':
+        from sonde.formats.lcra import LcraDataset
+        return LcraDataset(data_file, *args, **kwargs)
     else:
         raise NotImplementedError("file format '%s' is not supported" % \
                                    (file_format,))
@@ -205,6 +208,8 @@ def autodetect(data_file, filename=None):
         # possible binary junk in first line of hydrotech file
     if lines[1].lower().find('log file name') != -1:
         return 'hydrotech'
+    if lines[0].lower().find('the following data have been') != -1:
+        return 'lcra'
 
     # ascii files for ysi in brazos riv.
     if lines[0].find('espey') != -1:

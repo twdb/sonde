@@ -1,25 +1,15 @@
 """
-    sonde.formats.midgewater
+    sonde.formats.lcra
     ~~~~~~~~~~~~~~~~~
 
-    This module implements a midgewater format.
-    The files are in .txt format and must conform to the
+    This module implements an lcra format.
+    the files are in .txt format and must conform to the
     following guidelines
-    comments and metadata at top of file in the format:
-      # name: value
-    a timezone field: (UTC-?, the data must all be in one UTC offset)
-      # timezone: UTC-6 ?
-    a fill_value field:
-      # fill_value = -9.99
-    the last two comment/header lines should be the following
-    parameter header prepended by single #:
-      #yyyy,mm,dd,HH,MM,temperature,ph,conductivity,salinity, etc
-      (datetime must be 5 field and in format yyyy mm dd HH MM)
-      (parameter names must be from master_param_list
-    unit header prepended by single #:
-      yyyy mm dd HH MM, C,nd, mmho, ppt, etc
-      (units must be from supported_units_list)
-
+    the first 10 lines are comments.The second line from last should have
+    units.
+    local timezone 
+    fill_value = -99.9
+     
     space separated data
 
     special columns or header items:
@@ -31,13 +21,9 @@
 """
 from __future__ import absolute_import
 
-import csv
 import datetime
 import pkg_resources
-import re
-from StringIO import StringIO
 import warnings
-import xlrd
 
 import numpy as np
 import quantities as pq
@@ -47,17 +33,17 @@ from .. import sonde
 from .. import quantities as sq
 from ..timezones import UTCStaticOffset
 
-class MidgewaterDataset(sonde.BaseSondeDataset):
+class LcraDataset(sonde.BaseSondeDataset):
     """
-    Dataset object that represents the data contained in 'midgewater' txt
+    Dataset object that represents the data contained in 'lcra' txt
     file.
     """
     def __init__(self, data_file, tzinfo=None):
         self.manufacturer = 'na'
-        self.file_format = 'midgewater'
+        self.file_format = 'lcra'
         self.data_file = data_file
         self.default_tzinfo = tzinfo
-        super(MidgewaterDataset, self).__init__(data_file)
+        super(LcraDataset, self).__init__(data_file)
 
     def _read_data(self):
         """
@@ -65,33 +51,35 @@ class MidgewaterDataset(sonde.BaseSondeDataset):
         """
         #salinity used in some mw files was not consistent w/ what's calculated w/
         #seawater module used in pint. So not using it. SN
-        param_map = {'Temperature': 'water_temperature',
+        param_map = {'temp': 'water_temperature',
              'pH': 'water_ph',
-             'Conductivity': 'water_specific_conductance',  
-             'DO': 'water_dissolved_oxygen_concentration',
-             'WaterLevel': 'water_depth_non_vented',
-             'Turbidity': 'water_turbidity',
-             'DOSat': 'water_dissolved_oxygen_percent_saturation',
-             'Battery': 'instrument_battery_voltage',
+             'salinity': 'seawater_salinity',
+             'cond': 'water_specific_conductance',  
+             'D.O.': 'water_dissolved_oxygen_concentration',
+             'level': 'water_depth_non_vented',
+             'turbid': 'water_turbidity',
              }
 
         unit_map = {'C': pq.degC,
-                    'mmho': sq.mScm,
+                    'mS/cm': sq.mScm,
+                    'uS/cm': sq.uScm,
+                    'psu': sq.psu,
                     '%': pq.percent,
                     'mg/l': sq.mgl,
                     'nd': pq.dimensionless,
                     'm': sq.mH2O,
+                    'ft': sq.ftH2O,
                     'volts': pq.volt,
                     'ntu': sq.ntu
                     }
 
-        midgewater_data = MidgewaterDataReader(
+        lcra_data = LcraDataReader(
             self.data_file, tzinfo=self.default_tzinfo)
         self.parameters = dict()
         self.data = dict()
         metadata = dict()
 
-        for parameter in midgewater_data.parameters:
+        for parameter in lcra_data.parameters:
             try:
                 pcode = param_map[(parameter.name).strip()]
                 punit = unit_map[(parameter.unit).strip()]
@@ -109,10 +97,9 @@ class MidgewaterDataset(sonde.BaseSondeDataset):
                 metadata[parameter.name.lower()] = parameter.data
 
         try:
-            self.site_name = midgewater_data.site_name
+            self.site_name = lcra_data.site_name
         except AttributeError:
             pass
-
         #overide default metadata if present in file
         names = ['manufacturer', 'data_file', 'serial_number']
         kwds = ['instrument_manufacturer', 'original_data_file',
@@ -127,10 +114,10 @@ class MidgewaterDataset(sonde.BaseSondeDataset):
             if idx != []:
                 exec('self.' + name + ' = metadata[idx[0]]')
 
-        self.dates = midgewater_data.dates
+        self.dates = lcra_data.dates
 
 
-class MidgewaterDataReader:
+class LcraDataReader:
     """
     A reader object that opens and reads wq files processed with older script.
 
@@ -144,39 +131,54 @@ class MidgewaterDataReader:
         self.parameters = []
         self.format_parameters = {}
         self.default_tzinfo = tzinfo
-        self.read_midgewater(data_file)
-
-    def read_midgewater(self, data_file):
+        self.read_lcra(data_file)   
+        
+    def correct_time_string(self, int_time):
+        if len(str(int_time)) == 1:
+            return '000' + str(int_time)
+        if len(str(int_time)) == 2:
+            return '00' + str(int_time)
+        if len(str(int_time)) == 3:
+            return '0' + str(int_time)
+        else:
+            return str(int_time)
+        
+    def read_lcra(self, data_file):
         """
-        Open and read a MW file.
+        Open and read an LC file.
         """
         if type(data_file) == str:
             fid = open(data_file, 'r')
 
         else:
             fid = data_file
+            
+        buf = 'header'
+        while buf:
+            buf = fid.readline()
+            if buf.strip()[:2] == 'yr':
+                columns = buf.strip().split()
+                temp_units = fid.readline().strip().split()
+                fid.readline() 
+                break
 
-        params = ['Temperature', 'pH', 'Conductivity', 'Salinity', 'DO',
-                  'WaterLevel', 'Turbidity','DOSat','Battery']
-        units = ['C', 'nd', 'mmho', 'ppt', 'mg/l', 'm', 'ntu', '%', 'volts']
-        names = ['year', 'month', 'day', 'hour', 'minute'] + params + \
-                ['raw_file']
-        data = pd.read_csv(fid, sep='\s*', comment='#', names=names,
+        data = pd.read_csv(fid, sep='\s*', names=columns,
                            na_values='-9.99')
+        data['yr'] = data['yr'].apply(lambda x: '200' + str(x) 
+                                        if x < 10 else '19' + str(x))
+        data['time'] = data['time'].apply(self.correct_time_string)                                    
+                                    
 #        import pdb; pdb.set_trace()
-        raw_dates = np.array([datetime.datetime(year=int(y), month=int(m), 
-                                                 day=int(d), hour=int(hh), 
-                                                 minute=int(mm),
-                                                 tzinfo=self.default_tzinfo)
-                                if (np.isnan(y) * np.isnan(m) * np.isnan(d) * \
-                                np.isnan(hh) * np.isnan(mm)) == False else np.nan
-                                for y, m, d, hh, mm
-                               in zip(data['year'].values, data['month'].values,
-                                      data['day'].values, data['hour'].values,
-                                      data['minute'].values)])
-        # remove records missing any of y,m,d,hh and mm parameters
+        raw_dates = np.array([datetime.datetime(int(y), m, d,int(str(t)[:2]), 
+                                                int(str(t)[2:]),0)
+                                for y, m, d, t
+                               in zip(data['yr'].values, data['mo'].values,
+                                      data['dy'].values, data['time'].values)])
+        # remove records missing any of y,m,d,time parameters
         na_dates_mask = np.where(raw_dates != np.nan)[0]
         self.dates = raw_dates[na_dates_mask]
+        params = columns[4:]
+        units = temp_units[4:]
 #        import pdb; pdb.set_trace()
         #assign param & unit names
         for param, unit in zip(params, units):
