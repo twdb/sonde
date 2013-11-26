@@ -15,7 +15,7 @@ import warnings
 import numpy as np
 import quantities as pq
 import pytz
-import seawater.csiro
+import seawater
 
 from sonde import quantities as sq
 from sonde import util
@@ -142,7 +142,7 @@ def Sonde(data_file, file_format=None, *args, **kwargs):
     if file_format.lower() == 'espey':
         from sonde.formats.espey import EspeyDataset
         return EspeyDataset(data_file, *args, **kwargs)
-        
+
     if file_format.lower() == 'lcra':
         from sonde.formats.lcra import LcraDataset
         return LcraDataset(data_file, *args, **kwargs)
@@ -648,7 +648,7 @@ class BaseSondeDataset(object):
                 P = (pq.atm).rescale(sq.dbar).magnitude
 
             R = cond / 42.914
-            sal = seawater.csiro.salt(R, T, P)
+            sal = seawater.salt(R, T, P)
 
             self.set_standard_unit('seawater_salinity', sq.psu)
             self.data['seawater_salinity'] = sal * sq.psu
