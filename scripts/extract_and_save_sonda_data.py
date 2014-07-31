@@ -72,6 +72,7 @@ header_line = fid.readline()
 while 'timezone' not in header_line:
     header += header_line
     header_line = fid.readline()
+header += header_line
 fid.close()
 
 sonde_dates = [pd.datetime.strptime(dt.strftime('%m-%d-%y %H:%M:%S'), 
