@@ -18,6 +18,14 @@ import sonde
 import matplotlib.pyplot as plt
 import pandas
 
+site_description = {'sab2': 'Sabine Lake',
+                    'midg': 'Galveston Bay',
+                    'trin': 'Trinity Bay',
+                    'mosq': 'San Antonio Bay',
+                    'ingl': 'Corpus Christi Bay',
+                    'spcg': 'Lower Laguna Madre',
+                    'mata': 'Matagorda Bay'}
+
 def apply_qa_rule(sonde_data, start_date, stop_date, qa_rule, qa_params, param_to_qa):
     """function for removing bad values from wq data 
     arguments:
@@ -78,10 +86,10 @@ else:
     base_dir = '/T/BaysEstuaries/Data/WQData'
 
 log_file_dir = 'deployment_logs'
-log_file_name = 'master_deployment_log_pipe_del.csv'
+log_file_name = 'master_deployment_log.csv'
 log_file = os.path.join(base_dir, log_file_dir, log_file_name)
 
-metadata_file = os.path.join(base_dir,'swis_site_list_with_nueces_added.psv')
+metadata_file = os.path.join(base_dir,'swis_site_list.psv')
 
 disclaimer = ''
 disclaimer += 'This data has been collected by a Texas Water Development Board datasonde.\n'
@@ -94,11 +102,13 @@ disclaimer += 'representative of bay conditions. The Board makes no warranties (
 disclaimer += ' as to merchantability or fitness) either expressed or implied with respect to the data \n' 
 disclaimer += 'or its fitness for any specific application. \n'
 
+
 #choose site and setup remaining variables
 site_name = raw_input('Enter Site Name: ').lower()
 site_dir = os.path.join(base_dir, 'sites', site_name)
 original_data_files_dir = os.path.join(site_dir, 'original_data_files')
 
+error_log_file = os.path.join(site_dir, 'read_errors.txt')
 qa_rules_file = os.path.join(site_dir, 'twdb_wq_' + site_name +'_qa_rules.csv')
 raw_data_file = os.path.join(site_dir,'twdb_wq_'+site_name+'_raw.csv')
 clean_data_file = os.path.join(site_dir,'twdb_wq_'+site_name+'.csv')
@@ -106,11 +116,11 @@ image_file = os.path.join(site_dir,'twdb_wq_'+site_name+'.png')
 image_file_wclipped = os.path.join(site_dir,'twdb_wq_'+site_name+'_withclipped.png')
 
 if not os.path.isdir(site_dir):
-    print 'No directory found for: ', site_dir
+    #print 'No directory found for: ', site_dir
     raise
 
 if not os.path.isdir(original_data_files_dir):
-    print 'No directory found for: ', original_data_files_dir
+    #print 'No directory found for: ', original_data_files_dir
     raise
 
 #read in site metadata
@@ -130,7 +140,7 @@ fid = open(log_file)
 buf = fid.readline()
 while buf:
     if buf.strip('# ').lower()[0:9]=='site_name':
-        fields = buf.replace(' ','').strip('#\r\n').split('|')
+        fields = buf.replace(' ','').strip('#\r\n').split(',')
         # todo read in units
         break
     buf = fid.readline()
@@ -160,11 +170,11 @@ dtype = [('site_name','S32'),
          ('verified_by', 'S32'),
          ('qa_status', np.int32),
          ('notes', 'S60')]
-log_data = np.genfromtxt(fid, delimiter='|', dtype=dtype,
+log_data = np.genfromtxt(fid, delimiter=',', dtype=dtype,
                          comments="somethingthatnoonewilleveruse",
                          autostrip=True, names=fields,
                          converters={'site_name': tolower,'renamed_filename': strip},
-                         )
+                         invalid_raise=True)
 fid.close()
 
 #filter out data from other sites
@@ -195,6 +205,7 @@ local_log_file.close()
 
 #read in original data files
 data_files = glob.glob(os.path.join(original_data_files_dir,'*.*'))
+data_files = [str(f) for f in data_files]
 data_file_names = [os.path.split(f)[-1] for f in data_files]
 
 #check if deployment log file list matches files in original_data_files dir
@@ -202,9 +213,9 @@ log_files = log_data['renamed_filename']
 if set(data_file_names)==set(log_files):
     print 'List of files in deployment logs match files found in original_data_files folder'
 else:
-    print 'Warning: list of data files in deployment log does not match what is found in original_data_files folder'
-    print 'please check log file and fix, log file name: ', site_name + '_missing_files.txt'
-    print 'for files that are not in the deployment log timezone will be applied automatically based on start_time in data'
+    #print 'Warning: list of data files in deployment log does not match what is found in original_data_files folder'
+    #print 'please check log file and fix, log file name: ', site_name + '_missing_files.txt'
+    #print 'for files that are not in the deployment log timezone will be applied automatically based on start_time in data'
     missing_files_log = os.path.join(site_dir, site_name + '_missing_files.txt')
     fid = open(missing_files_log, 'w')
     fid.write('log file written: ' + time.ctime() + '\n')
@@ -225,7 +236,7 @@ for file_name in data_file_names:
     if file_name in log_files:
         tz = log_data['timezone'][log_data['renamed_filename']==file_name][0]
         if tz.strip()=='' or tz.strip().lower()=='nd':
-            print 'No timezone specified in deployment log, assuming auto:', file_name 
+            #print 'No timezone specified in deployment log, assuming auto:', file_name 
             tz = 'auto'
         tz_list.append(tz)
     else:
@@ -237,7 +248,7 @@ merged_data = sonde.merge(data_files, tz_list=tz_list)
 raw_data = copy.copy(merged_data)
 for file_name in np.unique(raw_data.data_file):
     if file_name not in log_data['renamed_filename']:
-        print 'Filename not found in deployment log, unable to clip file: ', file_name
+        #print 'Filename not found in deployment log, unable to clip file: ', file_name
         continue
 
     idx = np.where(file_name==log_data['renamed_filename'])[0]
@@ -245,7 +256,7 @@ for file_name in np.unique(raw_data.data_file):
     try:
         deploy_stop_time = log_dates[idx+1] #assumes no gaps in deployment log
     except:
-        print 'no deploy stop time found for file: ', file_name
+        #print 'no deploy stop time found for file: ', file_name
         deploy_stop_time = deploy_start_time + datetime.timedelta(365)
     outside_mask = ~(raw_data.data_file == file_name)
 
@@ -255,12 +266,12 @@ for file_name in np.unique(raw_data.data_file):
 
     mask = clip_mask | outside_mask
     raw_data.apply_mask(mask)
-    print str(np.where(mask==False)[0].size) + ' entries clipped from file: ', file_name
+    #print str(np.where(mask==False)[0].size) + ' entries clipped from file: ', file_name
 
-print 'writing raw data file'
+#print 'writing raw data file'
 raw_header = header.copy()
 raw_header['qa_level']='raw uncorrected data'
-raw_data.write(raw_data_file, file_format='csv',disclaimer=disclaimer, metadata=raw_header)
+raw_data.write(str(raw_data_file), file_format='csv',disclaimer=disclaimer, metadata=raw_header, float_fmt='%5.3f')
 
 #apply qa rules
 clean_data = copy.copy(raw_data)
@@ -278,19 +289,20 @@ if os.path.exists(qa_rules_file):
         qarules = np.array(qarules, ndmin=1)
         
         for qarule in qarules:
-            print qarule
+            #print qarule
             startdate = datetime.datetime.strptime(qarule['start_datetime'],
                                                    '%m/%d/%Y %H:%M')
             stopdate = datetime.datetime.strptime(qarule['stop_datetime'],
                                                   '%m/%d/%Y %H:%M')
             startdate = startdate.replace(tzinfo=sonde.default_static_timezone)
             stopdate = stopdate.replace(tzinfo=sonde.default_static_timezone)
+#            import pdb; pdb.set_trace()
             clean_data = apply_qa_rule(clean_data, startdate, stopdate, 
                                        qarule['rule_name'], 
                                        qarule['rule_parameters'],
                                        qarule['apply_to_parameters'])
     except IOError:
-        print "Empty qa rules file, skipping qa step..."    
+        pass    
 
 
 
@@ -309,14 +321,15 @@ if end_date:
 else:
     end_date_time = raw_data.dates[-1]
 
-data_range_mask = (clean_data.dates >= start_date_time) * (clean_data.dates <= end_date_time)
-clean_data.apply_mask(data_range_mask)
-clean_data.write(clean_data_file, file_format='csv',disclaimer=disclaimer, metadata=clean_header)
+#data_range_mask = (clean_data.dates >= start_date_time) * (clean_data.dates <= end_date_time)
+#clean_data.apply_mask(data_range_mask)
+clean_data.write(clean_data_file, file_format='csv',disclaimer=disclaimer, metadata=clean_header,
+                 float_fmt='%5.3f')
 
 #create plots
 #read in data @todo fix copy.copy problems
-raw_data = sonde.Sonde(raw_data_file)
-clean_data = sonde.Sonde(clean_data_file)
+raw_data = sonde.Sonde(str(raw_data_file))
+clean_data = sonde.Sonde(str(clean_data_file))
 
 
 raw_dates = [pandas.datetime.strptime(dt.strftime('%m-%d-%y %H:%M:%S'), 
@@ -336,30 +349,52 @@ spot_series = pandas.DataFrame(log_data,index=log_dates)
 
 #salinity plots
 #plt.figure(site_name.upper() + "Salinity")
+#site_descriptions = {'emath': 'GIWW near Matagorda Harbor',
+#                     'ematt': 'Old Tide Gage',
+#                     'ematc': 'Shellfish Marker C',
+#                     'eemat': 'East End of East Matagorda Bay',
+ # 
+#                   'caney': 'Caney Creek'}
+
+clean_series = clean_series.groupby(level=0).first()
 try:
     clean_sal_series = clean_series['seawater_salinity']
-    plt.figure()
     raw_sal_series = raw_series['seawater_salinity']
     spotcheck_sal_series = spot_series['salinity']
     #clean_sal_series = clean_sal_series.asfreq('Min')
-    raw = raw_sal_series.plot(style='c.', mec='c', label='raw data', markersize=4)
-    clean = clean_sal_series.plot(style='b.',mec='b', label='QAed data', markersize=4)
-    S = spotcheck_sal_series.plot(style='ro',mec='r',label='spot check')  
+    site_sal_ax = plt.figure().add_subplot(111)
+    raw = raw_sal_series.plot(style='c.', mec='c', label='raw data', 
+                              markersize=4, ax=site_sal_ax)
+    clean = clean_sal_series.plot(style='b.',mec='b', label='QAed data',
+                                  markersize=4, ax=site_sal_ax)
+    if spotcheck_sal_series.size != 0:
+        S = spotcheck_sal_series.plot(style='ro',mec='r',label='spot check')  
     plt.legend(loc='best')
     ymax = clean_sal_series.max() + 2
-    plt.ylim(0,40)
-    plt.ylabel('Salinity,psu')
-    plt.title(site_name.upper() + ' Salinity')
+#    plt.xlim(pandas.datetime(2012,1,1))
+    site_sal_ax.set_ylim(0, ymax)
+    site_sal_ax.set_ylabel('Salinity,ppt')
+#    plt.title("Salinity at " + site_descriptions[site_name] + '(' + site_name  + ')')
+    plt.title("Salinity at " +  site_name.upper())
+    
     plt.savefig(image_file)
     print "plotted raw vs qa'ed salinity"
 
-    plt.figure(site_name.upper() + 'depl. salinity')
+
+    dep_sal_ax = plt.figure().add_subplot(111)
 #    plt.title('OLDR salinity - unique color per deployment')
 
 
     filename_list = np.unique(clean_series['filename'])
+    for sonde_file in filename_list:      
+        clean_sal_series = clean_sal_series.groupby(level=0).first()
+        sonde_sal_series = clean_sal_series[clean_series.filename==sonde_file]
+        sonde_sal_series.plot(style='.', ax=dep_sal_ax)
 
+    """
     i = 1
+    if spotcheck_sal_series.size != 0:
+        S = spotcheck_sal_series.plot(style='ro',mec='r',label='spot check')  
     for filename in filename_list.sort_index():
         idx = clean_series['filename'] == filename
         deployment_series = clean_series[idx]
@@ -373,31 +408,35 @@ try:
                 qa_status = 2
             else:
                 qa_status = 1
-            
+                   
         if qa_status == 1:
             deployment_series['qa_status'].plot(style='r-',linewidth=3)
         elif qa_status == 2:
             deployment_series['qa_status'].plot(style='y-',linewidth=3)
         elif qa_status == 3:
             deployment_series['qa_status'].plot(style='g-',linewidth=3)
-
+        
         date_list = []
    
         if i%2 == 0:
-            deployment_series['seawater_salinity'].plot(style='b.', mew=0)
+            deployment_series['seawater_salinity'].plot(style='b.', mew=0,
+                                                        raise_on_error=False)
         if i%2 == 1:
-            deployment_series['seawater_salinity'].plot(style='c.', mew=0)
+            deployment_series['seawater_salinity'].plot(style='c.', mew=0,
+                                                        raise_on_error=False)
         i += 1
-
-    S = spotcheck_sal_series.plot(style='ro',mec='r',label='spot check')   
+    """
+    if spotcheck_sal_series.size != 0:
+        S = spotcheck_sal_series.plot(style='ro',mec='r',label='spot check')  
+    
  #   plt.ylim(0,50)
-    plt.xlim(start_date_time, end_date_time)
-    plt.ylabel('Salinity,psu')
-    plt.ylim(0,40)
-    plt.title(site_name.upper() + ' Salinity')
+#    plt.xlim(start_date_time, end_date_time)
+    dep_sal_ax.set_ylabel('Salinity,psu')
+    dep_sal_ax.set_ylim(0, ymax)
+    dep_sal_ax.set_title(site_name.upper() + ' Salinity')
     plt.grid(True, which='major')
 #    plt.legend()
-    print "plotted qa'ed salinity with unique deployment colors"
+    #print "plotted qa'ed salinity with unique deployment colors"
 except KeyError:
   pass
     
@@ -405,16 +444,31 @@ except KeyError:
 try:
     raw_wsl_series = raw_series['water_depth_non_vented']
     clean_wsl_series = clean_series['water_depth_non_vented']
-    plt.figure("Water Level")
-    raw = raw_wsl_series.plot(style='c.', mec='c', label='raw data', markersize=4)
-    clean = clean_wsl_series.plot(style='b.',mec='b', label='QAed data', markersize=4)
+    site_wsl_ax = plt.figure().add_subplot(111)
+#    raw = raw_wsl_series.plot(style='c.', mec='c', label='raw data', markersize=4)
+#    clean = clean_wsl_series.plot(style='b.',mec='b', label='QAed data', markersize=4)
     plt.legend(loc='best')
-    plt.ylim(0,clean_wsl_series.max())
-    plt.ylabel('Water level, m')
-    plt.title(site_name.upper() + ' Water Surface Elevation')
-    print "plotted water surface elevation"
+    site_wsl_ax.set_ylabel('Water level, m')
+    site_wsl_ax.set_title(site_name.upper())
+    raw_wsl_series.plot(style='c.', label='raw', ax=site_wsl_ax)
+    clean_wsl_series.plot(style='b.', label="qa'ed", ax=site_wsl_ax)
+    site_wsl_ax.set_title(site_name.upper())
+    site_wsl_ax.set_ylim(0,np.ceil(clean_wsl_series.max()))
+    site_wsl_ax.set_xlim(clean_series.index[0], clean_series.index[-1])
+    site_wsl_ax.set_ylabel('water depth above sonde, m')
+    dep_wsl_ax = plt.figure().add_subplot(111)
+    filename_list = np.unique(clean_series['filename'])
+    for sonde_file in filename_list:      
+        clean_wsl_series = clean_wsl_series.groupby(level=0).first()
+        sonde_wsl_series = clean_wsl_series[clean_series.filename==sonde_file]
+        sonde_wsl_series.plot(style='.', ax=dep_wsl_ax)
+    dep_wsl_ax.set_title(site_name.upper())
+    dep_wsl_ax.set_xlim(clean_series.index[0], clean_series.index[-1])
+    dep_wsl_ax.set_ylim(0,np.ceil(clean_wsl_series.max()))
+    dep_wsl_ax.set_ylabel('absolute pressure reading, m')
+    #print "plotted water surface elevation"
 except KeyError:
-    print "no water level data found"
+    #print "no water level data found"
     pass
 #plt.savefig(image_file_wclipped)
 #plt.savefig(image_file)
