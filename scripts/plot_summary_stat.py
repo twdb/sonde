@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 """
-script to generate wq summary stasistics plot and file.
+script to generate wq summary statistics plot and csv file.
+- best to run this from the project/data request directory since that's where it will save files.
 
 Usage:
-    generate_wq_summary_stat.py <parameter> <site_list> [--save-plot --save-txt --ymin=<ymin> --ymax=<ymax> --recent_years=<number>]
+    plot_summary_stat.py <parameter> <site_list> <averaging> [--save-plot --save-txt --ymin=<ymin> --ymax=<ymax> --recent_years=<number>]
 
 Options:
     -h --help                   show this screen
@@ -14,16 +15,19 @@ Options:
                                 - ph
                                 - DO
                                 - turbidity
+    <averaging>                 monthly or daily
     <site_list>                 comma separated(no space) list of sites to plot
                                 wq parameter for.
     --save-plot                 save plot in current working directory
-    --save-txt                  save summary statistics
-    --ymin=<ymin>               min limit of y-axis
-    --ymax=<ymax>               max limit of y-axis
+    --save-txt                  save summary statistics in current working directory
+    --ymin=<ymin>               min limit of y-axis. default is maximum data value
+    --ymax=<ymax>               max limit of y-axis. default is minimum data value
+    --recent_years=<number>     the number of most recent years to plot with historical plot. default is three.
+    --plot-title                optional plot title. if not given site name is used.
 
 
 Example:
-    run /home/snegusse/sonde/scripts/plot_sites_salinity.py temperature midg,trin --ymin=0 --ymax=30 --sdate=2008-01-01 --edate=2009-01-01
+    run /home/snegusse/sonde/scripts/plot_summary_stat temperature midg,trin --ymin=0 --ymax=30
 
 """
 from calendar import month_name
@@ -55,53 +59,84 @@ param_map = {'depth': 'water_depth_non_vented',
              'turbidity': 'water_turbidity',
              }
 
-def _calculate_historical_statistics(sonde_file, parameter, recent_years=3):
+def _calculate_historical_statistics(sonde_file, parameter, averaging,
+                                    recent_years=3):
     sonde_data = _read_sonde_data(sonde_file)
     sonde_param_data = sonde_data[parameter]
     sonde_param_data[sonde_param_data < -900] = np.nan
 
+    sonde_param_data[np.logical_and(sonde_param_data.index.month==2,
+                                    sonde_param_data.index.day==29)] = np.nan
+    sonde_param_data.dropna(inplace=True)
+
+
     final_year = sonde_param_data.index.year[-1]
     first_year = sonde_param_data.first_valid_index().year
-    year_str = '(%s - %s)' % (first_year, final_year)
+    year_str = '(%s - %s)' % (first_year, final_year-1)
 
     historical_enddate = pd.datetime(final_year - 1, 12, 31, 23, 59)
     historical_data = sonde_param_data.ix[:historical_enddate]
-    grouped_monthly_data = historical_data.groupby(lambda d: d.month)
-    hist_stat = grouped_monthly_data.describe()
-    hist_stat = pd.DataFrame({
-        'min':  hist_stat.xs('min', level=1),
-        'mean': hist_stat.xs('mean', level=1),
-        'max': hist_stat.xs('max', level=1)})
+    if averaging == 'monthly':
+        grouped_monthly_data = historical_data.groupby(lambda d: d.month)
+        hist_stat = grouped_monthly_data.describe()
+        hist_stat = pd.DataFrame({
+        'min':  grouped_monthly_data.min(),
+        'mean': grouped_monthly_data.mean(),
+        'max': grouped_monthly_data.max()})
+        for year_ago in np.arange(recent_years):
+            start_date = pd.datetime(final_year - year_ago, 1, 1)
+            end_date = pd.datetime(final_year - year_ago, 12, 31, 23, 59)
+            monthly_mean = _calculate_mean(sonde_param_data.ix[start_date:end_date], 'M')
+            hist_stat[str(start_date.year)] = pd.DataFrame(monthly_mean.values,
+                index=monthly_mean.index.month)
+    else:
+        grouped_daily_data = historical_data.groupby(lambda d:
+            (d.month, d.day))
+        hist_stat = pd.DataFrame({
+            'min':  grouped_daily_data.min(),
+            'mean': grouped_daily_data.mean(),
+            'max': grouped_daily_data.max()})
+        hist_stat.index = np.arange(1,366)
+        for year_ago in np.arange(recent_years):
+            start_date = pd.datetime(final_year - year_ago, 1, 1)
+            end_date = pd.datetime(final_year - year_ago, 12, 31, 23, 59)
+            daily_mean = _calculate_mean(sonde_param_data.ix[start_date:end_date], 'D')
+            daily_mean.index = daily_mean.index.dayofyear
+            hist_stat[str(start_date.year)] = pd.DataFrame(daily_mean.values,
+                index=daily_mean.index)
 
     hist_stat.year_range = year_str
     hist_stat.final_year = final_year
     hist_stat.first_year = first_year
 
-    for year_ago in np.arange(recent_years):
-        start_date = pd.datetime(final_year - year_ago, 1, 1)
-        end_date = pd.datetime(final_year - year_ago, 12, 31, 23, 59)
-        monthly_mean = _calculate_monthly_mean(sonde_param_data.ix[start_date:end_date])
-        hist_stat[str(start_date.year)] = pd.DataFrame(monthly_mean.values,
-                     index=monthly_mean.index.month)
-#    import pdb; pdb.set_trace()
     return hist_stat
 
-def _calculate_monthly_mean(sonde_series):
-    return sonde_series.resample('M')
+def _calculate_mean(sonde_series, frequency):
+    return sonde_series.resample(frequency)
 
 #def generate_stat_file(sonde_file, parameter, recent_years=3):
 
-def plot_statistics(sonde_file, parameter, recent_years=3):
+def plot_statistics(sonde_file, parameter, averaging, recent_years=3, ymin=None,
+                    ymax=None, title=None):
     _set_mpl_params()
-    historical_stat = _calculate_historical_statistics(sonde_file, parameter, recent_years=recent_years)
+    historical_stat = _calculate_historical_statistics(sonde_file, parameter,
+        averaging=averaging, recent_years=recent_years)
     hist_max = historical_stat['max']
     hist_mean = historical_stat['mean']
     hist_min = historical_stat['min']
 
     figure = plt.figure(edgecolor='none')
+    plt.title(title)
     ax = figure.add_subplot(111)
     figure.patch.set_alpha(.1)
-    xticks = np.arange(0.5,12.5)
+    if averaging == 'monthly':
+        xticks = np.arange(0.5,12.5)
+    if averaging == 'daily':
+        #grabbing the first of a non-leap year's first day of month to be used  1-365 based index
+        is_first_day_of_month = pd.date_range(start='2005-01-01', end='2005-12-31',
+            freq='D').day == 1
+        xticks = historical_stat.index[is_first_day_of_month]
+
     mon_labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
                   'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     ax.xaxis.set_ticklabels(mon_labels)
@@ -116,35 +151,59 @@ def plot_statistics(sonde_file, parameter, recent_years=3):
     plot_props = [(0, '#2C4C61', 'o'),
                   (1, '#1693A5', 's'),
                   (2, '#ACBEB3', 'D')]
-    year_handle_labels = []
-
-    if recent_years <= 3:
-        for year_ago, color, marker  in plot_props:
+    year_handles_labels = []
+    if  0 < recent_years and recent_years <= 3:
+        for year_ago, color, marker  in plot_props[:recent_years]:
             year = historical_stat.final_year - year_ago
             historical_stat[str(year)].plot(ax=ax, style = '-', xticks=xticks,
-                marker=marker, color=color,
-                label='mean ' + str(year))
+                color=color, label='mean ' + str(year))
+            if averaging == 'monthly':
+                historical_stat[str(year)].plot(ax=ax, style='.', xticks=xticks,
+                marker=marker, color=color)
+            if averaging == 'daily':
+                is_day_15_of_month = pd.date_range(start='2005-01-01',
+                    end='2005-12-31', freq='D').day == 15
+                historical_stat[str(year)].ix[is_day_15_of_month].plot(ax=ax, style='.',
+                    marker=marker, color=color)
+            year_handles_labels.append(
+                (matplotlib.lines.Line2D([0, 1], [0, 1], color=color,
+                    marker=marker, markeredgewidth=0), str(year)))
 
-            year_line = ax.get_legend_handles_labels()[0][-1]
-            year_label = ax.get_legend_handles_labels()[1][-1]
-            year_handle_labels.append((year_label, year_line))
-        year_handle_labels.sort(reverse=True)
-        year_handle_labels = zip(*year_handle_labels)
-#        import pdb; pdb.set_trace()
-        first_legend =  ax.legend(year_handle_labels[1], year_handle_labels[0],
-            frameon=False, numpoints=1, ncol=len(year_handle_labels[0]),
-            loc='upper center', bbox_to_anchor=(0.3, 1.15))
+        year_handles_labels = year_handles_labels[::-1]
+
+        first_legend =  ax.legend(*zip(*year_handles_labels),
+            frameon=False, numpoints=1, ncol=len(year_handles_labels[0]),
+            loc='lower center', bbox_to_anchor=(0.3, -0.225))
+        ax.add_artist(first_legend)
         all_handles = ax.get_legend_handles_labels()
         ax.legend(all_handles[0][:3], all_handles[1][:3],
-            loc='upper center', bbox_to_anchor=(0.83, 1.20), frameon=False)
-        ax.add_artist(first_legend)
-        figure.subplots_adjust(top=0.85)
-        ax.set_xlim(0.5,12.5)
-        ax.set_ylim(0,40)
+            loc='lower center', bbox_to_anchor=(0.83, -0.275), frameon=False)
+        figure.subplots_adjust(bottom=0.20)
+        if averaging == 'monthly':
+            ax.set_xlim(0.5,13)
+        else:
+            ax.set_xlim(1, 365)
+        if ymin:
+            ax.set_ylim(ymin=float(ymin))
+        if ymax:
+            ax.set_ylim(ymax=float(ymax))
         param_name = sonde.master_parameter_list[param_code][0]
         param_unit = sonde.master_parameter_list[param_code][1].symbol
         ax.set_ylabel(param_name + ', ' + param_unit)
-
+        return ax
+    elif recent_years == 0:
+        all_handles = ax.get_legend_handles_labels()
+        ax.legend(all_handles[0][:3], all_handles[1][:3],
+            loc='lower center', bbox_to_anchor=(0.83, -0.275), frameon=False)
+        figure.subplots_adjust(bottom=0.20)
+        ax.set_xlim(0.5,12.5)
+        if ymin:
+            ax.set_ylim(ymin=ymin)
+        if ymax:
+            ax.set_ylim(ymax=ymax)
+        param_name = sonde.master_parameter_list[param_code][0]
+        param_unit = sonde.master_parameter_list[param_code][1].symbol
+        ax.set_ylabel(param_name + ', ' + param_unit)
         return ax
 
     else:
@@ -172,17 +231,17 @@ def _set_mpl_params():
     matplotlib.rcdefaults()
     params = {
         'axes.labelsize': 12,
-        'font.family': 'Linux Biolinum O',
+        'font.family': 'serif',
         'font.weight': 'normal',
-        'font.size': 11,
-        'legend.fontsize': 10,
+        'font.size': 12,
+        'legend.fontsize': 11,
         'lines.linewdith': 3,
         'lines.markeredgewidth': 0,
         'lines.markersize': 6,
-        'text.fontsize': 11,
+        'text.fontsize': 12,
         'usetex': False,
-        'xtick.labelsize': 11,
-        'ytick.labelsize': 11,
+        'xtick.labelsize': 12,
+        'ytick.labelsize': 12,
         }
 
     matplotlib.rcParams.update(params)
@@ -195,6 +254,12 @@ if __name__ == '__main__':
     if parameter not in param_map.keys():
         raise ValueError("Unknown wq parameter. Check the help menu for list of parameters.")
     sites = args['<site_list>'].lower().split(',')
+    averaging = args['<averaging>']
+    if args['--recent_years']:
+        recent_years = int(args['--recent_years'])
+    ymin = args['--ymin']
+    ymax = args['--ymax']
+
     for site in sites:
         sonde_file = os.path.join(data_dir, site, 'twdb_wq_' + site + '.csv')
         if not os.path.exists(sonde_file):
@@ -206,10 +271,13 @@ if __name__ == '__main__':
             warnings.warn("Parameter %s not found in %s" % (parameter, site))
             continue
 
-        plot_statistics(sonde_file, param_code, recent_years=3)
+        plot_statistics(sonde_file, param_code, averaging,
+            recent_years=recent_years, ymin=ymin, ymax=ymax,
+            title=site.upper())
 
         if args['--save-txt']:
-            historical_stat = _calculate_historical_statistics(sonde_file, param_code, recent_years=3)
+            historical_stat = _calculate_historical_statistics(sonde_file,
+                param_code, recent_years=recent_years)
             output_dir = os.getcwd()
             output_file = os.path.join(output_dir,  site + '_historical_stat.csv')
             save_stat_data(historical_stat, output_file)
