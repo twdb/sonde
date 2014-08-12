@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """
-script to generate wq summary statistics plot and csv file.
+script to generate wq summary statistics plot and csv file for sites with period of record of at least *five* years.  
+- this will give meaningful stat 
 - best to run this from the project/data request directory since that's where it will save files.
+- not well tested for cases where the historical dataset doesn't have a minimum of one record of each day of the year. 
 
 Usage:
     plot_summary_stat.py <parameter> <site_list> <averaging> [--save-plot --save-txt --ymin=<ymin> --ymax=<ymax> --recent_years=<number>]
@@ -96,7 +98,11 @@ def _calculate_historical_statistics(sonde_file, parameter, averaging,
             'min':  grouped_daily_data.min(),
             'mean': grouped_daily_data.mean(),
             'max': grouped_daily_data.max()})
-        hist_stat.index = np.arange(1,366)
+        try: 
+            hist_stat.index = np.arange(1,366)   #requiring historical data to have a minimum of one record for each day of year.
+        except ValueError:
+            raise ValueError("The merged data file %s doesn't have the minimum required record length of five years." % sonde_file)
+        
         for year_ago in np.arange(recent_years):
             start_date = pd.datetime(final_year - year_ago, 1, 1)
             end_date = pd.datetime(final_year - year_ago, 12, 31, 23, 59)
@@ -132,7 +138,7 @@ def plot_statistics(sonde_file, parameter, averaging, recent_years=3, ymin=None,
     if averaging == 'monthly':
         xticks = np.arange(0.5,12.5)
     if averaging == 'daily':
-        #grabbing the first of a non-leap year's first day of month to be used  1-365 based index
+        #generating random non-leap year arbitrary year to easily pick first day of month
         is_first_day_of_month = pd.date_range(start='2005-01-01', end='2005-12-31',
             freq='D').day == 1
         xticks = historical_stat.index[is_first_day_of_month]
@@ -172,7 +178,7 @@ def plot_statistics(sonde_file, parameter, averaging, recent_years=3, ymin=None,
         year_handles_labels = year_handles_labels[::-1]
 
         first_legend =  ax.legend(*zip(*year_handles_labels),
-            frameon=False, numpoints=1, ncol=len(year_handles_labels[0]),
+            frameon=False, numpoints=1, ncol=len(year_handles_labels),
             loc='lower center', bbox_to_anchor=(0.3, -0.225))
         ax.add_artist(first_legend)
         all_handles = ax.get_legend_handles_labels()
@@ -180,7 +186,7 @@ def plot_statistics(sonde_file, parameter, averaging, recent_years=3, ymin=None,
             loc='lower center', bbox_to_anchor=(0.83, -0.275), frameon=False)
         figure.subplots_adjust(bottom=0.20)
         if averaging == 'monthly':
-            ax.set_xlim(0.5,13)
+            ax.set_xlim(0.5,12.5)
         else:
             ax.set_xlim(1, 365)
         if ymin:
@@ -196,11 +202,14 @@ def plot_statistics(sonde_file, parameter, averaging, recent_years=3, ymin=None,
         ax.legend(all_handles[0][:3], all_handles[1][:3],
             loc='lower center', bbox_to_anchor=(0.83, -0.275), frameon=False)
         figure.subplots_adjust(bottom=0.20)
-        ax.set_xlim(0.5,12.5)
+        if averaging == 'monthly':
+            ax.set_xlim(0.5,12.5)
+        if averaging == 'daily':
+            ax.set_xlim(1, 365)
         if ymin:
-            ax.set_ylim(ymin=ymin)
+            ax.set_ylim(ymin=float(ymin))
         if ymax:
-            ax.set_ylim(ymax=ymax)
+            ax.set_ylim(ymax=float(ymax))
         param_name = sonde.master_parameter_list[param_code][0]
         param_unit = sonde.master_parameter_list[param_code][1].symbol
         ax.set_ylabel(param_name + ', ' + param_unit)
@@ -209,15 +218,21 @@ def plot_statistics(sonde_file, parameter, averaging, recent_years=3, ymin=None,
     else:
         raise NotImplementedError("please select a maximum of three recent years to plot")
 
-def save_stat_data(hist_stat_df, output_file):
+def save_stat_data(hist_stat_df, output_file, averaging):
     year_range = hist_stat_df.year_range
     hist_stat_df.rename(columns={'min': 'min' + '_' + year_range,
         'mean': 'mean' + '_' + year_range,
         'max': 'max' + '_' + year_range}, inplace=True)
-    hist_stat_df.index = [month_name[m] for m in hist_stat_df.index]
-    hist_stat_df.to_csv(output_file, sep=',', float_format="%5.2f", index_label='Month')
+    if averaging == 'monthly':
+        hist_stat_df.index = [month_name[m] for m in hist_stat_df.index]
+        hist_stat_df.to_csv(output_file, sep=',', float_format="%5.2f", index_label='Month')
 
-
+    if averaging == 'daily':
+        hist_stat_df.index = pd.date_range(
+            start='2005-01-01', end='2005-12-31', freq='D')     #proper datetime index with arbitrary year to generate Mon-day labels in file. 
+        hist_stat_df.to_csv(output_file, sep=',', float_format='%5.2f',
+            index_label='Month-Day', date_format='%b-%d')
+        
 def _read_sonde_data(sonde_file):
     sonde_data  = sonde.Sonde(sonde_file)
     datetimes = [pd.datetime.strptime(dt.strftime('%m-%d-%y %H:%M:%S'),
@@ -277,17 +292,11 @@ if __name__ == '__main__':
 
         if args['--save-txt']:
             historical_stat = _calculate_historical_statistics(sonde_file,
-                param_code, recent_years=recent_years)
+                param_code, averaging, recent_years=recent_years)
             output_dir = os.getcwd()
             output_file = os.path.join(output_dir,  site + '_historical_stat.csv')
-            save_stat_data(historical_stat, output_file)
+            save_stat_data(historical_stat, output_file, averaging)
             print "Historical statistics saved in file: %s" % output_file
-
-
-
-
-
-
 
 """
 for site in sites:
