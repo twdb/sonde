@@ -270,8 +270,12 @@ if __name__ == '__main__':
         raise ValueError("Unknown wq parameter. Check the help menu for list of parameters.")
     sites = args['<site_list>'].lower().split(',')
     averaging = args['<averaging>']
+    if averaging not in ['daily', 'monthly']:
+        raise ValueError("%s is an invalid averaging method. need to enter daily or monthly for averaging" % averaging)
     if args['--recent_years']:
         recent_years = int(args['--recent_years'])
+    else:
+        recent_years = 3
     ymin = args['--ymin']
     ymax = args['--ymax']
 

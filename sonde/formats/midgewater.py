@@ -172,8 +172,8 @@ class MidgewaterDataReader:
           for y, m, d, hh, mm in zip(data['year'].values, data['month'].values,
           data['day'].values, data['hour'].values, data['minute'].values)])
         # remove records missing any of y,m,d,hh and mm parameters
-        self.dates = raw_dates[is_valid_date]
-        # from IPython import embed; embed()
+        self.dates = raw_dates[is_valid_date.values]
+        #from IPython import embed; embed()
         #assign param & unit names
         for param, unit in zip(params, units):
             self.num_params += 1
@@ -181,7 +181,7 @@ class MidgewaterDataReader:
 
         for ii in range(self.num_params):
             param = self.parameters[ii].name
-            self.parameters[ii].data = data[param].values[is_valid_date]
+            self.parameters[ii].data = data[param].values[is_valid_date.values]
 
 
 class Parameter:
