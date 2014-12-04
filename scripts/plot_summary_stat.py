@@ -176,6 +176,7 @@ def plot_statistics(sonde_file, parameter, averaging, recent_years=3, ymin=None,
                     marker=marker, markeredgewidth=0), str(year)))
 
         year_handles_labels = year_handles_labels[::-1]
+
         first_legend =  ax.legend(*zip(*year_handles_labels),
             frameon=False, numpoints=1, ncol=len(year_handles_labels),
             loc='lower center', bbox_to_anchor=(0.3, -0.225))
@@ -267,18 +268,10 @@ if __name__ == '__main__':
     param_code = param_map[parameter]
     if parameter not in param_map.keys():
         raise ValueError("Unknown wq parameter. Check the help menu for list of parameters.")
-    
     sites = args['<site_list>'].lower().split(',')
-    
     averaging = args['<averaging>']
-    if averaging not in ['daily', 'monthly']:
-        raise ValueError("%s is an invalid averaging method. need to enter daily or monthly for averaging" % averaging)
-    
     if args['--recent_years']:
         recent_years = int(args['--recent_years'])
-    else:
-        recent_years = 3
-   
     ymin = args['--ymin']
     ymax = args['--ymax']
 
