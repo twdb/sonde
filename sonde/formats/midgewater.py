@@ -163,21 +163,17 @@ class MidgewaterDataReader:
                 ['raw_file']
         data = pd.read_csv(fid, sep='\s*', comment='#', names=names,
                            na_values='-9.99')
+        data.dropna(how='all', inplace=True)
+        datetime_cols = ['year', 'month', 'day', 'hour', 'minute']
+        is_valid_date = ~(data.ix[:, datetime_cols].isnull().sum(axis=1).astype(bool))
 #        import pdb; pdb.set_trace()
         raw_dates = np.array([datetime.datetime(year=int(y), month=int(m), 
-                                                 day=int(d), hour=int(hh), 
-                                                 minute=int(mm),
-                                                 tzinfo=self.default_tzinfo)
-                                if (np.isnan(y) * np.isnan(m) * np.isnan(d) * \
-                                np.isnan(hh) * np.isnan(mm)) == False else np.nan
-                                for y, m, d, hh, mm
-                               in zip(data['year'].values, data['month'].values,
-                                      data['day'].values, data['hour'].values,
-                                      data['minute'].values)])
+          day=int(d), hour=int(hh), minute=int(mm), tzinfo=self.default_tzinfo)
+          for y, m, d, hh, mm in zip(data['year'].values, data['month'].values,
+          data['day'].values, data['hour'].values, data['minute'].values)])
         # remove records missing any of y,m,d,hh and mm parameters
-        na_dates_mask = np.where(raw_dates != np.nan)[0]
-        self.dates = raw_dates[na_dates_mask]
-#        import pdb; pdb.set_trace()
+        self.dates = raw_dates[is_valid_date]
+        # from IPython import embed; embed()
         #assign param & unit names
         for param, unit in zip(params, units):
             self.num_params += 1
@@ -185,7 +181,7 @@ class MidgewaterDataReader:
 
         for ii in range(self.num_params):
             param = self.parameters[ii].name
-            self.parameters[ii].data = data[param].values[na_dates_mask]
+            self.parameters[ii].data = data[param].values[is_valid_date]
 
 
 class Parameter:
