@@ -181,7 +181,10 @@ def clip_data_to_deployment_times(raw_data, log_data, log_dates):
         raw_data.apply_mask(mask)
     return raw_data
 
-def create_plots(raw_data_file, clean_data_file, log_dates, config):
+def create_plots(raw_data_file, clean_data_file, site_dir, log_data, log_dates, config):
+    image_file = os.path.join(site_dir,'twdb_wq_'+config['site_name']+'.png')
+    image_file_wclipped = os.path.join(site_dir,'twdb_wq_'+config['site_name']+'_withclipped.png')
+
     #create plots
     #read in data @todo fix copy.copy problems
     raw_data = sonde.Sonde(str(raw_data_file))
@@ -231,7 +234,7 @@ def create_plots(raw_data_file, clean_data_file, log_dates, config):
         site_sal_ax.set_ylim(0, ymax)
         site_sal_ax.set_ylabel('Salinity,ppt')
     #    plt.title("Salinity at " + site_descriptions[site_name] + '(' + site_name  + ')')
-        plt.title("Salinity at " +  site_name.upper())
+        plt.title("Salinity at " +  config['site_name'].upper())
         
         plt.savefig(image_file)
         print "plotted raw vs qa'ed salinity"
@@ -289,7 +292,7 @@ def create_plots(raw_data_file, clean_data_file, log_dates, config):
     #    plt.xlim(start_date_time, end_date_time)
         dep_sal_ax.set_ylabel('Salinity,psu')
         dep_sal_ax.set_ylim(0, ymax)
-        dep_sal_ax.set_title(site_name.upper() + ' Salinity')
+        dep_sal_ax.set_title(config['site_name'].upper() + ' Salinity')
         plt.grid(True, which='major')
     #    plt.legend()
         #print "plotted qa'ed salinity with unique deployment colors"
@@ -305,10 +308,10 @@ def create_plots(raw_data_file, clean_data_file, log_dates, config):
     #    clean = clean_wsl_series.plot(style='b.',mec='b', label='QAed data', markersize=4)
         plt.legend(loc='best')
         site_wsl_ax.set_ylabel('Water level, m')
-        site_wsl_ax.set_title(site_name.upper())
+        site_wsl_ax.set_title(config['site_name'].upper())
         raw_wsl_series.plot(style='c.', label='raw', ax=site_wsl_ax)
         clean_wsl_series.plot(style='b.', label="qa'ed", ax=site_wsl_ax)
-        site_wsl_ax.set_title(site_name.upper())
+        site_wsl_ax.set_title(config['site_name'].upper())
         site_wsl_ax.set_ylim(0,np.ceil(clean_wsl_series.max()))
         site_wsl_ax.set_xlim(clean_series.index[0], clean_series.index[-1])
         site_wsl_ax.set_ylabel('water depth above sonde, m')
@@ -318,7 +321,7 @@ def create_plots(raw_data_file, clean_data_file, log_dates, config):
             clean_wsl_series = clean_wsl_series.groupby(level=0).first()
             sonde_wsl_series = clean_wsl_series[clean_series.filename==sonde_file]
             sonde_wsl_series.plot(style='.', ax=dep_wsl_ax)
-        dep_wsl_ax.set_title(site_name.upper())
+        dep_wsl_ax.set_title(config['site_name'].upper())
         dep_wsl_ax.set_xlim(clean_series.index[0], clean_series.index[-1])
         dep_wsl_ax.set_ylim(0,np.ceil(clean_wsl_series.max()))
         dep_wsl_ax.set_ylabel('absolute pressure reading, m')
@@ -341,6 +344,7 @@ def usage():
     print "end date --start_date in format MM/DD/YYYY"
     print "Base Directory --base_dir /path/to/my/data/directory"
     print "Site Name --site_name name of the site if you know it"
+    print "Database URI --db example postgresql://postgres:postgres@localhost/postgres"
 
 def apply_qa():
     optlist, args = getopt(sys.argv[1:], 'h', 
@@ -356,7 +360,8 @@ def apply_qa():
         'start_date':'',
         'end_date':'',
         'base_dir':base_dir,
-        'site_name':None
+        'site_name':None,
+        'db':None
     }
     base_dir = None
 
@@ -418,8 +423,6 @@ def apply_qa():
     qa_rules_file = os.path.join(site_dir, 'twdb_wq_' + config['site_name'] +'_qa_rules.csv')
     raw_data_file = os.path.join(site_dir,'twdb_wq_'+config['site_name']+'_raw.csv')
     clean_data_file = os.path.join(site_dir,'twdb_wq_'+config['site_name']+'.csv')
-    image_file = os.path.join(site_dir,'twdb_wq_'+config['site_name']+'.png')
-    image_file_wclipped = os.path.join(site_dir,'twdb_wq_'+config['site_name']+'_withclipped.png')
 
     #read in site metadata
     header = create_header_from_file(metadata_file, config)
@@ -533,7 +536,7 @@ def apply_qa():
     clean_data.write(clean_data_file, file_format='csv',disclaimer=disclaimer, metadata=clean_header,
                      float_fmt='%5.3f')
 
-    create_plots(raw_data_file, clean_data_file, log_dates, config)
+    create_plots(raw_data_file, clean_data_file, site_dir, log_data, log_dates, config)
 
 
 
