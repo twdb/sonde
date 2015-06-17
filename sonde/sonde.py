@@ -398,7 +398,8 @@ class BaseSondeDataset(object):
             self.serial_number = self.serial_number[mask]
         else:
             for parameter in parameters:
-                self.data[parameter][~mask] = np.nan
+                #set nan value to unit so dimensionless doesn't fail on rescale
+                self.data[parameter][~mask] = pq.Quantity(np.NaN, units=self.data[parameter].dimensionality)
 
     def write(self, file_name, file_format='netcdf4', fill_value='-999.99',
               metadata={}, disclaimer='', float_fmt='%5.2f'):
