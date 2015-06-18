@@ -17,7 +17,11 @@ import numpy as np
 import sonde
 import matplotlib.pyplot as plt
 import pandas
-from getopt import getopt
+import getopt
+import dataset
+import json
+
+
 
 
 def apply_qa_rule(sonde_data, start_date, stop_date, qa_rule, qa_params, param_to_qa):
@@ -40,7 +44,6 @@ def apply_qa_rule(sonde_data, start_date, stop_date, qa_rule, qa_params, param_t
         pmin = float(pmin)
         pmax = float(pmax)
         mask = ~(sonde_data.data[param] < pmin) * (sonde_data.data[param] > pmax) 
-
     elif qa_rule.strip().lower()=='remove_outside_limits':
         param, pmin, pmax = qa_params.split('/')
         pmin = float(pmin)
@@ -59,13 +62,15 @@ def apply_qa_rule(sonde_data, start_date, stop_date, qa_rule, qa_params, param_t
     if np.all(mask):
         print 'No data altered for rule: ', qa_rule
     else:
-        print str(np.where(mask==False)[0].size) + \
+        mask_index = np.where(mask==False)[0]
+        print str(mask_index.size) + \
         ' entries altered for rule: ', qa_rule
         parameters = param_to_qa.strip()
         if parameters=='':
-            sonde_data.apply_mask(mask)
+            sonde_data.apply_mask(mask, qa_rule=qa_rule + "/" + qa_params)
         else:
-            sonde_data.apply_mask(mask, parameters=parameters.split(','))
+            sonde_data.apply_mask(mask, parameters=parameters.split(','), qa_rule=qa_rule + "/" + qa_params)
+
     return sonde_data
 
 def read_deploy_log_data(log_file):
@@ -180,6 +185,46 @@ def clip_data_to_deployment_times(raw_data, log_data, log_dates):
         mask = clip_mask | outside_mask
         raw_data.apply_mask(mask)
     return raw_data
+
+def write_to_db(raw_data, clean_data, clean_header, db):
+
+
+    write_meta = clean_header.copy()
+    site_meta_table = db['site_meta']
+    for key, val in write_meta.iteritems():
+        if type(val) in [np.ndarray]:
+            write_meta[key] = json.dumps(np.unique(val).tolist())
+
+    site_meta_table.upsert(write_meta, keys=['site_name'])
+
+    site_id = site_meta_table.find_one(site_name=write_meta['site_name'])
+
+
+    coastal_data_table = db['coastal_data']
+    batch_limit =1000
+    insertobjs = []
+    counter = 1
+    for x in range(len(clean_data.data[clean_data.data.keys()[0]])):
+        tempval = {}
+        for key in clean_data.data.keys():
+            if type(clean_data.data[key][x].magnitude) == np.ndarray:
+                tempval[key] = float(clean_data.data[key][x].magnitude)
+            else:
+                tempval[key] = float(clean_data.data[key][x].magnitude)
+        insertobjs.append(tempval)
+
+        if counter > batch_limit:
+            coastal_data_table.insert_many(insertobjs)
+            counter = 1
+            insertobjs = []
+    coastal_data_table.insert_many(insertobjs)
+
+
+
+
+    #write data
+
+
 
 def create_plots(raw_data_file, clean_data_file, site_dir, log_data, log_dates, config):
     image_file = os.path.join(site_dir,'twdb_wq_'+config['site_name']+'.png')
@@ -347,8 +392,13 @@ def usage():
     print "Database URI --db example postgresql://postgres:postgres@localhost/postgres"
 
 def apply_qa():
-    optlist, args = getopt(sys.argv[1:], 'h', 
-        ['start_date=', 'end_date=', 'base_dir=', 'site_name=', 'help'])
+    try:
+        optlist, args = getopt.getopt(sys.argv[1:], 'h', 
+            ['start_date=', 'end_date=', 'base_dir=', 'site_name=', 'help', 'db='])
+    except getopt.GetoptError:
+        print "ERROR: failed to figure out the arguements."
+        usage()
+        sys.exit()
 
     # setup defaults
     if platform.system()=='Windows': 
@@ -470,7 +520,7 @@ def apply_qa():
         else:
             tz_list.append('auto')
 
-    merged_data = sonde.merge(data_files, tz_list=tz_list)
+    merged_data = sonde.merge(data_files, tz_list=tz_list, track_bad_data=True)
 
     #clip data to deployment times
     raw_data = copy.copy(merged_data)
@@ -510,6 +560,7 @@ def apply_qa():
                                            qarule['rule_name'], 
                                            qarule['rule_parameters'],
                                            qarule['apply_to_parameters'])
+
         except IOError:
             print "could not find the qa_rules_file at %s"%qa_rules_file
             pass    
@@ -535,6 +586,18 @@ def apply_qa():
     #clean_data.apply_mask(data_range_mask)
     clean_data.write(clean_data_file, file_format='csv',disclaimer=disclaimer, metadata=clean_header,
                      float_fmt='%5.3f')
+
+    if config['db']:
+        try:
+            db = dataset.connect(config['db'])
+        except Exception,e:
+            print "Error on connecting to database", e
+            db = None
+
+        if db:
+            clean_data.write_to_db(db_connection=db, metadata=clean_header)
+            #write_to_db(raw_data, clean_data, clean_header, db)
+
 
     create_plots(raw_data_file, clean_data_file, site_dir, log_data, log_dates, config)
 
