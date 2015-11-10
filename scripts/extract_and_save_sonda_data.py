@@ -103,12 +103,13 @@ for param in param_units.keys():
 #convert data to the desired frequency. the default resampling method is 'mean'.
 if freq in frequency_map.keys():
     freq_code = frequency_map[freq]
+    requested_wq_data[requested_wq_data < -900] = np.nan
     requested_wq_data = requested_wq_data.resample(freq_code)
 
 #
 output_dir = os.getcwd()
 requested_data_file = os.path.join(output_dir,site_name + '.csv')
-fid =  open(requested_data_file, 'w')
+fid = open(requested_data_file, 'w')
 fid.write(header)
 fid.write('# datetime,' + string.join(param_units.keys(), ',') + '\n')
 fid.write('# yyyy/mm/dd HH:MM:SS,' + string.join(param_units.values(), ',') + '\n')
