@@ -151,7 +151,6 @@ class GenericReader:
         else:
             fid = data_file
 
-        fid = open(data_file)
         buf = fid.readline().strip('# ')
         while buf:
             if buf[0:8].lower() == 'datetime':
