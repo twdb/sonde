@@ -13,6 +13,12 @@ import quantities as pq
 mgl = pq.UnitQuantity('Concentration',
                       pq.CompoundUnit("mg/L"),
                       symbol='mg/L')
+cellml = pg.UnitQuanitity('Cells per mililiter',
+                          pg.CompoundUnit("cells/mL"),
+                          symbol='cells/mL')
+ugl = pg.UnitQuanitity('Concentration',
+                          pg.CompoundUnit("ug/L"),
+                          symbol='ug/L')
 
 #: Unit of specific conductivity - milliSiemens per centimeter
 mScm = pq.UnitQuantity('Specific Conductivity in MilliSiemens per Centimeter',
