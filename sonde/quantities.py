@@ -18,9 +18,7 @@ mgl = pq.UnitQuantity('Concentration',
                       pq.CompoundUnit("mg/L"),
                       symbol='mg/L')
 
-ugl = pq.UnitQuantity('Concentration',
-                      pq.CompoundUnit("ug/L"),
-                      symbol='ug/L')
+ugl = pq.UnitQuantity('microgram per liter', mgl / 1000, symbol='ug/L')    
                       
 #: Unit of specific conductivity - milliSiemens per centimeter
 mScm = pq.UnitQuantity('Specific Conductivity in MilliSiemens per Centimeter',
