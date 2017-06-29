@@ -8,12 +8,20 @@
 from __future__ import absolute_import
 import quantities as pq
 
-
+#: unit of electrical potential
+mvolt = pq.UnitQuantity('Milivolts',
+                      pq.CompoundUnit("mV"),
+                      symbol='mV')
+                      
 #: Unit of concentration - milligrams per liter
 mgl = pq.UnitQuantity('Concentration',
                       pq.CompoundUnit("mg/L"),
                       symbol='mg/L')
 
+ugl = pq.UnitQuantity('Concentration',
+                      pq.CompoundUnit("ug/L"),
+                      symbol='ug/L')
+                      
 #: Unit of specific conductivity - milliSiemens per centimeter
 mScm = pq.UnitQuantity('Specific Conductivity in MilliSiemens per Centimeter',
                        pq.CompoundUnit("1e-3*S/cm"),
