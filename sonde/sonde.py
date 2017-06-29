@@ -67,6 +67,7 @@ master_parameter_list = {
     'upward_water_velocity': ('Upward Water Velocity', sq.mps),
     'water_x_velocity': ('Water Velocity in x direction', sq.mps),
     'water_y_velocity': ('Water in y direction', sq.mps),
+    'chlorophyll_a': ('Chlorophyll-a', pq.ugl),
     }
 
 
