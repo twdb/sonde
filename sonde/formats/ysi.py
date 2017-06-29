@@ -64,7 +64,7 @@ class YSIDataset(sonde.BaseSondeDataset):
                      'pH': 'water_ph',
                      'Depth': 'water_depth_non_vented',
                      'Battery': 'instrument_battery_voltage',
-                     'Chlorophyll': 'Chlorophyll_a',
+                     'Chlorophyll': 'chlorophyll_a',
                      }
 
         unit_map = {'C': pq.degC,
