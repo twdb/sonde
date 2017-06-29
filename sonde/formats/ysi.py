@@ -55,13 +55,16 @@ class YSIDataset(sonde.BaseSondeDataset):
                      'Salinity': 'seawater_salinity',
                      'Sal': 'seawater_salinity',
                      'DO+': 'water_dissolved_oxygen_percent_saturation',
+                     'DO': 'water_dissolved_oxygen_percent_saturation',
                      'ODOSat': 'water_dissolved_oxygen_percent_saturation',
                      'ODO%': 'water_dissolved_oxygen_percent_saturation',
                      'ODO': 'water_dissolved_oxygen_concentration',
                      'ODO Conc': 'water_dissolved_oxygen_concentration',
+                     'DOchrg': 'water_dissolved_oxygen_concentration',
                      'pH': 'water_ph',
                      'Depth': 'water_depth_non_vented',
                      'Battery': 'instrument_battery_voltage',
+                     'Chlorophyll': 'Chlorophyll_a',
                      }
 
         unit_map = {'C': pq.degC,
@@ -71,12 +74,14 @@ class YSIDataset(sonde.BaseSondeDataset):
                     'uS/cm': sq.uScm,
                     '%': pq.percent,
                     'mg/L': sq.mgl,
+                    'ug/L': sq.ugl,
                     'pH': pq.dimensionless,
                     'meters': sq.mH2O,
                     'm': sq.mH2O,
                     'feet': sq.ftH2O,
                     'volts': pq.volt,
                     'V': pq.volt,
+                    'mV': pq.mvolt,
                     'ppt': sq.psu,
                     }
 
