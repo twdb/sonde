@@ -60,8 +60,9 @@ class YSIDataset(sonde.BaseSondeDataset):
                      'ODO%': 'water_dissolved_oxygen_percent_saturation',
                      'ODO': 'water_dissolved_oxygen_concentration',
                      'ODO Conc': 'water_dissolved_oxygen_concentration',
-                     'DOchrg': 'water_dissolved_oxygen_concentration',
+                     'DO Charge': 'water_dissolved_oxygen_concentration',
                      'pH': 'water_ph',
+                     'pH mV': 'water_ph_mv',
                      'Depth': 'water_depth_non_vented',
                      'Battery': 'instrument_battery_voltage',
                      'Chlorophyll': 'chlorophyll_a',
@@ -81,8 +82,9 @@ class YSIDataset(sonde.BaseSondeDataset):
                     'feet': sq.ftH2O,
                     'volts': pq.volt,
                     'V': pq.volt,
-                    'mV': pq.mvolt,
+                    'mV': sq.mvolt,
                     'ppt': sq.psu,
+                    'DOchrg':sq.mgl,
                     }
 
         if self.file_format.split('_')[-1] == 'binary':
@@ -110,10 +112,15 @@ class YSIDataset(sonde.BaseSondeDataset):
         # determine parameters provided and in what units
         self.parameters = dict()
         self.data = dict()
+            
         for parameter in ysi_data.parameters:
             try:
                 pcode = param_map[(parameter.name).strip()]
                 punit = unit_map[(parameter.unit).strip()]
+                if ((parameter.name).strip() == 'pH') and ((parameter.unit).strip() == 'mV'):
+                    pcode = param_map['pH mV']
+                    parameter.name = 'pH mV'
+                    
                 self.parameters[pcode] = sonde.master_parameter_list[pcode]
                 self.data[param_map[parameter.name]] = parameter.data * punit
             except KeyError:
