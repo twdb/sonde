@@ -57,6 +57,7 @@ master_parameter_list = {
     'water_electrical_conductivity': (
         'Electrical Conductivity(Not Normalized)', sq.mScm),
     'water_ph': ('pH Level', pq.dimensionless),
+    'water_ph_mv': ('pH Sensor milivolts', sq.mvolt),
     'water_pressure': ('Water Pressure', pq.psi),
     'water_specific_conductance': ('Specific Conductance(Normalized @25degC)',
                                    sq.mScm),
@@ -67,7 +68,7 @@ master_parameter_list = {
     'upward_water_velocity': ('Upward Water Velocity', sq.mps),
     'water_x_velocity': ('Water Velocity in x direction', sq.mps),
     'water_y_velocity': ('Water in y direction', sq.mps),
-    'chlorophyll_a': ('Chlorophyll-a', pq.ugl),
+    'chlorophyll_a': ('Chlorophyll-a', sq.ugl),
     }
 
 
