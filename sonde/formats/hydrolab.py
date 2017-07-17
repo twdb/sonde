@@ -5,12 +5,12 @@
     This module implements the Hydrolab format
 
 """
-from __future__ import absolute_import
+
 
 import datetime
 import pkg_resources
 import re
-from StringIO import StringIO
+from io import StringIO
 import struct
 import time
 import warnings
@@ -136,7 +136,7 @@ class HydrolabReader:
         """
         Open and read a Hydrolab txt file.
         """
-        if type(hydrolab_file) == str:
+        if isinstance(hydrolab_file, str):
             fid = open(hydrolab_file, 'r')
 
         else:

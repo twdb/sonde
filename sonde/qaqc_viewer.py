@@ -18,7 +18,7 @@ from enthought.chaco.tools.api import PanTool, ZoomTool
 from enthought.chaco.scales.api import CalendarScaleSystem
 from enthought.chaco.scales_tick_generator import ScalesTickGenerator
 
-from sonde import Sonde
+from .sonde import Sonde
 import time
 import numpy as np
 

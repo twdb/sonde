@@ -8,7 +8,7 @@ class InstrumentPlugins:
         """ Plugin is used to open a file """
         self.filename = filename
         self.inboxdir = inboxdir
-        print '~~~~~~~~~~ reading : ' + self.filename
+        print('~~~~~~~~~~ reading : ' + self.filename)
         #self.outdir = outdir
         self.site = site
         self.tz = tz
@@ -65,7 +65,7 @@ class InstrumentPlugins:
 
     def convert_to_si(self,data):
         """ Cycle through paramlist and convert units for each. Also convert Conductivity to Salinity if needed """
-        for param,unit in self.paramlist.items():
+        for param,unit in list(self.paramlist.items()):
             #if self.conversion_factors.has_key(unit):
             #    try:
             idx = unit[1]
@@ -81,9 +81,9 @@ class InstrumentPlugins:
         if self.tz == 'CDT':
             self.dates = self.dates - datetime.timedelta(seconds=3600)
             self.tz = 'CST'
-            print 'Time converted from CDT to CST'
+            print('Time converted from CDT to CST')
         else:
-            print 'Time already in CST no conversion needed'
+            print('Time already in CST no conversion needed')
 
     def remove_abnormal_ECNorm(self):
         """ remove all rows with negative or > 100 EC Norm"""
@@ -104,8 +104,7 @@ class InstrumentPlugins:
         from numpy import ma
         header = ''
         unitheader = ''
-        items = self.masterparamlist.items()
-        items.sort()
+        items = sorted(self.masterparamlist.items())
         for param,unit in items: #assumes this will be displayed alpabetically
             header = header + param + ', '
             unitheader = unitheader + unit + ', '
@@ -138,7 +137,7 @@ class InstrumentPlugins:
     def write_data(self,filename):
         """ write final data to file """
         import os
-        print '~~~~~~~~ writing data from ' + self.filename + ' to ' + filename
+        print('~~~~~~~~ writing data from ' + self.filename + ' to ' + filename)
         data = self.finaldata.filled(-999)
         dates = data[:,0]
         #convert dates to numpy array of integers
@@ -208,19 +207,19 @@ class InstrumentPlugins:
     #conversion functions
     ####################################################################################################################
     def no_convert(self,param,val,idx):
-        print '~ No conversion needed for ' + param + ' ~'
+        print('~ No conversion needed for ' + param + ' ~')
         return val
 
     ###############################################################
     def ft2m(self,param,val,idx):
-        print '~ convert ft to m ~'
+        print('~ convert ft to m ~')
         self.paramlist[param] = ('m',self.paramlist[param][1])
         val[:,idx] = 0.3048*val[:,idx]
         return val
 
     ###############################################################
     def F2C(self,param,val,idx):
-        print '~ convert Farenheit to Celcius ~'
+        print('~ convert Farenheit to Celcius ~')
         self.paramlist[param] = ('degC',self.paramlist[param][1])
         val[:,idx] = (5.0/9.0)*(val[:,idx]-32.0)
         return val
@@ -233,7 +232,7 @@ class InstrumentPlugins:
         
         """
         
-        print '~ calculating salinity from normalized EC using seawater package~'
+        print('~ calculating salinity from normalized EC using seawater package~')
         from numpy import ma
         import seawater
         self.paramlist[param] = ('PSU',self.paramlist[param][1])
@@ -263,7 +262,7 @@ class InstrumentPlugins:
         
         """
         
-        print '~ calculating salinity from non normalised EC using seawater package~'
+        print('~ calculating salinity from non normalised EC using seawater package~')
         from numpy import ma
         import seawater
         self.paramlist[param] = ('PSU',self.paramlist[param][1])
@@ -294,7 +293,7 @@ class InstrumentPlugins:
         
         """
         
-        print '~ calculating MCTD salinity ~'
+        print('~ calculating MCTD salinity ~')
         from numpy import ma
         import seawater
         self.paramlist[param] = ('PSU',self.paramlist[param][1])
@@ -328,7 +327,7 @@ class InstrumentPlugins:
 
     ###############################################################
     def psi2m(self,param,val,idx):
-        print '~ converting psi to meters of water ~'
+        print('~ converting psi to meters of water ~')
         self.paramlist[param] = ('m',self.paramlist[param][1])\
         #assumes const atmospheric pressure
         val[:,idx] = (val[:,idx] - 14.7) * 0.703241 
@@ -336,7 +335,7 @@ class InstrumentPlugins:
 
     ###############################################################
     def uscm2mscm(self,param,val,idx):
-        print '~ converting EC from uS/cm to mS/cm ~'
+        print('~ converting EC from uS/cm to mS/cm ~')
         self.paramlist[param] = ('mS/cm',self.paramlist[param][1])
         val[:,idx] = val[:,idx] / 1000.00 
         return val

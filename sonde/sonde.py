@@ -5,7 +5,7 @@
     This module implements the main Sonde object.
 
 """
-from __future__ import absolute_import
+
 
 import datetime
 import os
@@ -165,7 +165,7 @@ def autodetect(data_file, filename=None):
     """
 
     if not filename:
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             filename = data_file
         elif hasattr(data_file, 'name'):
             filename = data_file.name
@@ -182,7 +182,7 @@ def autodetect(data_file, filename=None):
         os.remove(temp_csv_path)
 
     else:
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             fid = open(data_file, 'r')
         else:
             fid = data_file
@@ -282,7 +282,7 @@ def merge(file_list, tz_list=None):
     metadata['instrument_serial_number'] = np.empty(0, dtype='|S15')
     metadata['instrument_manufacturer'] = np.empty(0, dtype='|S15')
 
-    for param, unit in master_parameter_list.items():
+    for param, unit in list(master_parameter_list.items()):
         data[param] = np.empty(0, dtype='<f8') * unit[-1]
 
     for file_name, tz in zip(file_list, tz_list):
@@ -316,16 +316,16 @@ def merge(file_list, tz_list=None):
 
         no_data = np.zeros(len(dataset.dates))
         no_data[:] = np.nan
-        for param in master_parameter_list.keys():
-            if param in dataset.data.keys():
+        for param in list(master_parameter_list.keys()):
+            if param in list(dataset.data.keys()):
                 tmp_data = dataset.data[param]
             else:
                 tmp_data = no_data
 
             data[param] = np.hstack((data[param], tmp_data))
-        print 'merged: %s' % file_name
+        print('merged: %s' % file_name)
 
-    for param, unit in master_parameter_list.items():
+    for param, unit in list(master_parameter_list.items()):
         if np.all(np.isnan(data[param])):
             del data[param]
         else:
@@ -345,9 +345,9 @@ class BaseSondeDataset(object):
     parameters = {}
 
     def __init__(self, data_file=None):
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             self.file_name = data_file
-        elif type(data_file) == file:
+        elif isinstance(data_file, file):
             self.file_name = data_file.name
         self.data = {}
         self.dates = []
@@ -392,7 +392,7 @@ class BaseSondeDataset(object):
         """
         if parameters is None:
             self.dates = self.dates[mask]
-            for key in self.data.keys():
+            for key in list(self.data.keys()):
                 self.data[key] = self.data[key][mask]
 
             self.manufacturer = self.manufacturer[mask]
@@ -456,10 +456,10 @@ class BaseSondeDataset(object):
         unit_header = '# yyyy/mm/dd HH:MM:SS, '
         dtype_fmts = ['|S19']
         fmt = '%s, '
-        for param in np.sort(data.keys()):
+        for param in np.sort(list(data.keys())):
             param_header += param + ', '
             try:
-                unit_header += data[param].dimensionality.keys()[0].symbol + \
+                unit_header += list(data[param].dimensionality.keys())[0].symbol + \
                                ', '
             except:
                 unit_header += 'nd, '
@@ -480,7 +480,7 @@ class BaseSondeDataset(object):
         #        unit_header += 'n/a, '
         #        dtype_fmts.append(val.dtype)
         #        fmt += '%s, '
-        for key in np.sort(metadata.keys()):
+        for key in np.sort(list(metadata.keys())):
             if not isinstance(metadata[key], np.ndarray):
                 header.append('# %s: %s\n' % (str(key), str(metadata[key])))
 
@@ -508,11 +508,11 @@ class BaseSondeDataset(object):
             [datetime.datetime.strftime(dt, '%Y/%m/%d %H:%M:%S')
              for dt in dates])
 
-        for key, val in metadata.items():
+        for key, val in list(metadata.items()):
             if isinstance(val, np.ndarray):
                 write_data[key] = val
 
-        for param in data.keys():
+        for param in list(data.keys()):
             write_data[param] = data[param]
 
         #start writing file
@@ -548,7 +548,7 @@ class BaseSondeDataset(object):
         Cycle through the parameter list and convert all data values
         to their standard units.
         """
-        for param_code in self.parameters.keys():
+        for param_code in list(self.parameters.keys()):
             self.rescale_parameter(param_code)
 
     def rescale_parameter(self, param_code):
@@ -559,12 +559,12 @@ class BaseSondeDataset(object):
         current_unit = self.data[param_code].units
 
         # return if dimensionless parameter
-        if not len(std_unit.dimensionality.keys()):
+        if not len(list(std_unit.dimensionality.keys())):
             return
 
         # XXX: Todo: Fix upstream (see comment in _temperature_offset)
-        std_symbol = std_unit.dimensionality.keys()[0].symbol
-        current_symbol = current_unit.dimensionality.keys()[0].symbol
+        std_symbol = list(std_unit.dimensionality.keys())[0].symbol
+        current_symbol = list(current_unit.dimensionality.keys())[0].symbol
 
         #if current_unit != std_unit:
         if current_symbol != std_symbol:
@@ -589,8 +589,8 @@ class BaseSondeDataset(object):
         # temperatures. We need to compare the symbol string. We
         # should talk to the quantities maintainers and see if we can
         # come up with a cleaner way to do this.
-        from_symbol = from_unit.dimensionality.keys()[0].symbol
-        to_symbol = to_unit.dimensionality.keys()[0].symbol
+        from_symbol = list(from_unit.dimensionality.keys())[0].symbol
+        to_symbol = list(to_unit.dimensionality.keys())[0].symbol
 
         if from_symbol == to_symbol:
             return np.array([0]) * to_unit
@@ -623,7 +623,7 @@ class BaseSondeDataset(object):
         Calculate salinity if salinity parameter is missing but
         conductivity is present.
         """
-        params = self.parameters.keys()
+        params = list(self.parameters.keys())
         if 'seawater_salinity' in params:
             return
         else:

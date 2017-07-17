@@ -6,7 +6,7 @@
     The files may be in csv or Excel (xls) format
 
 """
-from __future__ import absolute_import
+
 
 import datetime
 import os
@@ -120,9 +120,9 @@ class EurekaReader:
         self.header_lines = []
         self.parameters = []
         self.site_name = ''
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             self.file_name = data_file
-        elif type(data_file) == file:
+        elif isinstance(data_file, file):
             self.file_name = data_file.name
         self.file_ext = self.file_name.split('.')[-1].lower()
 
@@ -132,9 +132,9 @@ class EurekaReader:
                 self.file_name)
             file_buf = open(temp_file_path, 'rb')
         else:
-            if type(data_file) == str:
+            if isinstance(data_file, str):
                 file_buf = open(data_file)
-            elif type(data_file) == file:
+            elif isinstance(data_file, file):
                 file_buf = data_file
 
         try:
@@ -142,7 +142,7 @@ class EurekaReader:
         except:
             raise
         finally:
-            if type(data_file) == str:
+            if isinstance(data_file, str):
                 file_buf.close()
             if temp_file_path:
                 os.remove(temp_file_path)
@@ -159,7 +159,7 @@ class EurekaReader:
         """
         Open and read a Eureka file.
         """
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             file_buf = open(data_file, 'r')
         else:
             file_buf = data_file

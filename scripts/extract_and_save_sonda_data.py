@@ -24,8 +24,8 @@ if platform.system() == 'Windows':
 if platform.system() == 'Linux':
     base_dir = '/T/BaysEstuaries/Data/WQData/sites'
 
-site_name = raw_input("\nEnter site name: ").lower()
-requested_param_list = raw_input('\nEnter comma separated list (no spaces) water quality parameter code to save\n'
+site_name = input("\nEnter site name: ").lower()
+requested_param_list = input('\nEnter comma separated list (no spaces) water quality parameter code to save\n'
                                     '\nParameter Codes\n'
                                     '===============\n'
                                     'For Salinity, enter seawater_salinity\n'
@@ -33,11 +33,11 @@ requested_param_list = raw_input('\nEnter comma separated list (no spaces) water
                                     'Or enter all to get all parameters\n'
                                     '\n: ').lower().split(',')
 
-start_date_str = raw_input('\nEnter the start date(yyyy-mm-dd) of the data range to plot. \n'
+start_date_str = input('\nEnter the start date(yyyy-mm-dd) of the data range to plot. \n'
                         '[Press enter to plot from first available record]: ')
-end_date_str = raw_input('\nEnter the end date(yyyy-mm-dd) of the data range to plot. \n'
+end_date_str = input('\nEnter the end date(yyyy-mm-dd) of the data range to plot. \n'
                         '[Press enter to plot to end of available record]:')    
-freq = raw_input('\nEnter data frequency requested as daily, hourly, etc.\n'
+freq = input('\nEnter data frequency requested as daily, hourly, etc.\n'
                  '[Press enter to use data frequency]: ')
                         
 frequency_map = {'hourly': 'H', 'daily': 'D', 'monthly': 'M'}
@@ -53,15 +53,15 @@ param_units = OrderedDict()
        
 if requested_param_list == ['all']:
     param_units = {param:unit[1].units.symbol for (param,unit) 
-    in sonde_data.parameters.iteritems()}
+    in sonde_data.parameters.items()}
 else:
     for param in requested_param_list:
-        if param in sonde.master_parameter_list.keys():
+        if param in list(sonde.master_parameter_list.keys()):
             param_units[param] = sonde.master_parameter_list[param][1].units.symbol
         else:
             sys.exit("The parameter %s could not be found in the master list" % param)
 
-if len(param_units.keys()) == 0:
+if len(list(param_units.keys())) == 0:
     sys.exit("The given list of parameters not found. Check the parameter\n"
                 "code is correct.")
     
@@ -90,18 +90,18 @@ if len(end_date_str) == 0:
 else:
     end_date = pd.datetime.strptime(end_date_str, '%Y-%m-%d')
 
-requested_wq_data = all_wq_data.ix[start_date:end_date, param_units.keys()]
+requested_wq_data = all_wq_data.ix[start_date:end_date, list(param_units.keys())]
 if requested_wq_data.shape[0] == 0:
     sys.exit("No data found for the given date range and parameters.")
 
-for param in param_units.keys():
+for param in list(param_units.keys()):
     if requested_wq_data[param].shape[0] == 0:
         requested_wq_data.drop(param, inplace=True)
         param_units.pop(param)
 
         
 #convert data to the desired frequency. the default resampling method is 'mean'.
-if freq in frequency_map.keys():
+if freq in list(frequency_map.keys()):
     freq_code = frequency_map[freq]
     requested_wq_data[requested_wq_data < -900] = np.nan
     requested_wq_data = requested_wq_data.resample(freq_code)
@@ -111,11 +111,11 @@ output_dir = os.getcwd()
 requested_data_file = os.path.join(output_dir,site_name + '.csv')
 fid = open(requested_data_file, 'w')
 fid.write(header)
-fid.write('# datetime,' + string.join(param_units.keys(), ',') + '\n')
-fid.write('# yyyy/mm/dd HH:MM:SS,' + string.join(param_units.values(), ',') + '\n')
+fid.write('# datetime,' + string.join(list(param_units.keys()), ',') + '\n')
+fid.write('# yyyy/mm/dd HH:MM:SS,' + string.join(list(param_units.values()), ',') + '\n')
 
 requested_wq_data.to_csv(fid, mode='a', sep=',', header=False, na_rep='-999.99',
                          date_format='%Y/%m/%d %H:%M:%S', float_format='%5.2f')
-print "\nOutput file written: %s" % requested_data_file
+print("\nOutput file written: %s" % requested_data_file)
 
 fid.close()

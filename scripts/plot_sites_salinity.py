@@ -23,10 +23,10 @@ else:
 #    plot_dir = '/T/BaysEstuaries/Data/WQData/sites'
     plot_dir = '/T/BaysEstuaries/USERS/SNegusse/data_requests/galveston_bay_john_mohan'
     
-sites = raw_input('Enter comma separated(no space) list of sites to plot: ').lower().strip().split(',')
-start_date_str = raw_input('\nEnter the start date(yyyy-mm-dd) of the data range to plot. \n'
+sites = input('Enter comma separated(no space) list of sites to plot: ').lower().strip().split(',')
+start_date_str = input('\nEnter the start date(yyyy-mm-dd) of the data range to plot. \n'
                         '[Press enter to plot from first available record]: ')
-end_date_str = raw_input('\nEnter the end date(yyyy-mm-dd) of the data range to plot. \n'
+end_date_str = input('\nEnter the end date(yyyy-mm-dd) of the data range to plot. \n'
                         '[Press enter to plot to end of available record]: ')                        
 
 for site in sites:

@@ -177,7 +177,7 @@ def plot_statistics(sonde_file, parameter, averaging, recent_years=3, ymin=None,
 
         year_handles_labels = year_handles_labels[::-1]
 
-        first_legend =  ax.legend(*zip(*year_handles_labels),
+        first_legend =  ax.legend(*list(zip(*year_handles_labels)),
             frameon=False, numpoints=1, ncol=len(year_handles_labels),
             loc='lower center', bbox_to_anchor=(0.3, -0.225))
         ax.add_artist(first_legend)
@@ -266,7 +266,7 @@ if __name__ == '__main__':
 
     parameter = args['<parameter>']
     param_code = param_map[parameter]
-    if parameter not in param_map.keys():
+    if parameter not in list(param_map.keys()):
         raise ValueError("Unknown wq parameter. Check the help menu for list of parameters.")
     sites = args['<site_list>'].lower().split(',')
     averaging = args['<averaging>']
@@ -300,7 +300,7 @@ if __name__ == '__main__':
             output_dir = os.getcwd()
             output_file = os.path.join(output_dir,  site + '_historical_stat.csv')
             save_stat_data(historical_stat, output_file, averaging)
-            print "Historical statistics saved in file: %s" % output_file
+            print("Historical statistics saved in file: %s" % output_file)
 
 """
 for site in sites:

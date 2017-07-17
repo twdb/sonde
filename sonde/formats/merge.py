@@ -5,12 +5,12 @@
     This module implements the Merge format used by sonde.merge
 
 """
-from __future__ import absolute_import
+
 
 import datetime
 import pkg_resources
 import re
-from StringIO import StringIO
+from io import StringIO
 import xlrd
 import csv
 
@@ -41,7 +41,7 @@ class MergeDataset(sonde.BaseSondeDataset):
         self.parameters = dict()
         self.data = dict()
 
-        for param in paramdata.keys():
+        for param in list(paramdata.keys()):
             self.parameters[param] = param
             self.data[param] = paramdata[param][idx][sort_idx]
 
@@ -56,14 +56,14 @@ class MergeDataset(sonde.BaseSondeDataset):
         #convert to single structured array
         dtypes = [datetime.datetime]
         names = ['datetime']
-        for param in data.keys():
+        for param in list(data.keys()):
             dtypes.append('f8')
             names.append(param)
 
         tmp_data = np.zeros(dates.size, dtype=np.dtype({'names': names,
                                                         'formats': dtypes}))
         tmp_data['datetime'] = dates
-        for param in data.keys():
+        for param in list(data.keys()):
             tmp_data[param] = data[param]
 
         u, idx = np.unique(tmp_data, return_index=True)

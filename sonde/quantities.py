@@ -5,7 +5,7 @@
     This module contains a few custom quantities that are used
     primarily for unit conversion.
 """
-from __future__ import absolute_import
+
 import quantities as pq
 
 #: unit of electrical potential

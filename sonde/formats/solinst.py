@@ -6,13 +6,13 @@
     Solinst files have two formats an older .lev format and a newer .csv format
 
 """
-from __future__ import absolute_import
+
 
 import csv
 import datetime
 import pkg_resources
 import re
-from StringIO import StringIO
+from io import StringIO
 import warnings
 import xlrd
 
@@ -256,7 +256,7 @@ class SolinstReader:
         """
         Open and read a Solinst file.
         """
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             fid = open(data_file, 'r')
 
         else:

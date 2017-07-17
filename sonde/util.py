@@ -16,7 +16,7 @@ def xls_to_csv(xls_file):
     """
     temp_csv_fid, csv_file_path = tempfile.mkstemp()
     with open(csv_file_path, 'wb') as csv_file:
-        if type(xls_file) == str:
+        if isinstance(xls_file, str):
             xls_file_path = xls_file
         else:
             # write out the xls_file-like object to a temp file to
@@ -36,7 +36,7 @@ def xls_to_csv(xls_file):
             this_row = []
             for col in range(sheet.ncols):
                 val = sheet.cell_value(row, col)
-                if isinstance(val, unicode):
+                if isinstance(val, str):
                     val = val.encode('utf8')
                 this_row.append(val)
 
