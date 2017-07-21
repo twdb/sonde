@@ -16,6 +16,14 @@ import numpy as np
 import quantities as pq
 import pytz
 import seawater
+import json
+try:
+    import dataset
+    from sqlalchemy.types import *
+    db_enabled = True
+except ImportError:
+    db_enabled = False
+
 
 from sonde import quantities as sq
 from sonde import util
@@ -254,7 +262,7 @@ def find_tz(dt):
     return UTCStaticOffset(utc_offset)
 
 
-def merge(file_list, tz_list=None):
+def merge(file_list, tz_list=None, track_bad_data=False):
     """
     Merges all files in file_list
     tz_list specifies timezone of each file.
@@ -331,7 +339,9 @@ def merge(file_list, tz_list=None):
         else:
             data[param] = data[param] * unit[-1]
 
-    return MergeDataset(metadata, data)
+    return MergeDataset(metadata, data, track_bad_data)
+
+
 
 
 class BaseSondeDataset(object):
@@ -383,7 +393,7 @@ class BaseSondeDataset(object):
         if not hasattr(self, 'site_name'):
             self.site_name = ''
 
-    def apply_mask(self, mask, parameters=None):
+    def apply_mask(self, mask, qa_rule=None, parameters=None):
         """
         remove data and headers where mask=False
         if parameters = None remove all data
@@ -391,16 +401,32 @@ class BaseSondeDataset(object):
         parameter values to np.nan based on mask
         """
         if parameters is None:
-            self.dates = self.dates[mask]
+            
             for key in self.data.keys():
+                if hasattr(self, "badrecords_obj"):
+                    self.badrecords_obj.record_qaed_records(
+                        mask_index=np.where(mask==False)[0],
+                        qa_rule="remove by date range",
+                        parameter = key,
+                        sonde_data = self
+                        )
                 self.data[key] = self.data[key][mask]
+            self.dates = self.dates[mask]
 
             self.manufacturer = self.manufacturer[mask]
             self.data_file = self.data_file[mask]
             self.serial_number = self.serial_number[mask]
         else:
             for parameter in parameters:
-                self.data[parameter][~mask] = np.nan
+                if hasattr(self, "badrecords_obj"):
+                    self.badrecords_obj.record_qaed_records(
+                        mask_index=np.where(mask==False)[0],
+                        qa_rule=qa_rule,
+                        parameter = parameter,
+                        sonde_data = self
+                        )
+                #set nan value to unit so dimensionless doesn't fail on rescale
+                self.data[parameter][~mask] = pq.Quantity(np.NaN, units=self.data[parameter].dimensionality)
 
     def write(self, file_name, file_format='netcdf4', fill_value='-999.99',
               metadata={}, disclaimer='', float_fmt='%5.2f'):
@@ -520,6 +546,151 @@ class BaseSondeDataset(object):
         fid.writelines(header)
         np.savetxt(fid, write_data, fmt=fmt)
         fid.close()
+
+    def write_to_db(self, db_uri=None, db_connection=None, fill_value='-999.99',
+              metadata={}, disclaimer='', float_fmt='%5.2f'):
+
+        """
+        Write data to a database
+        """
+
+        if not db_enabled:
+            print "Dataset must be installed to write to a database"
+            print "run pip install dataset"
+            return False
+
+        if not db_uri and not db_connection:
+            print "Database argument required"
+            return False
+        elif db_uri:
+            db_connection = dataset.connect(db_uri)
+
+        data = self.data.copy()
+
+        #convert to column file_format
+        if isinstance(self.data_file, str):
+            fn_list = np.zeros(len(self.dates), dtype='|S100')
+            fn_list[:] = self.data_file
+        else:
+            fn_list = self.data_file
+
+        if isinstance(self.serial_number, str):
+            sn_list = np.zeros(len(self.dates), dtype='|S100')
+            sn_list[:] = self.serial_number
+        else:
+            sn_list = self.serial_number
+
+        if isinstance(self.manufacturer, str):
+            m_list = np.zeros(len(self.dates), dtype='|S100')
+            m_list[:] = self.manufacturer
+        else:
+            m_list = self.manufacturer
+
+        data['original_data_file'] = fn_list
+        data['instrument_serial_number'] = sn_list
+        data['instrument_manufacturer'] = m_list
+        metadata['fill_value'] = fill_value
+
+
+        
+
+        param_header = '# datetime, '
+        # unit_header = '# yyyy/mm/dd HH:MM:SS, '
+        dtype_fmts = ['|S19']
+        # fmt = '%s, '
+        # for param in np.sort(data.keys()):
+        #     param_header += param + ', '
+        #     try:
+        #         unit_header += data[param].dimensionality.keys()[0].symbol + \
+        #                        ', '
+        #     except:
+        #         unit_header += 'nd, '
+        #     fill_value = float(metadata['fill_value']) * data[param].units
+        #     data[param][np.isnan(data[param])] = fill_value
+        #     dtype_fmts.append('f8')
+        #     fmt += float_fmt + ', '
+
+
+
+
+        # for key in np.sort(metadata.keys()):
+        #     if not isinstance(metadata[key], np.ndarray):
+        #         header.append('# %s: %s\n' % (str(key), str(metadata[key])))
+
+        #     else:
+        #         param_header += key + ', '
+        #         unit_header += 'n/a, '
+        #         dtype_fmts.append(metadata[key].dtype)
+        #         fmt += '%s, '
+
+        # #remove trailing commas
+        # param_header = param_header[:-2] + '\n'
+        # unit_header = unit_header[:-2] + '\n'
+        # fmt = fmt[:-2]
+
+        #header.append('# timezone: ' + str(self.default_tzinfo) + '\n')
+        # header.append(param_header)
+        # header.append(unit_header)
+
+        # dtype = np.dtype({
+        #     'names': param_header.replace(' ', '').strip('#\n').split(','),
+        #     'formats': dtype_fmts})
+
+        data['datetime'] = np.array(
+            [datetime.datetime.strftime(dt, '%Y/%m/%d %H:%M:%S')
+             for dt in self.dates])
+
+
+
+        for key, val in metadata.iteritems():
+            if type(val) in [np.ndarray]:
+                metadata[key] = json.dumps(np.unique(val).tolist())
+
+        site_meta_table = db_connection['site_meta']
+
+        site_meta_table.upsert(metadata, keys=['site_name'])
+
+        site_id = site_meta_table.find_one(site_name=metadata['site_name'])['id']
+
+
+        coltypes = {
+                    'dataindex': BigInteger,
+                    'datetime':DateTime(timezone=True),
+                    'original_data_file': Unicode,
+                    'instrument_serial_number': Unicode,
+                    'instrument_manufacturer':Unicode}
+
+        for key in data.keys():
+            if key not in coltypes.keys():
+                coltypes[key] = Float
+
+        coastal_data_table = db_connection['coastal_data']
+        batch_limit =1000
+        insertobjs = []
+        counter = 1
+        for x in range(len(self.dates)):
+            tempval = {'site_id': site_id}
+            for key in data.keys():
+                if hasattr(data[key][x], 'magnitude') and \
+                        type(data[key][x].magnitude) == np.ndarray:
+                    tempval[key] = float(data[key][x].magnitude)
+                elif key == 'datetime':
+                    tempval[key] = data[key][x]
+            tempval['dataindex'] = hash((
+                                        tempval['site_id'],
+                                        str(tempval['datetime']),
+                                        ))
+            insertobjs.append(tempval)
+
+            if counter > batch_limit:
+                coastal_data_table.insert_many(insertobjs, types=coltypes)
+                counter = 1
+                insertobjs = []
+        coastal_data_table.insert_many(insertobjs, types=coltypes)
+        if hasattr(self, "badrecords_obj"):
+            self.badrecords_obj.write_to_db(site_id, db_connection)
+
+
 
     def get_standard_unit(self, param_code):
         """

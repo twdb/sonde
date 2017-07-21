@@ -20,6 +20,7 @@ import quantities as pq
 from .. import sonde
 from .. import quantities as sq
 from ..timezones import cdt, cst
+from .. import util
 
 
 class MergeDataset(sonde.BaseSondeDataset):
@@ -29,7 +30,7 @@ class MergeDataset(sonde.BaseSondeDataset):
     names/units are from the master list data is a dict containing all
     the data with param names and units.
     """
-    def __init__(self, metadata, paramdata):
+    def __init__(self, metadata, paramdata, track_bad_data=False):
         idx = self._indices_duplicate_data(metadata['dates'], paramdata)
         sort_idx = np.argsort(metadata['dates'][idx])
         self.manufacturer = metadata['instrument_manufacturer'][idx][sort_idx]
@@ -46,8 +47,12 @@ class MergeDataset(sonde.BaseSondeDataset):
             self.data[param] = paramdata[param][idx][sort_idx]
 
         self.dates = metadata['dates'][idx][sort_idx]
-        # I don't think the following line is needed
-        # super(MergeDataset, self).__init__()
+
+        if track_bad_data:
+            self.badrecords_obj = util.BadDataRecords()
+
+
+        #super(MergeDataset, self).__init__(*args, **kw)
 
     def _indices_duplicate_data(self, dates, data):
         """

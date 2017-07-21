@@ -25,6 +25,11 @@ setup(
     packages=find_packages(),
     package_data={'': ['data/ysi_param.def']},
     platforms='any',
+    entry_points={
+        'console_scripts': [
+            'apply_qa=scripts.apply_qa:apply_qa'
+            ]
+        },
     install_requires=[
         'numpy>=1.5.0',
         'pytz>=2010o',
