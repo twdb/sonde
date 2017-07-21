@@ -6,7 +6,7 @@
     The files may be in csv or Excel (xls) format
 
 """
-from __future__ import absolute_import
+
 
 import datetime
 import pkg_resources
@@ -106,9 +106,9 @@ class MacroctdReader:
         """
         Open and read a Macroctd file.
         """
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             fid = open(data_file)
-        elif type(data_file) == file:
+        elif isinstance(data_file, file):
             fid = data_file
             initial_file_location = fid.tell()
 
@@ -136,7 +136,7 @@ class MacroctdReader:
 
         data = np.genfromtxt(fid, delimiter=',', dtype=None, names=fields)
 
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             fid.close()
         else:
             fid.seek(initial_file_location)

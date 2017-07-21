@@ -83,7 +83,7 @@ for parameter in parameters:
         elif os.path.isfile(old_sonde_file):
             sonde_file = old_sonde_file
         else:
-            print "No merged file exists for site: ", site + '\n' 
+            print("No merged file exists for site: ", site + '\n') 
             continue
             
         site_sonde  = sonde.Sonde(sonde_file)
@@ -103,7 +103,7 @@ for parameter in parameters:
           #  import pdb; pdb.set_trace()
             continue
     if np.alltrue(parameter_not_exist):
-        print sonde.master_parameter_list[parameter][0] + " not available at any of the sites.\n"
+        print(sonde.master_parameter_list[parameter][0] + " not available at any of the sites.\n")
         continue
     data_availability[parameter] = pd.DataFrame(param_availability)
     param_code[parameter] = site_param_counter
@@ -114,11 +114,11 @@ for parameter in parameters:
         param_name = "Water Depth"
     plt.title(estuary + " " + param_name + " " + "Data Availability", fontsize=14)
     data_availability[parameter].plot(style='b.', ax=ax)
-    ax.set_yticks(site_param_counter.values())
-    ax.set_yticklabels(site_param_counter.keys())
+    ax.set_yticks(list(site_param_counter.values()))
+    ax.set_yticklabels(list(site_param_counter.keys()))
     ax.set_ylabel("Site Name")
     plt.legend().set_visible(False)
-    plt.ylim(.5, site_param_counter.values()[-1] + .5)
+    plt.ylim(.5, list(site_param_counter.values())[-1] + .5)
     data_availability_dir = os.path.join(data_dir, 'data_availability', estuary)
     if not os.path.exists(data_availability_dir):
         os.makedirs(data_availability_dir)

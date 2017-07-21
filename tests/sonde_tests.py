@@ -5,7 +5,7 @@
 
     These tests are run to make sure Sonde is working properly
 """
-from __future__ import with_statement
+
 
 import collections
 import csv

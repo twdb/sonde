@@ -55,7 +55,7 @@ def apply_qa_rule(sonde_data, start_date, stop_date, qa_rule, qa_params, param_t
     elif qa_rule.strip().lower()=='remove_all':
         mask = outside_mask.copy()
     else:
-        print 'rule_name unknown: ', qa_rule
+        print('rule_name unknown: ', qa_rule)
 
     #apply filters
     #for filt in ['data_file','manufacturer','serial_number']:
@@ -63,10 +63,10 @@ def apply_qa_rule(sonde_data, start_date, stop_date, qa_rule, qa_params, param_t
     #        exec('mask *= clean_data.'+filt+'!=qarule[filt]')
     mask = mask | outside_mask
     if np.all(mask):
-        print 'No data altered for rule: ', qa_rule
+        print('No data altered for rule: ', qa_rule)
     else:
-        print str(np.where(mask==False)[0].size) + \
-        ' entries altered for rule: ', qa_rule
+        print(str(np.where(mask==False)[0].size) + \
+        ' entries altered for rule: ', qa_rule)
         parameters = param_to_qa.strip()
         if parameters=='':
             sonde_data.apply_mask(mask)
@@ -104,7 +104,7 @@ disclaimer += 'or its fitness for any specific application. \n'
 
 
 #choose site and setup remaining variables
-site_name = raw_input('Enter Site Name: ').lower()
+site_name = input('Enter Site Name: ').lower()
 site_dir = os.path.join(base_dir, 'sites', site_name)
 original_data_files_dir = os.path.join(site_dir, 'original_data_files')
 
@@ -211,7 +211,7 @@ data_file_names = [os.path.split(f)[-1] for f in data_files]
 #check if deployment log file list matches files in original_data_files dir
 log_files = log_data['renamed_filename']
 if set(data_file_names)==set(log_files):
-    print 'List of files in deployment logs match files found in original_data_files folder'
+    print('List of files in deployment logs match files found in original_data_files folder')
 else:
     #print 'Warning: list of data files in deployment log does not match what is found in original_data_files folder'
     #print 'please check log file and fix, log file name: ', site_name + '_missing_files.txt'
@@ -307,7 +307,7 @@ if os.path.exists(qa_rules_file):
 
 
 #write final file
-print 'writing clean data file'
+print('writing clean data file')
 clean_header = header.copy()
 clean_header['qa_level']='provisional data corrected according to QA rules in file ' + os.path.split(qa_rules_file)[-1]
 if start_date:
@@ -378,7 +378,7 @@ try:
     plt.title("Salinity at " +  site_name.upper())
     
     plt.savefig(image_file)
-    print "plotted raw vs qa'ed salinity"
+    print("plotted raw vs qa'ed salinity")
 
 
     dep_sal_ax = plt.figure().add_subplot(111)

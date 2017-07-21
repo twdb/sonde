@@ -6,12 +6,10 @@
     primarily for unit conversion.
 """
 from __future__ import absolute_import
-import quantities as pq
+import quantities 
 
 #: unit of electrical potential
-mvolt = pq.UnitQuantity('Milivolts',
-                      pq.CompoundUnit("mV"),
-                      symbol='mV')
+mvolt = quantities.UnitQuantity('Milivolts', pq.CompoundUnit("mV"), symbol='mV')
                       
 #: Unit of concentration - milligrams per liter
 mgl = pq.UnitQuantity('Concentration',

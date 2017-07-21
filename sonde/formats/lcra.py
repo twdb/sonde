@@ -19,7 +19,7 @@
         self.data_file and self.serial_number
 
 """
-from __future__ import absolute_import
+
 
 import datetime
 import pkg_resources
@@ -107,10 +107,10 @@ class LcraDataset(sonde.BaseSondeDataset):
         for name, kwd in zip(names, kwds):
             #check format_parameters
             idx = [i for i
-                   in self.format_parameters.keys() if i.lower() == kwd]
+                   in list(self.format_parameters.keys()) if i.lower() == kwd]
             if idx != []:
                 exec('self.' + name + '=self.format_parameters[idx[0]]')
-            idx = [i for i in metadata.keys() if i.lower() == kwd]
+            idx = [i for i in list(metadata.keys()) if i.lower() == kwd]
             if idx != []:
                 exec('self.' + name + ' = metadata[idx[0]]')
 
@@ -147,7 +147,7 @@ class LcraDataReader:
         """
         Open and read an LC file.
         """
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             fid = open(data_file, 'r')
 
         else:

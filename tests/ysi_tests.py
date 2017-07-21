@@ -6,7 +6,7 @@
     These tests make sure that the YSI format module is working
     correctly
 """
-from __future__ import with_statement
+
 
 import collections
 import csv
@@ -35,7 +35,7 @@ def ysi_csv_read(filename):
 
         # loop through first two header lines
         for i in range(2):
-            csv_file.next()
+            next(csv_file)
 
         date_list = []
         temp_list = []

@@ -38,7 +38,7 @@ def drop_seconds(time_series):
     return [pandas.datetime(dt.year, dt.month, dt.day,dt.hour, dt.minute) for dt in 
                             time_series.index]
 def string_cleaner(string):
-    if type(string) is str:
+    if isinstance(string, str):
         return string.strip().lower()
     else:
         return string
@@ -47,9 +47,9 @@ def string_cleaner(string):
  #the pressure in meters at which     
 
 
-site_name = raw_input('Enter Site Name: ').lower()
-barologger_sitename = raw_input('Enter Barologger Site Name: ').lower()
-write_file = raw_input("Write output file? [yes/no]: ").lower()
+site_name = input('Enter Site Name: ').lower()
+barologger_sitename = input('Enter Barologger Site Name: ').lower()
+write_file = input("Write output file? [yes/no]: ").lower()
 
 if barologger_sitename == 'nude3_baro':
     barologger_file_name = 'lower_delta_filled_barometer_data.csv'
@@ -192,7 +192,7 @@ for sonde_file in deploy_filename_list:
     site_sonde_baro_series = sonde_baro_series[dep_file_mask] 
     sonde_baro_series['sonde_id'][dep_file_mask] = sonde_type[0]
     if 'ltc' in sonde_type.values[0]:
-        print "correcting deployment file ", sonde_file
+        print("correcting deployment file ", sonde_file)
         sonde_baro_series['corrected_sonde_depth'][dep_file_mask] = \
         sonde_baro_series.water_depth_non_vented[dep_file_mask] - \
         sonde_baro_series.air_pressure[dep_file_mask] + \
@@ -200,10 +200,10 @@ for sonde_file in deploy_filename_list:
         if site_name == 'nueces13':
             if sonde_file == '0712nu13':
                 survey_solinst_sonde_to_gps = 1.48
-                print "solinst_to_gps,", sonde_file, survey_solinst_sonde_to_gps
+                print("solinst_to_gps,", sonde_file, survey_solinst_sonde_to_gps)
             else:
                 survey_solinst_sonde_to_gps = 0.905
-                print "solinst_to_gps,", sonde_file, survey_solinst_sonde_to_gps
+                print("solinst_to_gps,", sonde_file, survey_solinst_sonde_to_gps)
 
         else: 
             survey_solinst_sonde_to_gps = sensor_to_gps_height.ix[site_name,
@@ -286,7 +286,7 @@ for sonde_file in deploy_filename_list:
             
         
     if 'ysi' in sonde_type.values[0]:
-        print "correcting deployment file ", sonde_file
+        print("correcting deployment file ", sonde_file)
         site_calibration_data = calibration_data\
                              [calibration_data['SITE ID']== site_name]
         site_dep_data = pandas.read_csv(site_dep_log_file, header=0, 

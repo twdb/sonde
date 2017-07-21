@@ -32,7 +32,7 @@ def test_files():
         yield check_file, test_file_config, sonde_file_path
 
         with open(sonde_file_path) as sonde_file_fid:
-            print 'Testing:', sonde_file_path
+            print('Testing:', sonde_file_path)
             yield check_file, test_file_config, sonde_file_fid
 
 
@@ -101,7 +101,7 @@ def check_values_match(test_data, parameters, units, test_sonde):
 
 
 def check_format_parameters(format_parameters, test_sonde):
-    for parameter_name, test_value in format_parameters.items():
+    for parameter_name, test_value in list(format_parameters.items()):
         if test_value == '':
             continue
 

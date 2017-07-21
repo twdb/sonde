@@ -8,14 +8,14 @@
     The module attempts to autodetect the correct format
 
 """
-from __future__ import absolute_import
+
 
 import csv
 import datetime
 import os.path
 import pkg_resources
 import re
-from StringIO import StringIO
+from io import StringIO
 import warnings
 import xlrd
 
@@ -155,9 +155,9 @@ class GreenspanReader:
         self.data = {}
         self.dates = []
         self.xlrd_datemode = 0
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             self.file_name = data_file
-        elif type(data_file) == file:
+        elif isinstance(data_file, file):
             self.file_name = data_file.name
         self.file_ext = self.file_name.split('.')[-1].lower()
 
@@ -166,9 +166,9 @@ class GreenspanReader:
             temp_file_path, self.xlrd_datemode = util.xls_to_csv(self.file_name)
             file_buf = open(temp_file_path, 'rb')
         else:
-            if type(data_file) == str:
+            if isinstance(data_file, str):
                 file_buf = open(data_file)
-            elif type(data_file) == file:
+            elif isinstance(data_file, file):
                 file_buf = data_file
 
         try:
@@ -193,7 +193,7 @@ class GreenspanReader:
         expects a file object
         """
 
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             warnings.warn('Expects File Object', Warning)
         else:
             fid = data_file
@@ -228,7 +228,7 @@ class GreenspanReader:
         """
         Open and read a Greenspan file.
         """
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             fid = open(data_file, 'r')
         else:
             fid = data_file
@@ -259,7 +259,7 @@ class GreenspanReader:
             #column 0,1,2 = 'Data', 'dd/mm/yyyy hh:mm:ss', 'Type/Comment'
             #column [3:] = actual data
             fields = fid.readline().rstrip('\r\n').split(',')
-            cols = range(len(fields))[3:]
+            cols = list(range(len(fields)))[3:]
             params = fields[3:]
             units = fid.readline().rstrip('\r\n').split(',')[3:]
 

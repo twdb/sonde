@@ -8,13 +8,13 @@
     The module attempts to autodetect the correct format
 
 """
-from __future__ import absolute_import
+
 
 import csv
 import datetime
 import pkg_resources
 import re
-from StringIO import StringIO
+from io import StringIO
 import warnings
 import xlrd
 
@@ -120,9 +120,9 @@ class HydrotechReader:
         a # to the beginning of comment lines.
         Returns a StringIO object
         """
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             fid = open(data_file)
-        elif type(data_file) == file:
+        elif isinstance(data_file, file):
             fid = data_file
 
         file_string = fid.read()
@@ -141,7 +141,7 @@ class HydrotechReader:
         """
         Open and read a Hydrotech file.
         """
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             fid = open(data_file, 'r')
 
         else:

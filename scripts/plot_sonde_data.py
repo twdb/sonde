@@ -56,7 +56,7 @@ parameter_map = {'salinity': 'seawater_salinity',
 #sites = raw_input('Enter comma separated(no space) list of sites to plot: ').lower().strip().split(',')
 args = docopt(__doc__)
 parameter = args['<parameter>']
-if parameter.lower() not in parameter_map.keys():
+if parameter.lower() not in list(parameter_map.keys()):
     raise LookupError("parameter %s is not available for plotting" % parameter)
 param_unit = sonde.master_parameter_list[parameter_map[parameter]][1].symbol
 sites = args['<site_list>']
@@ -107,6 +107,6 @@ for site in sites.split(','):
     if args['--save-plot']:
         plot_file = os.path.join(os.getcwd(), site + '_' + parameter + '.png')
         plt.savefig(plot_file)
-        print '%s plot for site %s saved in %s' % (parameter, site, plot_file)
+        print('%s plot for site %s saved in %s' % (parameter, site, plot_file))
               
 plt.show()

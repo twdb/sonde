@@ -5,12 +5,12 @@
     This module implements the YSI format
 
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 import pkg_resources
 import re
-from StringIO import StringIO
+from io import StringIO
 import struct
 import time
 import warnings
@@ -211,11 +211,11 @@ class YSIReaderBin:
         if param_file == None:
             file_string = pkg_resources.resource_string('sonde',
                                                         DEFAULT_YSI_PARAM_DEF)
-        elif type(param_file) == str:
+        elif isinstance(param_file, str):
             with open(param_file, 'rb') as fid:
                 file_string = fid.read()
 
-        elif type(param_file) == file:
+        elif isinstance(param_file, file):
             file_string = param_file.read()
 
         file_string = re.sub("\n\s*\n*", "\n", file_string)
@@ -241,7 +241,7 @@ class YSIReaderBin:
         """
         Open and read a YSI binary file.
         """
-        if type(ysi_file) == str:
+        if isinstance(ysi_file, str):
             fid = open(ysi_file, 'rb')
 
         else:
@@ -289,7 +289,7 @@ class YSIReaderBin:
 
             record_type = fid.read(1)
 
-        if type(ysi_file) == str:
+        if isinstance(ysi_file, str):
             fid.close()
 
 
@@ -314,7 +314,7 @@ class YSIReaderTxt:
         """
         Open and read a YSI text file.
         """
-        if type(data_file) == str:
+        if isinstance(data_file, str):
             fid = open(data_file, 'r')
         else:
             fid = data_file
